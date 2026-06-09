@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AgriRisk Rwanda</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">🌿</div><div><h1>AgriRisk</h1><small>Rwanda • 30 Districts</small></div></div>
+    <div class="nav-label">Modules</div>
+    <nav class="nav" id="nav">
+      <a data-screen="home" class="active">🏠 <span>Home</span></a>
+      <a data-screen="price">📈 <span>Price Forecast</span></a>
+      <a data-screen="risk">⚠️ <span>Seasonal Risk</span></a>
+      <a data-screen="disease">🦠 <span>Disease Alert</span></a>
+      <a data-screen="inputs">🛒 <span>Input Recommender</span></a>
+      <a data-screen="whatsapp">💬 <span>WhatsApp Preview</span></a>
+    </nav>
+    <div class="profile"><div class="avatar">EU</div><div><b>Elyse U.</b><span>Extension Officer</span></div></div>
+  </aside>
+
+  <main class="main">
+    <!-- HOME -->
+    <section class="screen active" id="screen-home">
+      <div class="page-head"><h2>Dashboard</h2><p>Nationwide agricultural risk advisory platform</p></div>
+      <div class="grid stats">
+        <div class="card stat"><div class="num" style="color:var(--emerald)">30</div><div class="lbl">Districts</div></div>
+        <div class="card stat"><div class="num" style="color:var(--g600)">3</div><div class="lbl">Crops covered</div></div>
+        <div class="card stat"><div class="num" style="color:var(--amber)">3</div><div class="lbl">Channels</div></div>
+        <div class="card stat"><div class="num" style="color:var(--purple)">6</div><div class="lbl">Data sources</div></div>
+      </div>
+      <div class="grid two">
+        <div class="card alerts">
+          <div class="h">⚠️ Active alerts</div>
+          <p><b>Late Blight HIGH</b> for potatoes in Musanze, Burera, Gakenke</p>
+          <p><b>Angular Leaf Spot HIGH</b> for beans in Bugesera, Kayonza</p>
+        </div>
+        <div class="card">
+          <div class="label">Delivery channels</div>
+          <div class="chan-row">
+            <div class="chan"><div class="i">🖥️</div><b>Dashboard</b><span>Active</span></div>
+            <div class="chan"><div class="i">💬</div><b>WhatsApp</b><span>Preview</span></div>
+            <div class="chan"><div class="i">📱</div><b>SMS</b><span>47 subscribers</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card perf">
+        <div class="label">ML model performance (this project's trained models)</div>
+        <div class="perf-row" id="perf-row"><div class="loading">Loading…</div></div>
+      </div>
+      <div class="pills" id="pills"></div>
+    </section>
+
+    <!-- PRICE -->
+    <section class="screen" id="screen-price">
+      <div class="page-head"><h2>📈 Price Forecast</h2><p>Prophet + CPI + Fertilizer • LSTM benchmark • 4-week ahead</p></div>
+      <div class="card controls">
+        <div class="row"><div class="field"><label>Crop</label><select id="price-crop"></select></div>
+          <div class="field"><label>District</label><select id="price-district"></select></div></div>
+        <button class="btn green full" onclick="runForecast()">Generate Forecast</button>
+      </div>
+      <div class="results" id="price-results"></div>
+    </section>
+
+    <!-- RISK -->
+    <section class="screen" id="screen-risk">
+      <div class="page-head"><h2>⚠️ Seasonal Risk</h2><p>Random Forest / XGBoost • Rainfall + CPI + Fertilizer</p></div>
+      <div class="card controls">
+        <div class="row"><div class="field"><label>District</label><select id="risk-district"></select></div>
+          <div class="field"><label>Season</label><select id="risk-season"></select></div></div>
+        <button class="btn amber full" onclick="runRisk()">Assess Risk</button>
+      </div>
+      <div class="results" id="risk-results"></div>
+    </section>
+
+    <!-- DISEASE -->
+    <section class="screen" id="screen-disease">
+      <div class="page-head"><h2>🦠 Disease Alert</h2><p>Open-Meteo live weather + FAO disease rules • 3 crops</p></div>
+      <div class="card controls">
+        <div class="row" style="align-items:flex-end;margin-bottom:0">
+          <div class="field"><label>District</label><select id="disease-district"></select></div>
+          <button class="btn red" style="padding:8px 24px" onclick="runDisease()">Check Risk</button></div>
+      </div>
+      <div class="results" id="disease-results"></div>
+    </section>
+
+    <!-- INPUTS -->
+    <section class="screen" id="screen-inputs">
+      <div class="page-head"><h2>🛒 Input Recommender</h2><p>MINAGRI data • Budget-smart ranking • RWF</p></div>
+      <div class="card controls">
+        <div class="row"><div class="field"><label>Crop</label><select id="inputs-crop"></select></div>
+          <div class="field"><label>District</label><select id="inputs-district"></select></div></div>
+        <div class="budget" style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:600;color:var(--mut)">Farmer budget: <b id="budget-val">RWF 60,000</b></label>
+          <input type="range" id="inputs-budget" min="10000" max="150000" step="5000" value="60000"
+            oninput="document.getElementById('budget-val').textContent='RWF '+(+this.value).toLocaleString()"></div>
+        <button class="btn purple full" onclick="runInputs()">Get Recommendations</button>
+      </div>
+      <div class="results" id="inputs-results"></div>
+    </section>
+
+    <!-- WHATSAPP -->
+    <section class="screen" id="screen-whatsapp">
+      <div class="page-head"><h2>💬 WhatsApp Preview</h2><p>Farmer-facing chatbot • Kinyarwanda + English</p></div>
+      <div class="wa-grid">
+        <div class="phone"><div class="wa">
+          <div class="wa-head"><div class="avatar">🌿</div><div><b>AgriRisk Rwanda</b><span>online</span></div></div>
+          <div class="wa-body" id="wa-body"></div>
+          <div class="wa-input"><input id="wa-input" placeholder="Andika hano…" onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">➤</button></div>
+        </div></div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="label">Supported commands (Kinyarwanda)</div>
+            <div class="cmd"><code>ibigori igiciro bugesera</code><small>Maize price forecast for Bugesera</small></div>
+            <div class="cmd"><code>risk musanze</code><small>Seasonal risk for Musanze</small></div>
+            <div class="cmd"><code>indwara ibirayi musanze</code><small>Potato disease alert in Musanze</small></div>
+            <div class="cmd"><code>input maize bugesera 60000</code><small>Input recommendations within RWF 60,000</small></div>
+            <div class="cmd"><code>ubufasha / help</code><small>Show all available commands</small></div>
+          </div>
+          <div class="card"><div class="label">Farmer reach</div>
+            <div class="reach"><div class="r"><div class="v">47</div><div class="k">Subscribers</div></div>
+              <div class="r"><div class="v">30</div><div class="k">Districts</div></div>
+              <div class="r"><div class="v">🇷🇼</div><div class="k">Kinyarwanda</div></div></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
