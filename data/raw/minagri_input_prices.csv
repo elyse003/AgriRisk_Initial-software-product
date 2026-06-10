@@ -1,0 +1,301 @@
+input_id,input_name,input_type,crop_suitability,supplier,district,price_rwf
+1,Urea (50kg),fertilizer,"maize,potatoes",Nyarugenge Agrodealer,Nyarugenge,33365
+2,Urea (50kg),fertilizer,"maize,potatoes",Gasabo Agrodealer,Gasabo,33096
+3,Urea (50kg),fertilizer,"maize,potatoes",Kicukiro Agrodealer,Kicukiro,30312
+4,Urea (50kg),fertilizer,"maize,potatoes",Burera Agrodealer,Burera,32299
+5,Urea (50kg),fertilizer,"maize,potatoes",Gakenke Agrodealer,Gakenke,32536
+6,Urea (50kg),fertilizer,"maize,potatoes",Gicumbi Agrodealer,Gicumbi,32393
+7,Urea (50kg),fertilizer,"maize,potatoes",Musanze Agrodealer,Musanze,30989
+8,Urea (50kg),fertilizer,"maize,potatoes",Rulindo Agrodealer,Rulindo,30232
+9,Urea (50kg),fertilizer,"maize,potatoes",Gisagara Agrodealer,Gisagara,35400
+10,Urea (50kg),fertilizer,"maize,potatoes",Huye Agrodealer,Huye,33000
+11,Urea (50kg),fertilizer,"maize,potatoes",Kamonyi Agrodealer,Kamonyi,34960
+12,Urea (50kg),fertilizer,"maize,potatoes",Muhanga Agrodealer,Muhanga,33740
+13,Urea (50kg),fertilizer,"maize,potatoes",Nyamagabe Agrodealer,Nyamagabe,34689
+14,Urea (50kg),fertilizer,"maize,potatoes",Nyanza Agrodealer,Nyanza,30822
+15,Urea (50kg),fertilizer,"maize,potatoes",Nyaruguru Agrodealer,Nyaruguru,30118
+16,Urea (50kg),fertilizer,"maize,potatoes",Ruhango Agrodealer,Ruhango,33368
+17,Urea (50kg),fertilizer,"maize,potatoes",Bugesera Agrodealer,Bugesera,32955
+18,Urea (50kg),fertilizer,"maize,potatoes",Gatsibo Agrodealer,Gatsibo,30057
+19,Urea (50kg),fertilizer,"maize,potatoes",Kayonza Agrodealer,Kayonza,33352
+20,Urea (50kg),fertilizer,"maize,potatoes",Kirehe Agrodealer,Kirehe,30604
+21,Urea (50kg),fertilizer,"maize,potatoes",Ngoma Agrodealer,Ngoma,30132
+22,Urea (50kg),fertilizer,"maize,potatoes",Nyagatare Agrodealer,Nyagatare,35745
+23,Urea (50kg),fertilizer,"maize,potatoes",Rwamagana Agrodealer,Rwamagana,32996
+24,Urea (50kg),fertilizer,"maize,potatoes",Karongi Agrodealer,Karongi,31550
+25,Urea (50kg),fertilizer,"maize,potatoes",Ngororero Agrodealer,Ngororero,30067
+26,Urea (50kg),fertilizer,"maize,potatoes",Nyabihu Agrodealer,Nyabihu,35307
+27,Urea (50kg),fertilizer,"maize,potatoes",Nyamasheke Agrodealer,Nyamasheke,35472
+28,Urea (50kg),fertilizer,"maize,potatoes",Rubavu Agrodealer,Rubavu,31084
+29,Urea (50kg),fertilizer,"maize,potatoes",Rusizi Agrodealer,Rusizi,32224
+30,Urea (50kg),fertilizer,"maize,potatoes",Rutsiro Agrodealer,Rutsiro,33571
+31,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyarugenge Agrodealer,Nyarugenge,35804
+32,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Gasabo Agrodealer,Gasabo,39040
+33,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Kicukiro Agrodealer,Kicukiro,36621
+34,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Burera Agrodealer,Burera,36672
+35,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Gakenke Agrodealer,Gakenke,39543
+36,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Gicumbi Agrodealer,Gicumbi,37316
+37,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Musanze Agrodealer,Musanze,39142
+38,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Rulindo Agrodealer,Rulindo,36953
+39,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Gisagara Agrodealer,Gisagara,38666
+40,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Huye Agrodealer,Huye,42044
+41,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Kamonyi Agrodealer,Kamonyi,38643
+42,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Muhanga Agrodealer,Muhanga,38770
+43,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyamagabe Agrodealer,Nyamagabe,38705
+44,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyanza Agrodealer,Nyanza,41469
+45,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyaruguru Agrodealer,Nyaruguru,40141
+46,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Ruhango Agrodealer,Ruhango,35192
+47,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Bugesera Agrodealer,Bugesera,35856
+48,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Gatsibo Agrodealer,Gatsibo,39351
+49,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Kayonza Agrodealer,Kayonza,40737
+50,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Kirehe Agrodealer,Kirehe,35849
+51,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Ngoma Agrodealer,Ngoma,38781
+52,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyagatare Agrodealer,Nyagatare,39842
+53,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Rwamagana Agrodealer,Rwamagana,38006
+54,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Karongi Agrodealer,Karongi,40230
+55,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Ngororero Agrodealer,Ngororero,37563
+56,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyabihu Agrodealer,Nyabihu,39694
+57,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Nyamasheke Agrodealer,Nyamasheke,40779
+58,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Rubavu Agrodealer,Rubavu,42224
+59,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Rusizi Agrodealer,Rusizi,39815
+60,NPK 17-17-17 (50kg),fertilizer,"maize,beans,potatoes",Rutsiro Agrodealer,Rutsiro,37632
+61,DAP (50kg),fertilizer,"maize,beans",Nyarugenge Agrodealer,Nyarugenge,43634
+62,DAP (50kg),fertilizer,"maize,beans",Gasabo Agrodealer,Gasabo,44316
+63,DAP (50kg),fertilizer,"maize,beans",Kicukiro Agrodealer,Kicukiro,41120
+64,DAP (50kg),fertilizer,"maize,beans",Burera Agrodealer,Burera,40693
+65,DAP (50kg),fertilizer,"maize,beans",Gakenke Agrodealer,Gakenke,38970
+66,DAP (50kg),fertilizer,"maize,beans",Gicumbi Agrodealer,Gicumbi,43270
+67,DAP (50kg),fertilizer,"maize,beans",Musanze Agrodealer,Musanze,41367
+68,DAP (50kg),fertilizer,"maize,beans",Rulindo Agrodealer,Rulindo,38809
+69,DAP (50kg),fertilizer,"maize,beans",Gisagara Agrodealer,Gisagara,42323
+70,DAP (50kg),fertilizer,"maize,beans",Huye Agrodealer,Huye,45837
+71,DAP (50kg),fertilizer,"maize,beans",Kamonyi Agrodealer,Kamonyi,38140
+72,DAP (50kg),fertilizer,"maize,beans",Muhanga Agrodealer,Muhanga,41947
+73,DAP (50kg),fertilizer,"maize,beans",Nyamagabe Agrodealer,Nyamagabe,45393
+74,DAP (50kg),fertilizer,"maize,beans",Nyanza Agrodealer,Nyanza,45584
+75,DAP (50kg),fertilizer,"maize,beans",Nyaruguru Agrodealer,Nyaruguru,40522
+76,DAP (50kg),fertilizer,"maize,beans",Ruhango Agrodealer,Ruhango,39127
+77,DAP (50kg),fertilizer,"maize,beans",Bugesera Agrodealer,Bugesera,41169
+78,DAP (50kg),fertilizer,"maize,beans",Gatsibo Agrodealer,Gatsibo,40331
+79,DAP (50kg),fertilizer,"maize,beans",Kayonza Agrodealer,Kayonza,41677
+80,DAP (50kg),fertilizer,"maize,beans",Kirehe Agrodealer,Kirehe,42606
+81,DAP (50kg),fertilizer,"maize,beans",Ngoma Agrodealer,Ngoma,44019
+82,DAP (50kg),fertilizer,"maize,beans",Nyagatare Agrodealer,Nyagatare,42920
+83,DAP (50kg),fertilizer,"maize,beans",Rwamagana Agrodealer,Rwamagana,45034
+84,DAP (50kg),fertilizer,"maize,beans",Karongi Agrodealer,Karongi,43752
+85,DAP (50kg),fertilizer,"maize,beans",Ngororero Agrodealer,Ngororero,41972
+86,DAP (50kg),fertilizer,"maize,beans",Nyabihu Agrodealer,Nyabihu,38698
+87,DAP (50kg),fertilizer,"maize,beans",Nyamasheke Agrodealer,Nyamasheke,44310
+88,DAP (50kg),fertilizer,"maize,beans",Rubavu Agrodealer,Rubavu,43576
+89,DAP (50kg),fertilizer,"maize,beans",Rusizi Agrodealer,Rusizi,40476
+90,DAP (50kg),fertilizer,"maize,beans",Rutsiro Agrodealer,Rutsiro,39622
+91,Hybrid maize seed (10kg),seed,maize,Nyarugenge Agrodealer,Nyarugenge,12619
+92,Hybrid maize seed (10kg),seed,maize,Gasabo Agrodealer,Gasabo,11242
+93,Hybrid maize seed (10kg),seed,maize,Kicukiro Agrodealer,Kicukiro,12929
+94,Hybrid maize seed (10kg),seed,maize,Burera Agrodealer,Burera,11584
+95,Hybrid maize seed (10kg),seed,maize,Gakenke Agrodealer,Gakenke,12464
+96,Hybrid maize seed (10kg),seed,maize,Gicumbi Agrodealer,Gicumbi,11768
+97,Hybrid maize seed (10kg),seed,maize,Musanze Agrodealer,Musanze,12185
+98,Hybrid maize seed (10kg),seed,maize,Rulindo Agrodealer,Rulindo,12961
+99,Hybrid maize seed (10kg),seed,maize,Gisagara Agrodealer,Gisagara,11728
+100,Hybrid maize seed (10kg),seed,maize,Huye Agrodealer,Huye,11119
+101,Hybrid maize seed (10kg),seed,maize,Kamonyi Agrodealer,Kamonyi,11225
+102,Hybrid maize seed (10kg),seed,maize,Muhanga Agrodealer,Muhanga,11218
+103,Hybrid maize seed (10kg),seed,maize,Nyamagabe Agrodealer,Nyamagabe,12141
+104,Hybrid maize seed (10kg),seed,maize,Nyanza Agrodealer,Nyanza,11239
+105,Hybrid maize seed (10kg),seed,maize,Nyaruguru Agrodealer,Nyaruguru,12030
+106,Hybrid maize seed (10kg),seed,maize,Ruhango Agrodealer,Ruhango,12714
+107,Hybrid maize seed (10kg),seed,maize,Bugesera Agrodealer,Bugesera,13151
+108,Hybrid maize seed (10kg),seed,maize,Gatsibo Agrodealer,Gatsibo,11571
+109,Hybrid maize seed (10kg),seed,maize,Kayonza Agrodealer,Kayonza,13144
+110,Hybrid maize seed (10kg),seed,maize,Kirehe Agrodealer,Kirehe,13387
+111,Hybrid maize seed (10kg),seed,maize,Ngoma Agrodealer,Ngoma,12541
+112,Hybrid maize seed (10kg),seed,maize,Nyagatare Agrodealer,Nyagatare,12809
+113,Hybrid maize seed (10kg),seed,maize,Rwamagana Agrodealer,Rwamagana,12199
+114,Hybrid maize seed (10kg),seed,maize,Karongi Agrodealer,Karongi,11219
+115,Hybrid maize seed (10kg),seed,maize,Ngororero Agrodealer,Ngororero,13343
+116,Hybrid maize seed (10kg),seed,maize,Nyabihu Agrodealer,Nyabihu,13308
+117,Hybrid maize seed (10kg),seed,maize,Nyamasheke Agrodealer,Nyamasheke,11814
+118,Hybrid maize seed (10kg),seed,maize,Rubavu Agrodealer,Rubavu,11509
+119,Hybrid maize seed (10kg),seed,maize,Rusizi Agrodealer,Rusizi,11197
+120,Hybrid maize seed (10kg),seed,maize,Rutsiro Agrodealer,Rutsiro,12234
+121,Climbing bean seed (5kg),seed,beans,Nyarugenge Agrodealer,Nyarugenge,9392
+122,Climbing bean seed (5kg),seed,beans,Gasabo Agrodealer,Gasabo,7889
+123,Climbing bean seed (5kg),seed,beans,Kicukiro Agrodealer,Kicukiro,8859
+124,Climbing bean seed (5kg),seed,beans,Burera Agrodealer,Burera,9240
+125,Climbing bean seed (5kg),seed,beans,Gakenke Agrodealer,Gakenke,8465
+126,Climbing bean seed (5kg),seed,beans,Gicumbi Agrodealer,Gicumbi,8860
+127,Climbing bean seed (5kg),seed,beans,Musanze Agrodealer,Musanze,8574
+128,Climbing bean seed (5kg),seed,beans,Rulindo Agrodealer,Rulindo,7931
+129,Climbing bean seed (5kg),seed,beans,Gisagara Agrodealer,Gisagara,8677
+130,Climbing bean seed (5kg),seed,beans,Huye Agrodealer,Huye,7971
+131,Climbing bean seed (5kg),seed,beans,Kamonyi Agrodealer,Kamonyi,8984
+132,Climbing bean seed (5kg),seed,beans,Muhanga Agrodealer,Muhanga,8347
+133,Climbing bean seed (5kg),seed,beans,Nyamagabe Agrodealer,Nyamagabe,9184
+134,Climbing bean seed (5kg),seed,beans,Nyanza Agrodealer,Nyanza,8817
+135,Climbing bean seed (5kg),seed,beans,Nyaruguru Agrodealer,Nyaruguru,9409
+136,Climbing bean seed (5kg),seed,beans,Ruhango Agrodealer,Ruhango,9074
+137,Climbing bean seed (5kg),seed,beans,Bugesera Agrodealer,Bugesera,9052
+138,Climbing bean seed (5kg),seed,beans,Gatsibo Agrodealer,Gatsibo,8337
+139,Climbing bean seed (5kg),seed,beans,Kayonza Agrodealer,Kayonza,8571
+140,Climbing bean seed (5kg),seed,beans,Kirehe Agrodealer,Kirehe,9087
+141,Climbing bean seed (5kg),seed,beans,Ngoma Agrodealer,Ngoma,9047
+142,Climbing bean seed (5kg),seed,beans,Nyagatare Agrodealer,Nyagatare,8996
+143,Climbing bean seed (5kg),seed,beans,Rwamagana Agrodealer,Rwamagana,7833
+144,Climbing bean seed (5kg),seed,beans,Karongi Agrodealer,Karongi,7849
+145,Climbing bean seed (5kg),seed,beans,Ngororero Agrodealer,Ngororero,7934
+146,Climbing bean seed (5kg),seed,beans,Nyabihu Agrodealer,Nyabihu,7873
+147,Climbing bean seed (5kg),seed,beans,Nyamasheke Agrodealer,Nyamasheke,9133
+148,Climbing bean seed (5kg),seed,beans,Rubavu Agrodealer,Rubavu,8749
+149,Climbing bean seed (5kg),seed,beans,Rusizi Agrodealer,Rusizi,8678
+150,Climbing bean seed (5kg),seed,beans,Rutsiro Agrodealer,Rutsiro,7965
+151,Certified potato seed (50kg),seed,potatoes,Nyarugenge Agrodealer,Nyarugenge,30097
+152,Certified potato seed (50kg),seed,potatoes,Gasabo Agrodealer,Gasabo,26279
+153,Certified potato seed (50kg),seed,potatoes,Kicukiro Agrodealer,Kicukiro,27002
+154,Certified potato seed (50kg),seed,potatoes,Burera Agrodealer,Burera,30345
+155,Certified potato seed (50kg),seed,potatoes,Gakenke Agrodealer,Gakenke,29638
+156,Certified potato seed (50kg),seed,potatoes,Gicumbi Agrodealer,Gicumbi,26278
+157,Certified potato seed (50kg),seed,potatoes,Musanze Agrodealer,Musanze,26173
+158,Certified potato seed (50kg),seed,potatoes,Rulindo Agrodealer,Rulindo,28036
+159,Certified potato seed (50kg),seed,potatoes,Gisagara Agrodealer,Gisagara,29139
+160,Certified potato seed (50kg),seed,potatoes,Huye Agrodealer,Huye,27141
+161,Certified potato seed (50kg),seed,potatoes,Kamonyi Agrodealer,Kamonyi,29036
+162,Certified potato seed (50kg),seed,potatoes,Muhanga Agrodealer,Muhanga,27772
+163,Certified potato seed (50kg),seed,potatoes,Nyamagabe Agrodealer,Nyamagabe,29056
+164,Certified potato seed (50kg),seed,potatoes,Nyanza Agrodealer,Nyanza,29822
+165,Certified potato seed (50kg),seed,potatoes,Nyaruguru Agrodealer,Nyaruguru,30481
+166,Certified potato seed (50kg),seed,potatoes,Ruhango Agrodealer,Ruhango,26856
+167,Certified potato seed (50kg),seed,potatoes,Bugesera Agrodealer,Bugesera,26236
+168,Certified potato seed (50kg),seed,potatoes,Gatsibo Agrodealer,Gatsibo,26422
+169,Certified potato seed (50kg),seed,potatoes,Kayonza Agrodealer,Kayonza,26686
+170,Certified potato seed (50kg),seed,potatoes,Kirehe Agrodealer,Kirehe,27576
+171,Certified potato seed (50kg),seed,potatoes,Ngoma Agrodealer,Ngoma,25920
+172,Certified potato seed (50kg),seed,potatoes,Nyagatare Agrodealer,Nyagatare,30422
+173,Certified potato seed (50kg),seed,potatoes,Rwamagana Agrodealer,Rwamagana,30514
+174,Certified potato seed (50kg),seed,potatoes,Karongi Agrodealer,Karongi,29753
+175,Certified potato seed (50kg),seed,potatoes,Ngororero Agrodealer,Ngororero,27756
+176,Certified potato seed (50kg),seed,potatoes,Nyabihu Agrodealer,Nyabihu,29717
+177,Certified potato seed (50kg),seed,potatoes,Nyamasheke Agrodealer,Nyamasheke,28977
+178,Certified potato seed (50kg),seed,potatoes,Rubavu Agrodealer,Rubavu,29469
+179,Certified potato seed (50kg),seed,potatoes,Rusizi Agrodealer,Rusizi,26252
+180,Certified potato seed (50kg),seed,potatoes,Rutsiro Agrodealer,Rutsiro,30658
+181,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyarugenge Agrodealer,Nyarugenge,9402
+182,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Gasabo Agrodealer,Gasabo,9251
+183,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Kicukiro Agrodealer,Kicukiro,9482
+184,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Burera Agrodealer,Burera,9209
+185,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Gakenke Agrodealer,Gakenke,10628
+186,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Gicumbi Agrodealer,Gicumbi,9967
+187,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Musanze Agrodealer,Musanze,10443
+188,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Rulindo Agrodealer,Rulindo,10546
+189,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Gisagara Agrodealer,Gisagara,9844
+190,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Huye Agrodealer,Huye,10260
+191,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Kamonyi Agrodealer,Kamonyi,10460
+192,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Muhanga Agrodealer,Muhanga,9025
+193,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyamagabe Agrodealer,Nyamagabe,9251
+194,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyanza Agrodealer,Nyanza,9503
+195,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyaruguru Agrodealer,Nyaruguru,9923
+196,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Ruhango Agrodealer,Ruhango,10199
+197,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Bugesera Agrodealer,Bugesera,9395
+198,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Gatsibo Agrodealer,Gatsibo,10341
+199,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Kayonza Agrodealer,Kayonza,9983
+200,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Kirehe Agrodealer,Kirehe,9446
+201,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Ngoma Agrodealer,Ngoma,10033
+202,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyagatare Agrodealer,Nyagatare,10358
+203,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Rwamagana Agrodealer,Rwamagana,9378
+204,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Karongi Agrodealer,Karongi,9475
+205,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Ngororero Agrodealer,Ngororero,10054
+206,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyabihu Agrodealer,Nyabihu,9556
+207,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Nyamasheke Agrodealer,Nyamasheke,9077
+208,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Rubavu Agrodealer,Rubavu,10362
+209,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Rusizi Agrodealer,Rusizi,9122
+210,Mancozeb fungicide (1kg),pesticide,"potatoes,beans",Rutsiro Agrodealer,Rutsiro,9208
+211,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyarugenge Agrodealer,Nyarugenge,15309
+212,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Gasabo Agrodealer,Gasabo,14677
+213,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Kicukiro Agrodealer,Kicukiro,14088
+214,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Burera Agrodealer,Burera,13949
+215,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Gakenke Agrodealer,Gakenke,13393
+216,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Gicumbi Agrodealer,Gicumbi,13070
+217,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Musanze Agrodealer,Musanze,15426
+218,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Rulindo Agrodealer,Rulindo,13005
+219,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Gisagara Agrodealer,Gisagara,13052
+220,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Huye Agrodealer,Huye,14985
+221,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Kamonyi Agrodealer,Kamonyi,15382
+222,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Muhanga Agrodealer,Muhanga,14867
+223,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyamagabe Agrodealer,Nyamagabe,13557
+224,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyanza Agrodealer,Nyanza,13637
+225,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyaruguru Agrodealer,Nyaruguru,15571
+226,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Ruhango Agrodealer,Ruhango,14840
+227,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Bugesera Agrodealer,Bugesera,15197
+228,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Gatsibo Agrodealer,Gatsibo,14129
+229,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Kayonza Agrodealer,Kayonza,15054
+230,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Kirehe Agrodealer,Kirehe,15626
+231,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Ngoma Agrodealer,Ngoma,13878
+232,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyagatare Agrodealer,Nyagatare,13777
+233,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Rwamagana Agrodealer,Rwamagana,13000
+234,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Karongi Agrodealer,Karongi,14943
+235,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Ngororero Agrodealer,Ngororero,13553
+236,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyabihu Agrodealer,Nyabihu,13590
+237,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Nyamasheke Agrodealer,Nyamasheke,14649
+238,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Rubavu Agrodealer,Rubavu,14948
+239,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Rusizi Agrodealer,Rusizi,14020
+240,Lambda-cyhalothrin (1L),pesticide,"maize,beans",Rutsiro Agrodealer,Rutsiro,15524
+241,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyarugenge Agrodealer,Nyarugenge,5714
+242,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Gasabo Agrodealer,Gasabo,6152
+243,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Kicukiro Agrodealer,Kicukiro,6260
+244,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Burera Agrodealer,Burera,6260
+245,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Gakenke Agrodealer,Gakenke,6308
+246,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Gicumbi Agrodealer,Gicumbi,6280
+247,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Musanze Agrodealer,Musanze,6470
+248,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Rulindo Agrodealer,Rulindo,6496
+249,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Gisagara Agrodealer,Gisagara,6692
+250,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Huye Agrodealer,Huye,6647
+251,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Kamonyi Agrodealer,Kamonyi,6143
+252,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Muhanga Agrodealer,Muhanga,6367
+253,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyamagabe Agrodealer,Nyamagabe,6002
+254,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyanza Agrodealer,Nyanza,6300
+255,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyaruguru Agrodealer,Nyaruguru,5528
+256,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Ruhango Agrodealer,Ruhango,5961
+257,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Bugesera Agrodealer,Bugesera,6617
+258,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Gatsibo Agrodealer,Gatsibo,6330
+259,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Kayonza Agrodealer,Kayonza,5540
+260,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Kirehe Agrodealer,Kirehe,6147
+261,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Ngoma Agrodealer,Ngoma,5959
+262,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyagatare Agrodealer,Nyagatare,6490
+263,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Rwamagana Agrodealer,Rwamagana,5657
+264,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Karongi Agrodealer,Karongi,6244
+265,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Ngororero Agrodealer,Ngororero,6374
+266,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyabihu Agrodealer,Nyabihu,6234
+267,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Nyamasheke Agrodealer,Nyamasheke,5849
+268,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Rubavu Agrodealer,Rubavu,6471
+269,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Rusizi Agrodealer,Rusizi,6472
+270,Organic compost (50kg),fertilizer,"maize,beans,potatoes",Rutsiro Agrodealer,Rutsiro,5953
+271,Foliar feed (1L),fertilizer,potatoes,Nyarugenge Agrodealer,Nyarugenge,10706
+272,Foliar feed (1L),fertilizer,potatoes,Gasabo Agrodealer,Gasabo,11580
+273,Foliar feed (1L),fertilizer,potatoes,Kicukiro Agrodealer,Kicukiro,10929
+274,Foliar feed (1L),fertilizer,potatoes,Burera Agrodealer,Burera,10879
+275,Foliar feed (1L),fertilizer,potatoes,Gakenke Agrodealer,Gakenke,11111
+276,Foliar feed (1L),fertilizer,potatoes,Gicumbi Agrodealer,Gicumbi,11127
+277,Foliar feed (1L),fertilizer,potatoes,Musanze Agrodealer,Musanze,11945
+278,Foliar feed (1L),fertilizer,potatoes,Rulindo Agrodealer,Rulindo,12216
+279,Foliar feed (1L),fertilizer,potatoes,Gisagara Agrodealer,Gisagara,11689
+280,Foliar feed (1L),fertilizer,potatoes,Huye Agrodealer,Huye,10314
+281,Foliar feed (1L),fertilizer,potatoes,Kamonyi Agrodealer,Kamonyi,10863
+282,Foliar feed (1L),fertilizer,potatoes,Muhanga Agrodealer,Muhanga,10537
+283,Foliar feed (1L),fertilizer,potatoes,Nyamagabe Agrodealer,Nyamagabe,11579
+284,Foliar feed (1L),fertilizer,potatoes,Nyanza Agrodealer,Nyanza,11435
+285,Foliar feed (1L),fertilizer,potatoes,Nyaruguru Agrodealer,Nyaruguru,12281
+286,Foliar feed (1L),fertilizer,potatoes,Ruhango Agrodealer,Ruhango,11104
+287,Foliar feed (1L),fertilizer,potatoes,Bugesera Agrodealer,Bugesera,10352
+288,Foliar feed (1L),fertilizer,potatoes,Gatsibo Agrodealer,Gatsibo,11436
+289,Foliar feed (1L),fertilizer,potatoes,Kayonza Agrodealer,Kayonza,10927
+290,Foliar feed (1L),fertilizer,potatoes,Kirehe Agrodealer,Kirehe,10511
+291,Foliar feed (1L),fertilizer,potatoes,Ngoma Agrodealer,Ngoma,10936
+292,Foliar feed (1L),fertilizer,potatoes,Nyagatare Agrodealer,Nyagatare,10644
+293,Foliar feed (1L),fertilizer,potatoes,Rwamagana Agrodealer,Rwamagana,10553
+294,Foliar feed (1L),fertilizer,potatoes,Karongi Agrodealer,Karongi,11184
+295,Foliar feed (1L),fertilizer,potatoes,Ngororero Agrodealer,Ngororero,11902
+296,Foliar feed (1L),fertilizer,potatoes,Nyabihu Agrodealer,Nyabihu,12068
+297,Foliar feed (1L),fertilizer,potatoes,Nyamasheke Agrodealer,Nyamasheke,10692
+298,Foliar feed (1L),fertilizer,potatoes,Rubavu Agrodealer,Rubavu,11106
+299,Foliar feed (1L),fertilizer,potatoes,Rusizi Agrodealer,Rusizi,11974
+300,Foliar feed (1L),fertilizer,potatoes,Rutsiro Agrodealer,Rutsiro,12295

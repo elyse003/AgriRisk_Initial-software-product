@@ -1,0 +1,2 @@
+Python is a versatile language.
+Great for data analysis.

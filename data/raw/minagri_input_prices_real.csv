@@ -1,0 +1,4 @@
+input_id,input_name,input_type,crop_suitability,availability,price_rwf,market_price_rwf,subsidy_pct,season,source
+1,Urea (50kg bag),fertilizer,"maize,potatoes",Nationwide (Smart Nkunganire System),33000,50150,34,2025A,RAB/MINAGRI 2024-2025 subsidy
+2,DAP (50kg bag),fertilizer,"maize,beans",Nationwide (Smart Nkunganire System),36200,64900,44,2025A,RAB/MINAGRI 2024-2025 subsidy
+3,NPK 17-17-17 (50kg bag),fertilizer,"potatoes,maize,beans",Nationwide (Smart Nkunganire System),34200,57300,40,2025A,RAB/MINAGRI 2024-2025 subsidy

@@ -1,64 +1,37 @@
-"""Screen: Seasonal Risk. Uses the trained Random Forest classifier (or the
-proposal thresholds as fallback) to score climate-inflation risk."""
-import os, sys, pickle
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../.."))
-
-import pandas as pd
-import streamlit as st
-
-from config.settings import MODELS_STORE, DISTRICTS
+"""Seasonal Risk — real rainfall anomaly + latest CPI/fertilizer -> trained model."""
+from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model
+import pandas as pd, streamlit as st
+from config.settings import DISTRICTS
 from src.data.preprocessing import label_risk
 
-st.set_page_config(page_title="Seasonal Risk", page_icon="⚠️")
-st.title("⚠️ Seasonal Risk")
-
-
-@st.cache_resource
-def load_model():
-    path = MODELS_STORE / "risk_classifier.pkl"
-    if path.exists():
-        with open(path, "rb") as f:
-            return pickle.load(f)
-    return None
-
-
-model = load_model()
+setup("Seasonal Risk", "Random Forest / XGBoost · Rainfall + CPI + Fertilizer")
+rain, cpi, fert, model = load_rainfall(), load_cpi(), load_fert(), load_risk_model()
 
 c1, c2 = st.columns(2)
 district = c1.selectbox("District", DISTRICTS)
-season = c2.selectbox("Growing season", ["A (Mar-May)", "B (Oct-Dec)"])
+season = c2.selectbox("Season", ["A (Mar–May)", "B (Oct–Dec)"])
+scode = season[0]
 
-st.markdown("**Adjust current conditions:**")
-rain = st.slider("Rainfall anomaly (std-devs)", -2.0, 2.0, -0.5, 0.1)
-cpi = st.slider("Food CPI change (YoY %)", 0.0, 30.0, 12.0, 0.5)
-fert = st.slider("Fertilizer price change (YoY %)", 0.0, 60.0, 25.0, 0.5)
-
-if st.button("Assess risk", type="primary"):
+if st.button("Assess Risk", type="primary"):
+    r = rain[(rain.district == district) & (rain.season == scode)]
+    rain_a = float(r.rainfall_anomaly.iloc[-1]) if len(r) else float(rain.rainfall_anomaly.mean())
+    cpi_c = float(cpi.cpi_change.dropna().iloc[-1]); fert_c = float(fert.fert_change.dropna().iloc[-1])
     if model is not None:
-        pred = model.predict(pd.DataFrame(
-            [[rain, cpi, fert]], columns=["rainfall_anomaly", "cpi_change", "fert_change"]))[0]
-        proba = model.predict_proba(pd.DataFrame(
-            [[rain, cpi, fert]], columns=["rainfall_anomaly", "cpi_change", "fert_change"]))[0].max()
-        conf = f"{proba*100:.0f}% confidence"
+        X = pd.DataFrame([[rain_a, cpi_c, fert_c]], columns=["rainfall_anomaly", "cpi_change", "fert_change"])
+        level = str(model.predict(X)[0]); conf = f"{model.predict_proba(X).max()*100:.0f}% confidence"
     else:
-        pred = label_risk(rain, cpi, fert)
-        conf = "rule-based"
-
-    color = {"High": "🔴", "Medium": "🟡", "Low": "🟢"}[pred]
-    st.markdown(f"## {color} Risk level: **{pred}**  \n_{conf}_")
-
-    st.markdown("**Contributing factors:**")
-    st.progress(min(abs(rain) / 2, 1.0), text=f"Rainfall anomaly: {rain:+.1f} σ")
-    st.progress(min(cpi / 30, 1.0), text=f"Food CPI change: {cpi:.1f}%")
-    st.progress(min(fert / 60, 1.0), text=f"Fertilizer change: {fert:.1f}%")
-
-    advice = {
-        "High": "High combined climate-economic risk. Advise conservative planting and "
-                "minimal input spend this season.",
-        "Medium": "Moderate risk. Advise farmers to monitor conditions and consider "
-                  "drought-tolerant varieties.",
-        "Low": "Favourable conditions. Normal planting and input investment is reasonable.",
-    }[pred]
-    st.info(advice)
+        level = label_risk(rain_a, cpi_c, fert_c); conf = "rule-based"
+    color = {"High": "#DC2626", "Medium": "#D97706", "Low": "#40916C"}[level]
+    st.markdown(f"<div class='ar-card'><span class='ar-badge' style='background:{color}'>{level} risk</span>"
+                f"<span style='color:#5A7A6A;margin-left:10px'>{district} · Season {scode} · {conf}</span></div>",
+                unsafe_allow_html=True)
+    st.write("**Contributing factors**")
+    clamp = lambda v: max(0.0, min(v, 1.0))
+    st.progress(clamp(abs(rain_a)/2), text=f"Rainfall anomaly: {rain_a:+.2f} σ")
+    st.progress(clamp(cpi_c/30), text=f"Food CPI change: {cpi_c:.1f}%")
+    st.progress(clamp(fert_c/60), text=f"Fertilizer change: {fert_c:.1f}%")
+    st.info({"High": "High combined risk — advise conservative planting and minimal input spend.",
+             "Medium": "Moderate risk — monitor conditions; consider drought-tolerant varieties.",
+             "Low": "Favourable conditions — normal planting and input investment is reasonable."}[level])
 else:
-    st.info("Set the conditions above, then click **Assess risk**.")
+    st.info("Pick a district and season, then click **Assess Risk**.")

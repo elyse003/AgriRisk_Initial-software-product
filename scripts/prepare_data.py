@@ -4,7 +4,7 @@ written to data/processed/. Also (re)trains the risk model on the real data.
 Run once after placing the real files in data/raw/:
     python scripts/prepare_data.py
 
-Then run the app (webapp/app.py or dashboard/Home.py) — it auto-prefers data/processed/.
+Then run the dashboard (streamlit run dashboard/Home.py). It auto-prefers data/processed/.
 """
 from __future__ import annotations
 

@@ -1,0 +1,3 @@
+setting1=true
+setting2=false
+threshold=0.8

@@ -1,41 +1,29 @@
-"""Screen: Disease Alert. Calls Open-Meteo live; falls back to a sample forecast
-if offline so the screen always renders for a demo."""
-import os, sys
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/../.."))
-
+"""Disease Alert — live Open-Meteo weather + FAO rules (offline fallback)."""
+from _ui import setup
 import streamlit as st
-
+from config.settings import DISTRICT_COORDS, CROPS
 from src.models.disease_alert import assess_crop, get_all_alerts
-from config.settings import DISTRICT_COORDS as COORDS, CROPS
 
-st.set_page_config(page_title="Disease Alert", page_icon="🦠")
-st.title("🦠 Disease Alert")
+setup("Disease Alert", "Open-Meteo live weather + FAO disease rules · 3 crops")
+district = st.selectbox("District", list(DISTRICT_COORDS))
 
-district = st.selectbox("District", list(COORDS))
-
-if st.button("Check disease risk", type="primary"):
-    lat, lon = COORDS[district]
+if st.button("Check Risk", type="primary"):
+    lat, lon = DISTRICT_COORDS[district]
     try:
-        alerts = get_all_alerts(lat, lon, CROPS)
-        st.caption("Live 14-day forecast via Open-Meteo.")
+        alerts = get_all_alerts(lat, lon, CROPS); st.caption("Live 14-day Open-Meteo forecast.")
     except Exception:
-        # offline fallback: a sample high-humidity forecast
-        sample = {
-            "temperature_2m_min": [17] * 14, "temperature_2m_max": [23] * 14,
-            "relative_humidity_2m_mean": [92] * 14, "precipitation_sum": [6] * 14,
-        }
-        alerts = []
-        for c in CROPS:
-            alerts.extend(assess_crop(c, sample))
-        st.caption("⚠️ Offline — showing a sample high-humidity forecast.")
-
+        sample = {"temperature_2m_min": [17]*14, "temperature_2m_max": [23]*14,
+                  "relative_humidity_2m_mean": [90]*14, "precipitation_sum": [6]*14}
+        alerts = [a for c in CROPS for a in assess_crop(c, sample)]
+        st.caption("Offline mode: showing a sample forecast.")
     if not alerts:
-        st.success("No elevated disease risk detected for the forecast window.")
+        st.success("No elevated disease risk for the forecast window.")
     for a in alerts:
-        badge = {"High": "🔴", "Medium": "🟡"}.get(a["risk"], "🟢")
+        color = {"High": "#DC2626", "Medium": "#D97706"}.get(a["risk"], "#40916C")
         with st.container(border=True):
-            st.markdown(f"### {badge} {a['crop'].title()} — {a['disease']}  ({a['risk']} risk)")
-            st.write(f"**Recommended action:** {a['action']}")
+            st.markdown(f"**{a['crop'].title()}: {a['disease']}** "
+                        f"<span class='ar-badge' style='background:{color}'>{a['risk']}</span>", unsafe_allow_html=True)
+            st.write(f"**Action:** {a['action']}")
             st.caption(f"Triggers: {a['why']}")
 else:
-    st.info("Select a district and click **Check disease risk**.")
+    st.info("Pick a district and click **Check Risk**.")

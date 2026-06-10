@@ -1,0 +1,2 @@
+This document contains notes on data science.
+It is intended for beginners.
