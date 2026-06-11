@@ -16,7 +16,7 @@ Kinyarwanda and English. It is backed by trained machine learning models and a S
 
 ## Repository
 
-https://github.com/<your-username>/elyse-prototype
+https://github.com/elyse003/AgriRisk_Initial-software-product.git
 
 (Replace with your repository link before submission.)
 
@@ -25,8 +25,8 @@ https://github.com/<your-username>/elyse-prototype
 Requires Python 3.10 or newer.
 
 ```bash
-git clone https://github.com/<your-username>/elyse-prototype.git
-cd elyse-prototype
+git clone https://github.com/elyse003/AgriRisk_Initial-software-product.git
+cd AgriRisk_Initial-software-product
 
 python -m venv venv
 venv\Scripts\activate                 # Windows. macOS/Linux: source venv/bin/activate
@@ -65,7 +65,7 @@ Interface screenshots are in `docs/screenshots/`:
 ![Input Recommender](docs/screenshots/input_recommender.png)
 ![WhatsApp Preview](docs/screenshots/whatsapp_preview.png)
 
-Figma mockup: <add your Figma link>
+Figma mockup: <[Figma link](https://www.figma.com/design/xojszh9Hb3OfHGNwGK8eNG/AgriRisk?node-id=3-2&t=hLKZUy3iGXhZkMXo-0)>
 
 ## Models
 
