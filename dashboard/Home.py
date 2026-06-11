@@ -1,5 +1,6 @@
 """AgriRisk Rwanda dashboard (Home). Run: streamlit run dashboard/Home.py"""
 from _ui import setup, load_metrics
+from src.db.connection import subscriber_count
 import streamlit as st
 
 setup("Dashboard", "Nationwide agricultural risk advisory platform")
@@ -8,6 +9,7 @@ m = load_metrics()
 rf = m.get("risk_random_forest", {})
 mape = m.get("price_baseline_mape", "—")
 rf_acc = f"{rf.get('accuracy', 0)*100:.0f}%" if rf else "—"
+subs = subscriber_count()
 
 st.markdown(f"""
 <div class='ar-grid'>
@@ -24,12 +26,12 @@ with c1:
       <p><b>Late blight, high risk</b> for potatoes in Musanze, Burera, Gakenke</p>
       <p><b>Angular leaf spot, high risk</b> for beans in Bugesera, Kayonza</p></div>""", unsafe_allow_html=True)
 with c2:
-    st.markdown("""
+    st.markdown(f"""
     <div class='ar-card'><div class='ar-label'>Delivery channels</div>
       <div style='display:flex;gap:10px;margin-top:10px'>
         <div style='flex:1;text-align:center;background:#EDF7F0;border-radius:8px;padding:14px 8px'><b style='font-size:13px'>Dashboard</b><br><span style='font-size:11px;color:#5A7A6A'>Active</span></div>
         <div style='flex:1;text-align:center;background:#EDF7F0;border-radius:8px;padding:14px 8px'><b style='font-size:13px'>WhatsApp</b><br><span style='font-size:11px;color:#5A7A6A'>Preview</span></div>
-        <div style='flex:1;text-align:center;background:#EDF7F0;border-radius:8px;padding:14px 8px'><b style='font-size:13px'>SMS</b><br><span style='font-size:11px;color:#5A7A6A'>47 subscribers</span></div>
+        <div style='flex:1;text-align:center;background:#EDF7F0;border-radius:8px;padding:14px 8px'><b style='font-size:13px'>SMS</b><br><span style='font-size:11px;color:#5A7A6A'>{subs} subscribers</span></div>
       </div></div>""", unsafe_allow_html=True)
 
 st.markdown(f"""

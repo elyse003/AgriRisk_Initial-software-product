@@ -3,6 +3,7 @@ from _ui import setup, load_prices
 import numpy as np, pandas as pd, streamlit as st
 from sklearn.ensemble import RandomForestRegressor
 from config.settings import CROPS, DISTRICTS
+from src.db.connection import log_price
 
 setup("Price Forecast", "Prophet + CPI + Fertilizer · LSTM benchmark · 4-week ahead")
 prices = load_prices()
@@ -23,6 +24,7 @@ if st.button("Generate Forecast", type="primary"):
         tr = d.dropna(); feats = [c for c in d.columns if c.startswith("lag")]
         model = RandomForestRegressor(n_estimators=200, random_state=42).fit(tr[feats], tr["target"])
         cur = float(s.iloc[-1]); fc = float(model.predict(d[feats].iloc[[-1]])[0])
+        log_price(crop, district, str(s.index[-1].date()), cur)
         pct = (fc - cur) / cur * 100
         m1, m2, m3 = st.columns(3)
         m1.metric("Current", f"{cur:,.0f} RWF/kg")

@@ -1,11 +1,12 @@
 """Input Recommender — affordable inputs by crop/district/budget (real MINAGRI prices)."""
-from _ui import setup, load_catalogue
+from _ui import setup
+from src.db.connection import fetch_catalogue
 import streamlit as st
 from config.settings import CROPS, DISTRICTS
 from src.models.input_recommender import recommend
 
 setup("Input Recommender", "MINAGRI data · Budget-smart ranking · RWF")
-cat = load_catalogue()
+cat = fetch_catalogue()
 
 c1, c2 = st.columns(2)
 crop = c1.selectbox("Crop", CROPS, format_func=str.title)

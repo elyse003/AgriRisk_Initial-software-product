@@ -26,3 +26,7 @@ mlruns/
 
 # OS
 .DS_Store
+
+# runtime database (auto-created)
+data/agririsk.db
+*.db

@@ -3,6 +3,7 @@ from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model
 import pandas as pd, streamlit as st
 from config.settings import DISTRICTS
 from src.data.preprocessing import label_risk
+from src.db.connection import log_risk
 
 setup("Seasonal Risk", "Random Forest / XGBoost · Rainfall + CPI + Fertilizer")
 rain, cpi, fert, model = load_rainfall(), load_cpi(), load_fert(), load_risk_model()
@@ -21,6 +22,7 @@ if st.button("Assess Risk", type="primary"):
         level = str(model.predict(X)[0]); conf = f"{model.predict_proba(X).max()*100:.0f}% confidence"
     else:
         level = label_risk(rain_a, cpi_c, fert_c); conf = "rule-based"
+    log_risk(district, scode, rain_a, cpi_c, fert_c, level)
     color = {"High": "#DC2626", "Medium": "#D97706", "Low": "#40916C"}[level]
     st.markdown(f"<div class='ar-card'><span class='ar-badge' style='background:{color}'>{level} risk</span>"
                 f"<span style='color:#5A7A6A;margin-left:10px'>{district} · Season {scode} · {conf}</span></div>",
