@@ -67,6 +67,21 @@ Interface screenshots are in `docs/screenshots/`:
 
 Figma mockup: <[Figma link](https://www.figma.com/design/xojszh9Hb3OfHGNwGK8eNG/AgriRisk?node-id=3-2&t=hLKZUy3iGXhZkMXo-0)>
 
+## Datasets
+
+Every model is trained on public data. Each source, its key fields, and the module it feeds:
+
+| Dataset | Source | Key fields | Used for |
+| --- | --- | --- | --- |
+| Crop market prices | WFP (HDX) | date, district, commodity, pricetype, price RWF | Price forecasting (target) |
+| Food consumer price index | NISR | date, food CPI (base 2014) | Price regressor + risk feature |
+| Fertilizer price index | World Bank Pink Sheet | date, fertilizer index | Price regressor + risk feature |
+| District rainfall | CHIRPS (HDX) | date, district, rainfall vs normal | Seasonal-risk climate feature |
+| Weather forecast | Open-Meteo (live API) | temperature, humidity, precipitation | Disease alerts |
+| Input prices | MINAGRI / Smart Nkunganire | input, type, crop, subsidised and market price | Input recommender |
+
+Prices use the retail, RWF series. The processing and feature steps for each source live in `scripts/prepare_data.py`, and the dashboard shows how current the data is.
+
 ## Models
 
 The modelling is documented in `notebooks/AgriRisk_Rwanda_Models.ipynb`, on real data:
@@ -77,6 +92,17 @@ The modelling is documented in `notebooks/AgriRisk_Rwanda_Models.ipynb`, on real
   forecaster (ARIMA, Prophet, an LSTM with its layers, tanh activation, and Adam optimizer, and a
   random-forest baseline).
 - **Performance metrics**: accuracy, precision, recall, and macro F1 for risk, and MAPE for price.
+
+Price forecasting (mean absolute percentage error, maize, Musanze):
+
+| Model | MAPE |
+| --- | --- |
+| LSTM | 4.35% |
+| Prophet | 6.89% |
+| ARIMA | 8.76% |
+| Random forest (baseline) | 12.13% |
+
+All beat the 15% target. The seasonal-risk classifier (random forest against XGBoost) reaches near-perfect accuracy because its labels come from a transparent rule over the three input features, so it reproduces that rule rather than discovering a new pattern. The genuine predictive result is the price forecast.
 
 ## Deployment plan
 

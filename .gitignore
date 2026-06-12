@@ -30,3 +30,6 @@ mlruns/
 # runtime database (auto-created)
 data/agririsk.db
 *.db
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
