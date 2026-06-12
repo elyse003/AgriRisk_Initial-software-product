@@ -19,29 +19,35 @@ from config.settings import CROPS, DISTRICTS, DISTRICT_COORDS, MODELS_STORE, dat
 FOREST = "#1B4332"; EMERALD = "#2D6A4F"; G600 = "#40916C"; G50 = "#EDF7F0"
 AMBER = "#D97706"; RED = "#DC2626"; PURPLE = "#7C3AED"; MUT = "#5A7A6A"; BRD = "#E0F0E4"
 
-CSS = f"""
+CSS = """
 <style>
-#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] {{ display:none; }}
-.block-container {{ padding-top: 2rem; max-width: 1050px; }}
-section[data-testid="stSidebar"] {{ background: {FOREST}; }}
-section[data-testid="stSidebar"] * {{ color: #D8F3DC; }}
-section[data-testid="stSidebar"] a {{ border-radius: 8px; }}
-h1, h2, h3 {{ color: {FOREST}; }}
-.ar-head {{ font-size: 26px; font-weight: 800; color: {FOREST}; }}
-.ar-sub {{ color: {MUT}; font-size: 14px; margin-bottom: 6px; }}
-.ar-grid {{ display:flex; gap:14px; flex-wrap:wrap; margin:14px 0; }}
-.ar-card {{ background:#fff; border:1px solid {BRD}; border-radius:12px; padding:18px 20px;
-           box-shadow:0 1px 3px rgba(0,0,0,.04); flex:1; min-width:150px; }}
-.ar-num {{ font-size:30px; font-weight:800; }}
-.ar-lbl {{ color:{MUT}; font-size:13px; margin-top:2px; }}
-.ar-alert {{ background:#FFF8EC; border:1px solid #FDE68A; border-radius:12px; padding:16px 18px; }}
-.ar-alert b {{ color:#92400E; }} .ar-alert .t {{ color:#92400E; font-weight:700; margin-bottom:6px; }}
-.ar-alert p {{ color:#B45309; font-size:13.5px; margin:4px 0; }}
-.ar-pill {{ display:inline-block; background:{G50}; border:1px solid {BRD}; color:{EMERALD};
-           border-radius:16px; padding:5px 13px; font-size:12px; font-weight:600; margin:3px; }}
-.ar-badge {{ padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; color:#fff; }}
-.ar-label {{ font-size:11px; font-weight:700; color:{MUT}; letter-spacing:.1em; text-transform:uppercase; }}
-.stButton>button {{ font-weight:700; border-radius:8px; }}
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
+:root{ --forest:#1B4332; --emerald:#2D6A4F; --harvest:#C76E1B; --paper:#F6F2E8; --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4; }
+#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { display:none; }
+.stApp { background: var(--paper); }
+html, body, [class*="css"] { font-family:'Inter',sans-serif; color:var(--ink); }
+.block-container { padding-top: 2rem; max-width: 1050px; }
+section[data-testid="stSidebar"] { background: var(--forest); }
+section[data-testid="stSidebar"] * { color:#D8F3DC; }
+section[data-testid="stSidebar"] a { border-radius:8px; }
+h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--forest); letter-spacing:-.02em; }
+.ar-head { font-size:30px; font-weight:800; }
+.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'JetBrains Mono',monospace; letter-spacing:.02em; }
+.ar-grid { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
+.ar-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
+           box-shadow:0 1px 2px rgba(27,67,50,.04); flex:1; min-width:150px; }
+.ar-num { font-family:'JetBrains Mono',monospace; font-size:30px; font-weight:700; letter-spacing:-.02em; }
+.ar-lbl { color:var(--mut); font-size:13px; margin-top:2px; }
+.ar-alert { background:#FCF3E5; border:1px solid #F0DBBE; border-radius:16px; padding:16px 18px; }
+.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:700; margin-bottom:6px; font-family:'Bricolage Grotesque',sans-serif; }
+.ar-alert p { color:#B45309; font-size:13.5px; margin:4px 0; }
+.ar-pill { display:inline-block; background:#fff; border:1px solid var(--line); color:var(--emerald);
+           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'JetBrains Mono',monospace; }
+.ar-badge { padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; color:#fff; }
+.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'JetBrains Mono',monospace; }
+.stButton>button { font-weight:600; border-radius:9px; background:var(--forest); color:#fff; border:none; }
+.stButton>button:hover { background:#15392a; color:#fff; }
+[data-testid="stMetricValue"] { font-family:'JetBrains Mono',monospace; color:var(--forest); }
 </style>
 """
 
@@ -50,7 +56,7 @@ LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
 
 
 def setup(title, subtitle):
-    st.set_page_config(page_title="AgriRisk Rwanda", layout="wide")
+    st.set_page_config(page_title="AgriRisk Rwanda", layout="wide", initial_sidebar_state="expanded")
     st.markdown(CSS, unsafe_allow_html=True)
     try:
         st.logo(LOGO_PATH, size="large")
@@ -96,3 +102,28 @@ def load_metrics():
 def load_risk_model():
     p = MODELS_STORE / "risk_classifier.pkl"
     return pickle.load(open(p, "rb")) if p.exists() else None
+
+@st.cache_data(ttl=300)
+def load_last_updated():
+    """How current each series is. Reads data/processed/last_updated.json, written
+    by the refresh script; falls back to the latest date inside each processed file."""
+    import json
+    from config.settings import DATA_PROCESSED
+    status_file = DATA_PROCESSED / "last_updated.json"
+    if status_file.exists():
+        try:
+            return json.loads(status_file.read_text())
+        except Exception:
+            pass
+    out = {}
+    files = {"wfp_prices": "wfp_food_prices_rwanda.csv", "cpi": "rwanda_food_cpi.csv",
+             "fertilizer": "fertilizer_price_index.csv", "rainfall": "district_rainfall_anomalies.csv"}
+    for key, fname in files.items():
+        p = DATA_PROCESSED / fname
+        if p.exists():
+            try:
+                d = pd.read_csv(p, parse_dates=["date"])
+                out[key] = {"data_through": d["date"].max().strftime("%Y-%m")}
+            except Exception:
+                pass
+    return out

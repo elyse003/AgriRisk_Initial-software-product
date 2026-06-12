@@ -5,13 +5,21 @@ from config.settings import DISTRICTS
 from src.data.preprocessing import label_risk
 from src.db.connection import log_risk
 
-setup("Seasonal Risk", "Random Forest / XGBoost · Rainfall + CPI + Fertilizer")
+setup("Seasonal Risk", "Planting risk by district and season")
 rain, cpi, fert, model = load_rainfall(), load_cpi(), load_fert(), load_risk_model()
+
+# Rwanda's two main cropping seasons. The rainfall data codes the March-May long
+# rains as 'A' and the October-December short rains as 'B'; the official MINAGRI
+# calendar names them the other way round, so show the official names and map.
+SEASONS = {
+    "Season A · short rains (Oct–Dec)": "B",
+    "Season B · long rains (Mar–May)": "A",
+}
 
 c1, c2 = st.columns(2)
 district = c1.selectbox("District", DISTRICTS)
-season = c2.selectbox("Season", ["A (Mar–May)", "B (Oct–Dec)"])
-scode = season[0]
+season_label = c2.selectbox("Season", list(SEASONS.keys()))
+scode = SEASONS[season_label]
 
 if st.button("Assess Risk", type="primary"):
     r = rain[(rain.district == district) & (rain.season == scode)]
@@ -25,13 +33,13 @@ if st.button("Assess Risk", type="primary"):
     log_risk(district, scode, rain_a, cpi_c, fert_c, level)
     color = {"High": "#DC2626", "Medium": "#D97706", "Low": "#40916C"}[level]
     st.markdown(f"<div class='ar-card'><span class='ar-badge' style='background:{color}'>{level} risk</span>"
-                f"<span style='color:#5A7A6A;margin-left:10px'>{district} · Season {scode} · {conf}</span></div>",
+                f"<span style='color:#5E7065;margin-left:10px'>{district} · {season_label}</span></div>",
                 unsafe_allow_html=True)
-    st.write("**Contributing factors**")
+    st.write("**What's driving this**")
     clamp = lambda v: max(0.0, min(v, 1.0))
-    st.progress(clamp(abs(rain_a)/2), text=f"Rainfall anomaly: {rain_a:+.2f} σ")
-    st.progress(clamp(cpi_c/30), text=f"Food CPI change: {cpi_c:.1f}%")
-    st.progress(clamp(fert_c/60), text=f"Fertilizer change: {fert_c:.1f}%")
+    st.progress(clamp(abs(rain_a)/2), text="Rainfall compared to normal")
+    st.progress(clamp(cpi_c/30), text="Food price pressure")
+    st.progress(clamp(fert_c/60), text="Fertilizer cost pressure")
     st.info({"High": "High combined risk — advise conservative planting and minimal input spend.",
              "Medium": "Moderate risk — monitor conditions; consider drought-tolerant varieties.",
              "Low": "Favourable conditions — normal planting and input investment is reasonable."}[level])

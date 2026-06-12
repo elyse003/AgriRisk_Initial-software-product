@@ -22,7 +22,7 @@ INTENT_WORDS = {
     "price": ["igiciro", "price", "ibiciro"],
     "risk": ["risk", "ibyago", "ibyago"],
     "disease": ["indwara", "disease"],
-    "input": ["input", "ifumbire", "inputs", "imbuto"],
+    "input": ["input", "ifumbire", "inputs", "imbuto", "fertilizer", "fertiliser"],
     "help": ["help", "ubufasha"],
 }
 
@@ -49,9 +49,16 @@ def parse_message(text: str) -> dict:
     budget_match = re.search(r"\d{4,}", t.replace(",", ""))
     budget = int(budget_match.group()) if budget_match else None
 
+    # land size: "0.5 ha", "1 hectare", "50 ares" (1 are = 0.01 ha)
+    land_match = re.search(r"(\d+(?:\.\d+)?)\s*(hectares|hectare|ha|ares|are)\b", t)
+    land_ha = None
+    if land_match:
+        val = float(land_match.group(1))
+        land_ha = val * 0.01 if land_match.group(2).startswith("are") else val
+
     # infer intent when a crop/district is named without an explicit keyword
     if intent is None and crop and district:
         intent = "price"
 
     return {"intent": intent, "crop": crop, "district": district,
-            "budget": budget, "lang": lang}
+            "budget": budget, "land_ha": land_ha, "lang": lang}

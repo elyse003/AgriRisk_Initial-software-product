@@ -16,8 +16,10 @@ DDL = """
 CREATE TABLE IF NOT EXISTS users (
     user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
     name     TEXT NOT NULL,
-    role     TEXT NOT NULL,
-    district TEXT
+    role     TEXT NOT NULL,        -- 'farmer' | 'officer' | 'super_admin'
+    district TEXT,
+    phone    TEXT UNIQUE,
+    language TEXT DEFAULT 'rw'
 );
 CREATE TABLE IF NOT EXISTS price_records (
     record_id   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,6 +75,16 @@ SAMPLE_SUBSCRIBERS = [
     ("0788000108", "Gatsibo", "maize", "en"),
 ]
 
+# name, role, district, phone, language. Roles: 'farmer' | 'officer' | 'super_admin'
+SAMPLE_USERS = [
+    ("National Administrator (RAB)", "super_admin", "Nationwide", "0788000001", "en"),
+    ("Extension Officer - Musanze", "officer", "Musanze", "0788000010", "rw"),
+    ("Extension Officer - Bugesera", "officer", "Bugesera", "0788000011", "rw"),
+    ("Jean (farmer)", "farmer", "Musanze", "0788000101", "rw"),
+    ("Aline (farmer)", "farmer", "Bugesera", "0788000102", "rw"),
+    ("Eric (farmer)", "farmer", "Nyagatare", "0788000103", "en"),
+]
+
 
 def get_connection():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -107,6 +119,10 @@ def _seed(conn):
         cur.executemany(
             "INSERT OR IGNORE INTO subscribers (phone_number, district, crops, language) VALUES (?,?,?,?)",
             SAMPLE_SUBSCRIBERS)
+    if cur.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0:
+        cur.executemany(
+            "INSERT OR IGNORE INTO users (name, role, district, phone, language) VALUES (?,?,?,?,?)",
+            SAMPLE_USERS)
     conn.commit()
 
 
@@ -191,3 +207,58 @@ def log_price(crop, market, record_date, price_rwf):
         conn.commit(); conn.close()
     except Exception:
         pass
+
+
+# ---------------------------------------------------------------------------
+# User roles: how the system knows whether someone is a farmer, an officer,
+# or the super admin. The web platform looks a person up on sign-in; the
+# chatbot looks them up by phone number when they send a message.
+# ---------------------------------------------------------------------------
+def add_user(name, role, district=None, phone=None, language="rw"):
+    """Register a user. role is 'farmer', 'officer' or 'super_admin'."""
+    _ensure()
+    conn = get_connection()
+    conn.execute(
+        "INSERT OR IGNORE INTO users (name, role, district, phone, language) VALUES (?,?,?,?,?)",
+        (name, role, district, phone, language))
+    conn.commit(); conn.close()
+
+
+def get_user_by_phone(phone):
+    """Identify who is using the service from their phone number.
+
+    Returns a dict with their role, district and language, or None if unknown.
+    This is how the chatbot decides what a caller is allowed to see.
+    """
+    _ensure()
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT user_id, name, role, district, phone, language FROM users WHERE phone = ?",
+        (phone,)).fetchone()
+    conn.close()
+    if not row:
+        return None
+    keys = ["user_id", "name", "role", "district", "phone", "language"]
+    return dict(zip(keys, row))
+
+
+def list_users(role=None):
+    """All users, optionally filtered to one role."""
+    _ensure()
+    conn = get_connection()
+    if role:
+        df = pd.read_sql_query(
+            "SELECT name, role, district, phone, language FROM users WHERE role = ?", conn, params=(role,))
+    else:
+        df = pd.read_sql_query("SELECT name, role, district, phone, language FROM users", conn)
+    conn.close()
+    return df
+
+
+def role_counts():
+    """How many of each role are registered: {'farmer': n, 'officer': n, ...}."""
+    _ensure()
+    conn = get_connection()
+    rows = conn.execute("SELECT role, COUNT(*) FROM users GROUP BY role").fetchall()
+    conn.close()
+    return {r: c for r, c in rows}

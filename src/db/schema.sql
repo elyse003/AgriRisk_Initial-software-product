@@ -3,8 +3,10 @@
 CREATE TABLE IF NOT EXISTS users (
     user_id     SERIAL PRIMARY KEY,
     name        VARCHAR(120) NOT NULL,
-    role        VARCHAR(40)  NOT NULL,        -- 'extension_officer' | 'administrator'
-    district    VARCHAR(60)
+    role        VARCHAR(40)  NOT NULL,        -- 'farmer' | 'officer' | 'super_admin'
+    district    VARCHAR(60),
+    phone       VARCHAR(20) UNIQUE,
+    language    VARCHAR(5) DEFAULT 'rw'
 );
 
 CREATE TABLE IF NOT EXISTS price_records (

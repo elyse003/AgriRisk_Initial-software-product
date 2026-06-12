@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1B4332" />
+<title>AgriRisk Rwanda — advice for every stage of the season</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1B4332; --emerald:#2D6A4F; --leaf:#40916C; --sage:#74A98C;
+    --harvest:#C76E1B; --soil:#8A5A2B; --paper:#F6F2E8; --paper2:#EFEAdb;
+    --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4;
+    --disp:'Bricolage Grotesque',sans-serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;background:rgba(246,242,232,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:19px;color:var(--forest);letter-spacing:-.02em}
+  .brand .seed{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--emerald);transform:rotate(-45deg);box-shadow:inset -3px -3px 0 rgba(0,0,0,.08)}
+  .nav-links{display:flex;gap:26px;font-size:14px;font-weight:500;color:var(--mut)}
+  .nav-links a:hover{color:var(--forest)}
+  .btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:9px;padding:11px 18px;border:none;cursor:pointer;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
+  .btn-go{background:var(--forest);color:#fff}
+  .btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,67,50,.25)}
+  .btn-ghost{background:transparent;color:var(--forest);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--emerald)}
+  @media(max-width:740px){.nav-links{display:none}}
+
+  /* hero */
+  .hero{padding:78px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald);margin-bottom:20px}
+  h1{font-family:var(--disp);font-weight:800;font-size:clamp(38px,5.4vw,62px);line-height:1.02;letter-spacing:-.03em;color:var(--forest)}
+  h1 .em{color:var(--harvest)}
+  .lead{font-size:17.5px;color:var(--mut);margin:22px 0 30px;max-width:30em}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:var(--mut)}
+  @media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:52px}.ring-wrap{order:-1}}
+
+  /* the season ring (signature) */
+  .ring-wrap{display:flex;justify-content:center}
+  .ring{width:100%;max-width:420px;height:auto}
+  .ring text{font-family:var(--body)}
+  .stage-t{font-family:var(--disp);font-weight:700;fill:var(--forest)}
+  .stage-s{font-family:var(--mono);font-weight:500;fill:var(--mut);letter-spacing:.06em}
+
+  /* section frame */
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  .sec-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--harvest);margin-bottom:12px}
+  .sec-h{font-family:var(--disp);font-weight:700;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;color:var(--forest);max-width:18em}
+  .sec-sub{color:var(--mut);margin-top:12px;max-width:42em;font-size:16px}
+
+  /* module cards */
+  .mods{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:38px}
+  @media(max-width:720px){.mods{grid-template-columns:1fr}}
+  .mod{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px;position:relative;overflow:hidden;transition:transform .14s ease, box-shadow .14s ease}
+  .mod:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(27,67,50,.10)}
+  .mod .stage{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--harvest)}
+  .mod h3{font-family:var(--disp);font-weight:700;font-size:21px;color:var(--forest);margin:8px 0 8px;letter-spacing:-.01em}
+  .mod p{font-size:14.5px;color:var(--mut)}
+  .mod .num{position:absolute;right:18px;top:14px;font-family:var(--disp);font-weight:800;font-size:46px;color:var(--paper2)}
+
+  /* numbers */
+  .stats{background:var(--forest);border-radius:20px;padding:42px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px;color:#fff}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr);padding:30px}}
+  .stat .v{font-family:var(--mono);font-weight:700;font-size:34px;color:#fff;letter-spacing:-.02em}
+  .stat .v small{color:var(--sage);font-size:18px}
+  .stat .l{font-size:13px;color:var(--sage);margin-top:6px}
+
+  /* channels */
+  .chs{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+  @media(max-width:720px){.chs{grid-template-columns:1fr}}
+  .ch{border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--paper2)}
+  .ch .tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald)}
+  .ch h4{font-family:var(--disp);font-weight:700;font-size:19px;color:var(--forest);margin:8px 0 6px}
+  .ch p{font-size:14px;color:var(--mut)}
+
+  /* sources */
+  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .pill{font-family:var(--mono);font-size:12.5px;color:var(--emerald);background:#fff;border:1px solid var(--line);border-radius:30px;padding:8px 16px}
+
+  /* faq */
+  details{border-bottom:1px solid var(--line);padding:18px 0}
+  summary{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--forest);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-family:var(--mono);color:var(--harvest);font-size:22px;transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{color:var(--mut);font-size:15px;margin-top:12px;max-width:54em}
+
+  /* cta band + footer */
+  .band{background:var(--harvest);border-radius:20px;padding:48px;text-align:center;color:#fff;margin-top:10px}
+  .band h2{font-family:var(--disp);font-weight:800;font-size:clamp(26px,3.6vw,38px);letter-spacing:-.02em}
+  .band p{margin:14px auto 26px;max-width:36em;color:#FCEBD8}
+  .band .btn-go{background:#fff;color:var(--harvest)}
+  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mut);font-size:13.5px}
+  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><span class="seed"></span>AgriRisk Rwanda</a>
+    <div class="nav-links">
+      <a href="#season">The season</a>
+      <a href="#numbers">Results</a>
+      <a href="#reach">Reaching farmers</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <!-- Replace # with your deployed Streamlit URL (e.g. https://agririsk.streamlit.app) -->
+    <a class="btn btn-go" href="#">Open the dashboard</a>
+  </div>
+</nav>
+
+<header id="top" class="wrap hero">
+  <div>
+    <div class="eyebrow">Nationwide agricultural intelligence · Rwanda</div>
+    <h1>Advice for every<br>stage of the <span class="em">season.</span></h1>
+    <p class="lead">A machine-learning advisory platform for Rwanda's smallholder farmers. It follows the whole cycle, from deciding what to plant to selling at the right price, across all 30 districts and the country's staple crops.</p>
+    <div class="cta-row">
+      <a class="btn btn-go" href="#">Open the dashboard</a>
+      <a class="btn btn-ghost" href="#season">See how it works</a>
+    </div>
+    <div class="hero-note">maize · beans · Irish potatoes — in Kinyarwanda and English</div>
+  </div>
+  <div class="ring-wrap">
+    <svg class="ring" viewBox="0 0 420 420" role="img" aria-label="The four advisory modules around the farming season">
+      <circle cx="210" cy="210" r="150" fill="none" stroke="#DED7C4" stroke-width="2"/>
+      <circle cx="210" cy="210" r="150" fill="none" stroke="#C76E1B" stroke-width="3" stroke-linecap="round"
+              stroke-dasharray="180 762" transform="rotate(-90 210 210)"/>
+      <!-- centre -->
+      <text x="210" y="200" text-anchor="middle" class="stage-t" font-size="17">The farming</text>
+      <text x="210" y="222" text-anchor="middle" class="stage-t" font-size="17">season</text>
+      <text x="210" y="244" text-anchor="middle" class="stage-s" font-size="10">two rain seasons a year</text>
+      <!-- top: plan -->
+      <circle cx="210" cy="60" r="7" fill="#2D6A4F"/>
+      <text x="210" y="34" text-anchor="middle" class="stage-t" font-size="15">Before planting</text>
+      <text x="210" y="50" text-anchor="middle" class="stage-s" font-size="10">SEASONAL RISK</text>
+      <!-- right: inputs -->
+      <circle cx="360" cy="210" r="7" fill="#2D6A4F"/>
+      <text x="352" y="206" text-anchor="end" class="stage-t" font-size="15">At planting</text>
+      <text x="352" y="222" text-anchor="end" class="stage-s" font-size="10">INPUT PLAN</text>
+      <!-- bottom: grow -->
+      <circle cx="210" cy="360" r="7" fill="#2D6A4F"/>
+      <text x="210" y="388" text-anchor="middle" class="stage-t" font-size="15">While growing</text>
+      <text x="210" y="404" text-anchor="middle" class="stage-s" font-size="10">DISEASE ALERTS</text>
+      <!-- left: sell -->
+      <circle cx="60" cy="210" r="7" fill="#2D6A4F"/>
+      <text x="68" y="206" text-anchor="start" class="stage-t" font-size="15">At selling</text>
+      <text x="68" y="222" text-anchor="start" class="stage-s" font-size="10">PRICE FORECAST</text>
+    </svg>
+  </div>
+</header>
+
+<section id="season" class="wrap">
+  <div class="sec-eyebrow">Four tools, one cycle</div>
+  <h2 class="sec-h">Each module answers a question the farmer faces at that point in the season.</h2>
+  <div class="mods">
+    <div class="mod reveal"><span class="num">01</span><div class="stage">Before planting</div>
+      <h3>Seasonal risk</h3>
+      <p>Rates each district and season low, medium, or high by combining rainfall against its normal, food inflation, and fertilizer cost — so a farmer knows whether to plant cautiously.</p></div>
+    <div class="mod reveal"><span class="num">02</span><div class="stage">At planting</div>
+      <h3>Input plan</h3>
+      <p>Turns the farmer's land size into the exact fertilizer needed — the bags of NPK, urea, or DAP and their cost at subsidised prices, checked against the budget.</p></div>
+    <div class="mod reveal"><span class="num">03</span><div class="stage">While growing</div>
+      <h3>Disease alerts</h3>
+      <p>Reads the live weather forecast for the district and warns when conditions favour a crop disease, like potato late blight in cool, wet spells, with the action to take.</p></div>
+    <div class="mod reveal"><span class="num">04</span><div class="stage">At selling</div>
+      <h3>Price forecast</h3>
+      <p>Projects the market price four weeks ahead per crop and district, so a farmer can decide whether to sell now or hold for a better price.</p></div>
+  </div>
+</section>
+
+<section id="numbers" class="wrap">
+  <div class="sec-eyebrow">What the models do</div>
+  <h2 class="sec-h">Trained and validated on real Rwandan data.</h2>
+  <div class="stats reveal" style="margin-top:34px">
+    <div class="stat"><div class="v">30</div><div class="l">districts covered</div></div>
+    <div class="stat"><div class="v">3</div><div class="l">staple crops</div></div>
+    <div class="stat"><div class="v">4.35<small>%</small></div><div class="l">price forecast error (MAPE)</div></div>
+    <div class="stat"><div class="v">4</div><div class="l">advisory modules</div></div>
+  </div>
+  <p class="sec-sub" style="margin-top:20px">The price forecaster reaches a 4.35% mean error, well under the 15% target, benchmarked against Prophet, ARIMA, and a random-forest baseline. Full data engineering, model architecture, and metrics are documented in the modelling notebook.</p>
+</section>
+
+<section id="reach" class="wrap">
+  <div class="sec-eyebrow">Built for the farmer first</div>
+  <h2 class="sec-h">The advice reaches the farmer on the phone they already own.</h2>
+  <div class="chs">
+    <div class="ch reveal"><div class="tag">Basic phones</div><h4>SMS</h4><p>Short Kinyarwanda alerts for price moves, risk, and disease, delivered to any phone with no internet or data cost.</p></div>
+    <div class="ch reveal"><div class="tag">Conversational</div><h4>WhatsApp</h4><p>A farmer asks a plain question and gets a short, useful answer — prices, risk, or what to do about a disease warning.</p></div>
+    <div class="ch reveal"><div class="tag">For officers</div><h4>Dashboard</h4><p>Extension officers and administrators see their district's forecasts, risk, and the farmers they support, all in one place.</p></div>
+  </div>
+  <div class="sec-eyebrow" style="margin-top:46px">Grounded in public data</div>
+  <div class="pills">
+    <span class="pill">WFP market prices</span>
+    <span class="pill">NISR food inflation</span>
+    <span class="pill">World Bank fertilizer index</span>
+    <span class="pill">CHIRPS rainfall</span>
+    <span class="pill">Open-Meteo weather</span>
+    <span class="pill">MINAGRI / Smart Nkunganire</span>
+  </div>
+</section>
+
+<section id="faq" class="wrap">
+  <div class="sec-eyebrow">Questions</div>
+  <h2 class="sec-h">How it works in practice.</h2>
+  <div style="margin-top:30px">
+    <details><summary>Do farmers need a smartphone?</summary><p>No. The core advice goes out by SMS, which works on any basic phone with no internet. WhatsApp is there for farmers who use it, and the dashboard is for extension officers.</p></details>
+    <details><summary>Which crops and areas are covered?</summary><p>Maize, beans, and Irish potatoes across all 30 districts of Rwanda, the country's main food crops and the full national footprint.</p></details>
+    <details><summary>Where does the data come from?</summary><p>Public sources: WFP for market prices, NISR for food inflation, the World Bank for fertilizer costs, CHIRPS for rainfall, Open-Meteo for live weather, and MINAGRI for subsidised input prices.</p></details>
+    <details><summary>How current is it?</summary><p>Weather and disease alerts are live. Prices, inflation, fertilizer, and rainfall are published monthly, so the platform refreshes on that cycle and shows how recent its data is.</p></details>
+  </div>
+</section>
+
+<section class="wrap" style="border-top:none">
+  <div class="band reveal">
+    <h2>See the season before it arrives.</h2>
+    <p>Open the dashboard to explore forecasts, risk, disease alerts, and input plans across all 30 districts.</p>
+    <!-- Replace # with your deployed Streamlit URL -->
+    <a class="btn btn-go" href="#">Open the dashboard</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div><span class="brand" style="font-size:16px"><span class="seed" style="width:16px;height:16px"></span>AgriRisk Rwanda</span></div>
+    <div>Decision support for Rwandan agriculture · maize, beans, Irish potatoes · 30 districts</div>
+    <div>BSc Software Engineering capstone</div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
