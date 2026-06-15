@@ -14,11 +14,18 @@ across all 30 districts of Rwanda:
 The application runs as a Streamlit dashboard with a farmer-facing WhatsApp chat in
 Kinyarwanda and English. It is backed by trained machine learning models and a SQLite database.
 
+## Live demo
+
+- **Landing page (homepage):** https://elyse003.github.io/AgriRisk_Initial-software-product/
+- **Dashboard (the app):** https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app
+
+The landing page's "Open the dashboard" buttons link to the live Streamlit app. The
+homepage is published from `landing/` by a GitHub Actions workflow; the app is deployed
+on Streamlit Community Cloud.
+
 ## Repository
 
 https://github.com/elyse003/AgriRisk_Initial-software-product.git
-
-(Replace with your repository link before submission.)
 
 ## Setting up the environment and project
 

@@ -189,10 +189,10 @@
   <div class="stats reveal" style="margin-top:34px">
     <div class="stat"><div class="v">30</div><div class="l">districts covered</div></div>
     <div class="stat"><div class="v">3</div><div class="l">staple crops</div></div>
-    <div class="stat"><div class="v">4.35<small>%</small></div><div class="l">price forecast error (MAPE)</div></div>
+    <div class="stat"><div class="v">4.37<small>%</small></div><div class="l">best-model forecast error (MAPE)</div></div>
     <div class="stat"><div class="v">4</div><div class="l">advisory modules</div></div>
   </div>
-  <p class="sec-sub" style="margin-top:20px">The price forecaster reaches a 4.35% mean error, well under the 15% target, benchmarked against Prophet, ARIMA, and a random-forest baseline. Full data engineering, model architecture, and metrics are documented in the modelling notebook.</p>
+  <p class="sec-sub" style="margin-top:20px">In the modelling study, the best forecaster — an LSTM — reaches 4.37% mean error, well under the 15% target, ahead of Prophet, ARIMA, and a random-forest baseline. The deployed app uses a simpler, robust model that serves every crop and district at about 10% error. Full data engineering, model architecture, and metrics are documented in the modelling notebook.</p>
 </section>
 
 <section id="reach" class="wrap">
@@ -206,7 +206,7 @@
   <div class="sec-eyebrow" style="margin-top:46px">Grounded in public data</div>
   <div class="pills">
     <span class="pill">WFP market prices</span>
-    <span class="pill">NISR food inflation</span>
+    <span class="pill">World Bank CPI</span>
     <span class="pill">World Bank fertilizer index</span>
     <span class="pill">CHIRPS rainfall</span>
     <span class="pill">Open-Meteo weather</span>
