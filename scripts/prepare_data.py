@@ -58,11 +58,36 @@ def _find_cpi_file():
     return None
 
 
+def _prep_cpi_worldbank():
+    """Fallback CPI from the World Bank annual CPI file fetched by download_data.py.
+
+    Rwanda has no public *monthly food* CPI API, so we use the World Bank headline
+    CPI (2010=100, annual) as the macro-inflation feature, forward-filled to monthly
+    so the YoY pct_change(12) used downstream still works. Documented as such.
+    """
+    f = DATA_RAW / "worldbank_cpi_rwanda.csv"
+    if not f.exists():
+        return None
+    wb = pd.read_csv(f).dropna().sort_values("year")
+    # expand annual -> monthly (value stamped at mid-year, then interpolate/ffill)
+    wb["date"] = pd.to_datetime(wb["year"].astype(str) + "-07-01")
+    monthly = (wb.set_index("date")["cpi"]
+                 .resample("MS").interpolate("linear")
+                 .reset_index().rename(columns={"cpi": "food_cpi"}))
+    monthly["date"] = monthly["date"].values.astype("datetime64[M]")
+    monthly[["date", "food_cpi"]].to_csv(DATA_PROCESSED / "rwanda_food_cpi.csv", index=False)
+    return monthly
+
+
 def prep_cpi():
     f = _find_cpi_file()
     if f is None:
-        print("  ! CPI file not found; keeping existing canonical CPI.")
-        return None
+        cpi = _prep_cpi_worldbank()
+        if cpi is None:
+            print("  ! No CPI source (NISR file or World Bank file) found; keeping existing.")
+        else:
+            print("  cpi: World Bank headline CPI (annual -> monthly), no NISR file present.")
+        return cpi
     eng = "openpyxl" if f.suffix == ".xlsx" else "xlrd"
     raw = pd.read_excel(f, sheet_name="All Rwanda", header=None, engine=eng)
     hdr = raw[raw.apply(lambda r: r.astype(str).str.contains("Weights", case=False).any(), axis=1)].index[0]
@@ -135,61 +160,17 @@ def prep_inputs():
     return None
 
 
-def label_risk(rain_a, cpi_c, fert_c):
-    if rain_a < -0.8 and (cpi_c > 15 or fert_c > 30): return "High"
-    if rain_a < -0.3 or cpi_c > 10 or fert_c > 20:    return "Medium"
-    return "Low"
-
-
-def train_risk(rain, cpi, fert):
-    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, RandomForestRegressor
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-    if cpi is None or fert is None:
-        print("  ! Skipping risk training (missing CPI or fertilizer).")
-        return
-    cpi = cpi.copy(); fert = fert.copy()
-    cpi["cpi_change"] = cpi["food_cpi"].pct_change(12) * 100
-    fert["fert_change"] = fert["fert_index"].pct_change(12) * 100
-    df = rain[rain.season != "off"].merge(cpi[["date", "cpi_change"]], on="date", how="left")
-    df = df.merge(fert[["date", "fert_change"]], on="date", how="left").dropna(
-        subset=["rainfall_anomaly", "cpi_change", "fert_change"])
-    df["risk_level"] = df.apply(lambda x: label_risk(x.rainfall_anomaly, x.cpi_change, x.fert_change), axis=1)
-    feat = ["rainfall_anomaly", "cpi_change", "fert_change"]
-    X, y = df[feat], df["risk_level"]
-    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-    rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42).fit(Xtr, ytr)
-    gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42).fit(Xtr, ytr)
-    pickle.dump(rf, open(MODELS_STORE / "risk_classifier.pkl", "wb"))
-
-    def acc(model):
-        p = model.predict(Xte)
-        return {"accuracy": round(accuracy_score(yte, p), 3),
-                "precision": round(precision_score(yte, p, average="macro", zero_division=0), 3),
-                "recall": round(recall_score(yte, p, average="macro", zero_division=0), 3),
-                "f1": round(f1_score(yte, p, average="macro"), 3)}
-
-    # real price-baseline MAPE on a well-covered series
-    pr = pd.read_csv(DATA_PROCESSED / "wfp_food_prices_rwanda.csv", parse_dates=["date"])
-    s = pr[(pr.crop == "maize") & (pr.market == "Musanze")].sort_values("date").set_index("date")["price_rwf"]
-    mape = None
-    if len(s) > 40:
-        d = pd.DataFrame({"y": s})
-        for lag in [1, 2, 3, 6, 12]:
-            d[f"lag{lag}"] = d["y"].shift(lag)
-        d["target"] = d["y"].shift(-1); d = d.dropna()
-        feats = [c for c in d.columns if c.startswith("lag")]
-        cc = int(len(d) * 0.8)
-        reg = RandomForestRegressor(n_estimators=200, random_state=42).fit(d[feats][:cc], d["target"][:cc])
-        pred = reg.predict(d[feats][cc:])
-        mape = round(float(np.mean(np.abs((d["target"][cc:].values - pred) / d["target"][cc:].values)) * 100), 2)
-        pickle.dump(reg, open(MODELS_STORE / "price_baseline.pkl", "wb"))
-
-    metrics = {"risk_random_forest": acc(rf), "risk_gradient_boosting": acc(gb),
-               "price_baseline_mape": mape, "n_risk_rows": len(df)}
-    json.dump(metrics, open(MODELS_STORE / "metrics.json", "w"), indent=2)
-    print(f"  risk rows={len(df)} classes={dict(df.risk_level.value_counts())} "
-          f"RF acc={metrics['risk_random_forest']['accuracy']} price MAPE={mape}%")
+def _write_last_updated(pr, cpi, fert, rain):
+    """Record how current each series is, for the dashboard's freshness caption."""
+    def through(df, col="date"):
+        return pd.to_datetime(df[col]).max().strftime("%Y-%m") if df is not None and len(df) else None
+    status = {
+        "wfp_prices": {"data_through": through(pr)},
+        "cpi": {"data_through": through(cpi)},
+        "fertilizer": {"data_through": through(fert)},
+        "rainfall": {"data_through": through(rain)},
+    }
+    json.dump(status, open(DATA_PROCESSED / "last_updated.json", "w"), indent=2)
 
 
 def main():
@@ -199,8 +180,8 @@ def main():
     fert = prep_fertilizer(); print(f"  fertilizer: {'fallback' if fert is None else str(len(fert))+' months'}")
     rain = prep_rainfall(); print(f"  rainfall: {len(rain)} district-months, {rain.district.nunique()} districts")
     inp = prep_inputs();  print(f"  inputs: {0 if inp is None else len(inp)} items")
-    train_risk(rain, cpi, fert)
-    print("Done. Apps will now prefer data/processed/.")
+    _write_last_updated(pr, cpi, fert, rain)
+    print("Done. Next: python scripts/train_models.py  (trains + serializes the models)")
 
 
 if __name__ == "__main__":

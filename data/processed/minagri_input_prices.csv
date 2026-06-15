@@ -1,0 +1,4 @@
+input_id,input_name,input_type,crop_suitability,supplier,district,price_rwf
+1,Urea (50kg bag),fertilizer,"maize,potatoes",Nationwide (Smart Nkunganire System),Nationwide,33000
+2,DAP (50kg bag),fertilizer,"maize,beans",Nationwide (Smart Nkunganire System),Nationwide,36200
+3,NPK 17-17-17 (50kg bag),fertilizer,"potatoes,maize,beans",Nationwide (Smart Nkunganire System),Nationwide,34200

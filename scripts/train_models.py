@@ -1,73 +1,84 @@
-"""Train + evaluate models, serialize winners to models_store/, and write
-metrics.json (used by the web app's Home screen). Run: PYTHONPATH=. python scripts/train_models.py
+"""Train + serialize the production models on the REAL processed data, and write
+metrics.json (read by the dashboard's Home screen).
+
+    python scripts/prepare_data.py     # first: build data/processed/ from real sources
+    python scripts/train_models.py     # then: train + save models_store/*.pkl
+
+Artifacts written to models_store/:
+    price_forecaster.pkl   dict {crop: GradientBoostingRegressor}  (next-month log-return model)
+    risk_classifier.pkl    GradientBoostingClassifier              (food-price-stress risk)
+    metrics.json           real holdout metrics shown in the app
 """
-import json, pickle
-import numpy as np, pandas as pd
+from __future__ import annotations
+
+import json
+import pickle
+import sys
+from pathlib import Path
+
+import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import (RandomForestClassifier, GradientBoostingClassifier,
-                              RandomForestRegressor)
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score)
 
-from config.settings import DATA_RAW, MODELS_STORE
-from src.data.preprocessing import label_risk
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from config.settings import DATA_PROCESSED, MODELS_STORE, CROPS
+from src.models.price_forecasting import train_crop_model
+from src.models import risk_classifier as rc
 
 
-def build_risk():
-    cpi = pd.read_csv(DATA_RAW/"rwanda_food_cpi.csv", parse_dates=["date"]).sort_values("date")
-    fert = pd.read_csv(DATA_RAW/"fertilizer_price_index.csv", parse_dates=["date"]).sort_values("date")
-    rain = pd.read_csv(DATA_RAW/"district_rainfall_anomalies.csv", parse_dates=["date"]).sort_values("date")
-    cpi["cpi_change"] = cpi["food_cpi"].pct_change(12)*100
-    fert["fert_change"] = fert["fert_index"].pct_change(12)*100
-    df = pd.merge_asof(rain, cpi[["date","cpi_change"]], on="date")
-    df = pd.merge_asof(df, fert[["date","fert_change"]], on="date").dropna().reset_index(drop=True)
-    df["risk_level"] = df.apply(lambda r: label_risk(r.rainfall_anomaly, r.cpi_change, r.fert_change), axis=1)
-    return df
+def _load(name, **kw):
+    return pd.read_csv(DATA_PROCESSED / name, **kw)
+
+
+def train_price():
+    prices = _load("wfp_food_prices_rwanda.csv", parse_dates=["date"])
+    models, mape = {}, {}
+    for crop in CROPS:
+        model, score, n = train_crop_model(prices, crop)
+        if model is not None:
+            models[crop] = model
+            mape[crop] = score
+            print(f"  price[{crop}]: MAPE={score:.2f}%  (n={n})")
+    pickle.dump(models, open(MODELS_STORE / "price_forecaster.pkl", "wb"))
+    return mape
+
+
+def train_risk():
+    prices = _load("wfp_food_prices_rwanda.csv", parse_dates=["date"])
+    rain = _load("district_rainfall_anomalies.csv", parse_dates=["date"])
+    cpi = _load("rwanda_food_cpi.csv", parse_dates=["date"])
+    fert = _load("fertilizer_price_index.csv", parse_dates=["date"])
+
+    df = rc.build_risk_dataset(prices, rain, cpi, fert)
+    X, y = df[rc.FEATURES], df[rc.LABEL]
+    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+    rf = rc.fit_random_forest(Xtr, ytr)
+    gb = rc.fit_gradient_boosting(Xtr, ytr)
+    rf_m, gb_m = rc.evaluate(rf, Xte, yte), rc.evaluate(gb, Xte, yte)
+    best = gb if gb_m["macro_f1"] >= rf_m["macro_f1"] else rf
+    # refit the winner on all data for deployment
+    best.fit(X, y)
+    pickle.dump(best, open(MODELS_STORE / "risk_classifier.pkl", "wb"))
+    majority = round(float(y.value_counts().max() / len(y)), 3)
+    print(f"  risk: n={len(df)} classes={df[rc.LABEL].value_counts().to_dict()}")
+    print(f"  risk: RF={rf_m}  GB={gb_m}  majority_baseline={majority}")
+    return rf_m, gb_m, len(df), majority
 
 
 def main():
-    df = build_risk()
-    rng = np.random.default_rng(0)
-    X = df[["rainfall_anomaly","cpi_change","fert_change"]].copy()
-    X["rainfall_anomaly"] += rng.normal(0, 0.15, len(X))
-    X["cpi_change"]       += rng.normal(0, 1.0,  len(X))
-    X["fert_change"]      += rng.normal(0, 2.0,  len(X))
-    y = df["risk_level"]
-    Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-
-    rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42).fit(Xtr, ytr)
-    gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, random_state=42).fit(Xtr, ytr)
-
-    def m(model):
-        p = model.predict(Xte)
-        return dict(accuracy=accuracy_score(yte,p),
-                    precision=precision_score(yte,p,average="macro",zero_division=0),
-                    recall=recall_score(yte,p,average="macro",zero_division=0),
-                    f1=f1_score(yte,p,average="macro"))
-    rf_m, gb_m = m(rf), m(gb)
-    best = rf if rf_m["f1"] >= gb_m["f1"] else gb
-    pickle.dump(best, open(MODELS_STORE/"risk_classifier.pkl","wb"))
-
-    # price MAPE on maize / Bugesera baseline
-    prices = pd.read_csv(DATA_RAW/"wfp_food_prices_rwanda.csv", parse_dates=["date"])
-    s = prices[(prices.crop=="maize")&(prices.market=="Bugesera")].sort_values("date").set_index("date")["price_rwf"]
-    d = pd.DataFrame({"y": s})
-    for lag in [1,2,3,4,8,12,52]: d[f"lag{lag}"] = d["y"].shift(lag)
-    d["target"] = d["y"].shift(-4); d = d.dropna()
-    feats = [c for c in d.columns if c.startswith("lag")]
-    cut = int(len(d)*0.8)
-    reg = RandomForestRegressor(n_estimators=200, random_state=42).fit(d[feats][:cut], d["target"][:cut])
-    pred = reg.predict(d[feats][cut:])
-    mape = float(np.mean(np.abs((d["target"][cut:].values - pred)/d["target"][cut:].values))*100)
-    pickle.dump(reg, open(MODELS_STORE/"price_baseline.pkl","wb"))
-
+    print("Training production models on real data ...")
+    mape = train_price()
+    rf_m, gb_m, n_risk, majority = train_risk()
     metrics = {
-        "risk_random_forest": {k: round(v,3) for k,v in rf_m.items()},
-        "risk_gradient_boosting": {k: round(v,3) for k,v in gb_m.items()},
-        "price_baseline_mape": round(mape,2),
-        "n_risk_rows": len(df),
+        "price_mape_by_crop": {k: round(v, 2) for k, v in mape.items()},
+        "price_mape_avg": round(sum(mape.values()) / len(mape), 2) if mape else None,
+        "risk_random_forest": rf_m,
+        "risk_gradient_boosting": gb_m,
+        "risk_majority_baseline": majority,
+        "n_risk_rows": n_risk,
     }
-    json.dump(metrics, open(MODELS_STORE/"metrics.json","w"), indent=2)
-    print("Saved models + metrics.json")
+    json.dump(metrics, open(MODELS_STORE / "metrics.json", "w"), indent=2)
+    print("Saved models_store/price_forecaster.pkl, risk_classifier.pkl, metrics.json")
     print(json.dumps(metrics, indent=2))
 
 

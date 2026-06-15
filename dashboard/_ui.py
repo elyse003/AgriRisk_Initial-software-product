@@ -23,11 +23,23 @@ CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
 :root{ --forest:#1B4332; --emerald:#2D6A4F; --harvest:#C76E1B; --paper:#F6F2E8; --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4; }
+/* Hide the menu / Deploy / footer clutter. The sidebar is pinned open
+   below, so we don't need the toolbar's expand-sidebar arrow. */
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { display:none; }
 .stApp { background: var(--paper); }
 html, body, [class*="css"] { font-family:'Inter',sans-serif; color:var(--ink); }
 .block-container { padding-top: 2rem; max-width: 1050px; }
-section[data-testid="stSidebar"] { background: var(--forest); }
+/* Keep the sidebar always open: cancel the collapse transform/offset
+   Streamlit applies on narrow windows or when collapsed, and hide the
+   collapse button so it can't be dismissed. */
+section[data-testid="stSidebar"] {
+    background: var(--forest);
+    transform: none !important;
+    visibility: visible !important;
+    margin-left: 0 !important;
+    min-width: 300px !important;
+}
+[data-testid="stSidebarCollapseButton"], [data-testid="collapsedControl"] { display:none; }
 section[data-testid="stSidebar"] * { color:#D8F3DC; }
 section[data-testid="stSidebar"] a { border-radius:8px; }
 h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--forest); letter-spacing:-.02em; }
@@ -101,6 +113,12 @@ def load_metrics():
 @st.cache_resource
 def load_risk_model():
     p = MODELS_STORE / "risk_classifier.pkl"
+    return pickle.load(open(p, "rb")) if p.exists() else None
+
+@st.cache_resource
+def load_price_forecaster():
+    """dict {crop: fitted model} trained by scripts/train_models.py, or None."""
+    p = MODELS_STORE / "price_forecaster.pkl"
     return pickle.load(open(p, "rb")) if p.exists() else None
 
 @st.cache_data(ttl=300)

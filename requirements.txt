@@ -4,3 +4,10 @@ numpy
 scikit-learn
 requests
 python-dotenv
+
+# data rebuild (scripts/download_data.py + prepare_data.py read Excel sources)
+openpyxl
+xlrd
+
+# tests
+pytest

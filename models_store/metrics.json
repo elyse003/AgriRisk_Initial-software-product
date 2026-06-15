@@ -1,0 +1,18 @@
+{
+  "price_mape_by_crop": {
+    "maize": 10.39,
+    "beans": 10.89,
+    "potatoes": 9.21
+  },
+  "price_mape_avg": 10.16,
+  "risk_random_forest": {
+    "accuracy": 0.605,
+    "macro_f1": 0.607
+  },
+  "risk_gradient_boosting": {
+    "accuracy": 0.668,
+    "macro_f1": 0.672
+  },
+  "risk_majority_baseline": 0.333,
+  "n_risk_rows": 1428
+}
