@@ -1,5 +1,5 @@
 """AgriRisk Rwanda dashboard (Home). Run: streamlit run dashboard/Home.py"""
-from _ui import setup, load_last_updated
+from _ui import setup, load_last_updated, load_metrics
 from src.db.connection import subscriber_count
 import streamlit as st
 
@@ -29,6 +29,25 @@ with c2:
         <div style='flex:1;text-align:center;background:#F6F2E8;border-radius:10px;padding:14px 8px'><b style='font-size:13px'>WhatsApp</b><br><span style='font-size:11px;color:#5E7065'>Chat</span></div>
         <div style='flex:1;text-align:center;background:#F6F2E8;border-radius:10px;padding:14px 8px'><b style='font-size:13px'>SMS</b><br><span style='font-size:11px;color:#5E7065'>{subs} farmers</span></div>
       </div></div>""", unsafe_allow_html=True)
+
+# real model performance (from models_store/metrics.json)
+mt = load_metrics()
+if mt:
+    price = mt.get("price_mape_avg")
+    risk = (mt.get("risk_gradient_boosting") or {}).get("accuracy")
+    base = mt.get("risk_majority_baseline")
+    cols = st.columns(2)
+    if price is not None:
+        cols[0].markdown(
+            f"<div class='ar-card'><div class='ar-label'>Price model</div>"
+            f"<div class='ar-num' style='color:#2D6A4F'>{price:.1f}%</div>"
+            f"<div class='ar-lbl'>avg error (MAPE), target &lt;15%</div></div>", unsafe_allow_html=True)
+    if risk is not None:
+        extra = f" vs {base*100:.0f}% baseline" if base else ""
+        cols[1].markdown(
+            f"<div class='ar-card'><div class='ar-label'>Risk model</div>"
+            f"<div class='ar-num' style='color:#C76E1B'>{risk*100:.0f}%</div>"
+            f"<div class='ar-lbl'>accuracy{extra}</div></div>", unsafe_allow_html=True)
 
 # data freshness in plain language, no source names or model details
 lu = load_last_updated()

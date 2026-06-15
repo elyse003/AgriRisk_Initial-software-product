@@ -38,10 +38,24 @@ streamlit run dashboard/Home.py
 
 The dashboard opens at http://localhost:8501.
 
-To rebuild the datasets from the raw public sources, place the source files in `data/raw/`
-and run `pip install openpyxl xlrd xgboost` followed by `python scripts/prepare_data.py`.
-Running the modelling notebook also needs `prophet`, `statsmodels`, and `tensorflow`,
-which install most easily in Google Colab.
+### Rebuilding the data and models from the real public sources
+
+The models ship pre-trained in `models_store/`. To rebuild everything from scratch
+on freshly downloaded public data:
+
+```bash
+pip install openpyxl xlrd                 # for the Excel sources
+python scripts/download_data.py           # fetch WFP, rainfall, fertilizer, CPI -> data/raw/
+python scripts/prepare_data.py            # clean -> data/processed/
+python scripts/train_models.py            # train + serialize models -> models_store/
+```
+
+`download_data.py` pulls the WFP prices and CHIRPS rainfall from HDX, the fertilizer
+index from the World Bank Pink Sheet, and Rwanda CPI from the World Bank API — all open
+and free, no account needed. MINAGRI input prices are extracted by hand (PDF bulletins)
+into `data/raw/minagri_input_prices_real.csv`. The deep-learning comparison in the
+notebook additionally needs `prophet`, `statsmodels`, and `tensorflow`, which install
+most easily in Google Colab.
 
 ## Using the app
 
@@ -84,25 +98,48 @@ Prices use the retail, RWF series. The processing and feature steps for each sou
 
 ## Models
 
-The modelling is documented in `notebooks/AgriRisk_Rwanda_Models.ipynb`, on real data:
+Two models ship in the app, both trained on the real data by `scripts/train_models.py`
+and serialized to `models_store/`. Reported numbers are on a temporal/stratified
+hold-out the model never trained on.
 
-- **Data visualization and engineering**: price distributions and trends, correlations, and the
-  cleaning and feature steps for each source.
-- **Model architecture**: the seasonal-risk classifier (random forest and XGBoost) and the price
-  forecaster (ARIMA, Prophet, an LSTM with its layers, tanh activation, and Adam optimizer, and a
-  random-forest baseline).
-- **Performance metrics**: accuracy, precision, recall, and macro F1 for risk, and MAPE for price.
+### Price forecasting (Module 1)
 
-Price forecasting (mean absolute percentage error, maize, Musanze):
+The **deployed** forecaster is a gradient-boosted regression, one model per crop,
+pooled across all districts. It predicts the next-month **log return** (scale-free, so
+one model works across districts at very different price levels) and reconstructs the
+price. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 
-| Model | MAPE |
+| Crop | Hold-out MAPE | Naive (last-value) |
+| --- | --- | --- |
+| Maize | 10.4% | 11.4% |
+| Beans | 10.9% | 10.9% |
+| Potatoes | 9.2% | 9.8% |
+
+Average **10.2% MAPE**, comfortably under the 15% target. Monthly commodity prices are
+close to a random walk, so the model edges out the naive last-value baseline rather than
+crushing it — an honest result on real data. The heavier **ARIMA / Prophet / LSTM**
+comparison from the proposal lives in `notebooks/AgriRisk_Rwanda_Models.ipynb`; those
+libraries are awkward to deploy on Windows / Streamlit Cloud, so the scikit-learn model
+is what runs in the app.
+
+### Seasonal risk (Module 2)
+
+Risk is framed as a **real, data-derived** prediction: for each district-month the label
+is the realized 6-month-ahead change in local staple prices, split into High / Medium /
+Low terciles. The classifier (gradient boosting) learns whether pre-season conditions —
+the season's rainfall anomaly, food-price inflation (CPI YoY) and fertilizer-cost
+momentum — predict that coming price stress.
+
+| Metric | Value |
 | --- | --- |
-| LSTM | 4.35% |
-| Prophet | 6.89% |
-| ARIMA | 8.76% |
-| Random forest (baseline) | 12.13% |
+| Accuracy | ~67% |
+| Macro F1 | ~0.67 |
+| Majority-class baseline | 33% |
 
-All beat the 15% target. The seasonal-risk classifier (random forest against XGBoost) reaches near-perfect accuracy because its labels come from a transparent rule over the three input features, so it reproduces that rule rather than discovering a new pattern. The genuine predictive result is the price forecast.
+About **2× better than chance** on three balanced classes. This deliberately replaces an
+earlier version whose labels came from a hand-written rule, which let the classifier
+"reproduce the rule" and score a meaningless 100%. ~67% is lower but genuine: predicting
+food-price stress from pre-season signals is a real, hard problem.
 
 ## Deployment plan
 

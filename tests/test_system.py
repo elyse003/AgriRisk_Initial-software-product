@@ -18,93 +18,74 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from config.settings import data_path, MODELS_STORE
-from src.data.preprocessing import label_risk
+from config.settings import data_path, MODELS_STORE, CROPS
 from src.models.input_recommender import recommend
 from src.models.disease_alert import assess_crop
 from src.channels.whatsapp_bot import parse_message
+from src.models import price_forecasting as pf
+from src.models import risk_classifier as rc
 from src.db.connection import init_db, fetch_catalogue, subscriber_count, log_risk, get_connection
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 # ---------- shared fixtures (plain functions so the file also runs as a script) ----------
+def _prices():
+    return pd.read_csv(data_path("wfp_food_prices_rwanda.csv"), parse_dates=["date"])
+
+
 def _price_series(crop="maize", district="Musanze"):
-    df = pd.read_csv(data_path("wfp_food_prices_rwanda.csv"), parse_dates=["date"])
+    df = _prices()
     return df[(df.crop == crop) & (df.market == district)].sort_values("date")["price_rwf"].reset_index(drop=True)
 
 
 def _risk_dataset():
+    """The REAL, data-derived risk dataset (labels from realized price outcomes)."""
+    p = _prices()
     rain = pd.read_csv(data_path("district_rainfall_anomalies.csv"), parse_dates=["date"])
-    cpi = pd.read_csv(data_path("rwanda_food_cpi.csv"), parse_dates=["date"]).sort_values("date")
-    fert = pd.read_csv(data_path("fertilizer_price_index.csv"), parse_dates=["date"]).sort_values("date")
-    cpi["cpi_change"] = cpi["food_cpi"].pct_change(12) * 100
-    fert["fert_change"] = fert["fert_index"].pct_change(12) * 100
-    df = rain[rain.season != "off"].merge(cpi[["date", "cpi_change"]], on="date", how="left")
-    df = df.merge(fert[["date", "fert_change"]], on="date", how="left").dropna(
-        subset=["rainfall_anomaly", "cpi_change", "fert_change"])
-    df["risk_level"] = df.apply(lambda x: label_risk(x.rainfall_anomaly, x.cpi_change, x.fert_change), axis=1)
-    return df
-
-
-def _mape(y, p):
-    y, p = np.array(y), np.array(p)
-    return float(np.mean(np.abs((y - p) / y)) * 100)
+    cpi = pd.read_csv(data_path("rwanda_food_cpi.csv"), parse_dates=["date"])
+    fert = pd.read_csv(data_path("fertilizer_price_index.csv"), parse_dates=["date"])
+    return rc.build_risk_dataset(p, rain, cpi, fert)
 
 
 # ============================== 1. USE UNSEEN DATA ==============================
 def test_price_model_on_unseen_data():
-    """Train on the first 80% of months, forecast the unseen last 20%."""
-    s = _price_series()
-    assert len(s) > 40
-    d = pd.DataFrame({"y": s})
-    for lag in [1, 2, 3, 4, 8, 12]:
-        d[f"lag{lag}"] = d["y"].shift(lag)
-    d["target"] = d["y"].shift(-1)
-    d = d.dropna()
-    feats = [c for c in d.columns if c.startswith("lag")]
-    cut = int(len(d) * 0.8)
-    reg = RandomForestRegressor(n_estimators=200, random_state=42).fit(d[feats][:cut], d["target"][:cut])
-    mape = _mape(d["target"][cut:], reg.predict(d[feats][cut:]))
-    assert mape < 20, f"price MAPE on unseen data too high: {mape:.1f}%"
+    """Each crop's forecaster beats the 15% MAPE target on a temporal hold-out."""
+    prices = _prices()
+    for crop in CROPS:
+        model, mape, n = pf.train_crop_model(prices, crop)
+        assert model is not None and n > 100
+        assert mape < 15, f"{crop} price MAPE on unseen data too high: {mape:.1f}%"
 
 
 def test_risk_model_on_unseen_data():
-    """Stratified 80/20 split; the model must generalise to the held-out fold."""
+    """On a stratified hold-out the risk model must clearly beat the majority baseline."""
     df = _risk_dataset()
-    X, y = df[["rainfall_anomaly", "cpi_change", "fert_change"]], df["risk_level"]
+    X, y = df[rc.FEATURES], df[rc.LABEL]
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-    rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42).fit(Xtr, ytr)
-    assert accuracy_score(yte, rf.predict(Xte)) > 0.85
+    model = rc.fit_gradient_boosting(Xtr, ytr)
+    acc = rc.evaluate(model, Xte, yte)["accuracy"]
+    baseline = y.value_counts().max() / len(y)
+    assert acc > baseline + 0.1, f"risk acc {acc:.2f} not clearly above baseline {baseline:.2f}"
 
 
 # ============================== 2. EVALUATE KEY METRICS ==============================
 def test_risk_key_metrics():
-    """Precision, recall and F1 are computed and meet a reasonable bar."""
+    """Macro-F1 is computed and beats chance by a clear margin (genuine, not circular)."""
     df = _risk_dataset()
-    X, y = df[["rainfall_anomaly", "cpi_change", "fert_change"]], df["risk_level"]
+    X, y = df[rc.FEATURES], df[rc.LABEL]
     Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-    rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42).fit(Xtr, ytr)
-    p = rf.predict(Xte)
-    precision = precision_score(yte, p, average="macro", zero_division=0)
-    recall = recall_score(yte, p, average="macro", zero_division=0)
-    f1 = f1_score(yte, p, average="macro")
-    assert precision > 0.7 and recall > 0.7 and f1 > 0.7
+    m = rc.evaluate(rc.fit_gradient_boosting(Xtr, ytr), Xte, yte)
+    assert m["macro_f1"] > 0.5, f"risk macro-F1 too low: {m['macro_f1']}"
 
 
 def test_price_meets_mape_target():
-    """The price forecast should beat the 15% MAPE target set in the proposal."""
-    s = _price_series()
-    d = pd.DataFrame({"y": s})
-    for lag in [1, 2, 3, 4, 8, 12]:
-        d[f"lag{lag}"] = d["y"].shift(lag)
-    d["target"] = d["y"].shift(-1)
-    d = d.dropna()
-    feats = [c for c in d.columns if c.startswith("lag")]
-    cut = int(len(d) * 0.8)
-    reg = RandomForestRegressor(n_estimators=200, random_state=42).fit(d[feats][:cut], d["target"][:cut])
-    assert _mape(d["target"][cut:], reg.predict(d[feats][cut:])) < 15
+    """The deployed serialized forecaster predicts a sane next-month price."""
+    models = pickle.load(open(MODELS_STORE / "price_forecaster.pkl", "rb"))
+    s = pd.read_csv(data_path("wfp_food_prices_rwanda.csv"), parse_dates=["date"])
+    s = s[s.crop == "maize"].set_index("date")["price_rwf"].groupby(level=0).median().sort_index()
+    fc = pf.forecast_next(models["maize"], s)
+    cur = float(s.iloc[-1])
+    assert fc > 0 and 0.5 * cur < fc < 2.0 * cur, f"implausible forecast {fc} vs current {cur}"
 
 
 # ============================== 3. TEST EDGE CASES ==============================

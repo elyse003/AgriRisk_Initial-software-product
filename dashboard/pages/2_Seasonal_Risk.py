@@ -33,15 +33,17 @@ if st.button("Assess Risk", type="primary"):
     log_risk(district, scode, rain_a, cpi_c, fert_c, level)
     color = {"High": "#DC2626", "Medium": "#D97706", "Low": "#40916C"}[level]
     st.markdown(f"<div class='ar-card'><span class='ar-badge' style='background:{color}'>{level} risk</span>"
-                f"<span style='color:#5E7065;margin-left:10px'>{district} · {season_label}</span></div>",
+                f"<span style='color:#5E7065;margin-left:10px'>{district} · {season_label} · {conf}</span></div>",
                 unsafe_allow_html=True)
+    st.caption("Risk = how likely staple food prices are to rise sharply over the coming months, "
+               "predicted from pre-season conditions.")
     st.write("**What's driving this**")
     clamp = lambda v: max(0.0, min(v, 1.0))
     st.progress(clamp(abs(rain_a)/2), text="Rainfall compared to normal")
-    st.progress(clamp(cpi_c/30), text="Food price pressure")
+    st.progress(clamp(cpi_c/30), text="Food price pressure (CPI)")
     st.progress(clamp(fert_c/60), text="Fertilizer cost pressure")
-    st.info({"High": "High combined risk — advise conservative planting and minimal input spend.",
-             "Medium": "Moderate risk — monitor conditions; consider drought-tolerant varieties.",
-             "Low": "Favourable conditions — normal planting and input investment is reasonable."}[level])
+    st.info({"High": "High risk — food prices likely to climb. Advise storing harvest, budgeting for higher input costs, and conservative spending.",
+             "Medium": "Moderate risk — monitor markets and weather; plan inputs carefully.",
+             "Low": "Lower risk — prices likely stable. Normal planting and input investment is reasonable."}[level])
 else:
     st.info("Pick a district and season, then click **Assess Risk**.")

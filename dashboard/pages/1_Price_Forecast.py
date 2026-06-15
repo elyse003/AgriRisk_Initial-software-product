@@ -1,59 +1,65 @@
-"""Price Forecast — 4-week-ahead per crop/district on real data (all 30 districts)."""
-from _ui import setup, load_prices
+"""Price Forecast — next-month price per crop/district from the trained model.
+
+Loads the serialized per-crop forecaster (models_store/price_forecaster.pkl,
+built by scripts/train_models.py on real WFP data) instead of training on the
+fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
+"""
+from _ui import setup, load_prices, load_price_forecaster
 import numpy as np, pandas as pd, streamlit as st
-from sklearn.ensemble import RandomForestRegressor
 from config.settings import CROPS, DISTRICTS
+from src.models.price_forecasting import forecast_next, MIN_HISTORY
 from src.db.connection import log_price
 
-setup("Price Forecast", "Four-week price outlook by crop and district")
+setup("Price Forecast", "Next-month price outlook by crop and district")
 prices = load_prices()
+models = load_price_forecaster()
 
 c1, c2 = st.columns(2)
 crop = c1.selectbox("Crop", CROPS, format_func=str.title)
 district = c2.selectbox("District", DISTRICTS)
 
 if st.button("Generate Forecast", type="primary"):
+    model = (models or {}).get(crop)
+    if model is None:
+        st.error("The price model isn't available. Run `python scripts/train_models.py` first.")
+        st.stop()
+
     s_district = prices[(prices.crop == crop) & (prices.market == district)].sort_values("date").set_index("date")["price_rwf"]
     crop_all = prices[prices.crop == crop].sort_values("date")
     crop_latest = crop_all["date"].max()
     national = crop_all.set_index("date")["price_rwf"].groupby(level=0).median().sort_index()
 
-    if len(s_district) >= 20:
+    if len(s_district) >= MIN_HISTORY:
         last_date = s_district.index[-1]
         if (crop_latest - last_date).days > 540:          # district's own data older than ~18 months
             s = national
-            src_note = (f"Showing the national recent average. {district}'s own {crop} prices end "
+            src_note = (f"Showing the national recent trend. {district}'s own {crop} prices end "
                         f"{last_date:%b %Y}, so a current district figure isn't available.")
         else:
             s = s_district
-            src_note = f"Current price as of {last_date:%b %Y}."
+            src_note = f"Based on {district}'s prices through {last_date:%b %Y}."
     else:
         s = national
-        src_note = f"{district} has no local market in the price data, so this is the national recent average."
+        src_note = f"{district} has little local price history, so this uses the national trend."
 
-    d = pd.DataFrame({"y": s})
-    for lag in [1, 2, 3, 4, 8, 12]:
-        d[f"lag{lag}"] = d["y"].shift(lag)
-    d["target"] = d["y"].shift(-1)
-    tr = d.dropna(); feats = [c for c in d.columns if c.startswith("lag")]
-    model = RandomForestRegressor(n_estimators=200, random_state=42).fit(tr[feats], tr["target"])
-    cur = float(s.iloc[-1]); fc = float(model.predict(d[feats].iloc[[-1]])[0])
+    cur = float(s.iloc[-1])
+    fc = forecast_next(model, s)
     log_price(crop, district, str(s.index[-1].date()), cur)
     pct = (fc - cur) / cur * 100
     m1, m2, m3 = st.columns(3)
     m1.metric("Current", f"{cur:,.0f} RWF/kg")
-    m2.metric("4-week forecast", f"{fc:,.0f} RWF/kg", f"{pct:+.1f}%")
+    m2.metric("Next-month forecast", f"{fc:,.0f} RWF/kg", f"{pct:+.1f}%")
     m3.metric("Trend", "Rising" if pct > 1 else "Falling" if pct < -1 else "Stable")
     hist = s.tail(36)
-    fut = pd.Series(np.linspace(cur, fc, 4),
-                    index=pd.date_range(hist.index[-1], periods=5, freq="W")[1:])
-    st.line_chart(pd.concat([hist.rename("history"), fut.rename("forecast")], axis=1))
+    fut = pd.Series([fc], index=[hist.index[-1] + pd.offsets.MonthBegin(1)])
+    st.line_chart(pd.concat([hist.rename("history"),
+                             pd.concat([hist.tail(1), fut]).rename("forecast")], axis=1))
     if pct > 1:
         st.success(f"{crop.title()} trending up in {district}. Advise holding stock 2–3 weeks.")
     elif pct < -1:
         st.warning(f"{crop.title()} trending down in {district}. Advise selling soon.")
     else:
         st.info(f"{crop.title()} stable in {district}. No urgent action.")
-    st.caption(src_note + " Decision-support only; confirm with local market conditions.")
+    st.caption(src_note + " Next-month estimate from the trained model; confirm with local market conditions.")
 else:
     st.info("Pick a crop and district, then click **Generate Forecast**.")
