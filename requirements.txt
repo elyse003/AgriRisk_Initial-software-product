@@ -1,4 +1,4 @@
-# Core app + ML — pinned to the versions the shipped models were trained/pickled
+# Core app + ML, pinned to the versions the shipped models were trained/pickled
 # with, so they unpickle correctly on Streamlit Cloud (a scikit-learn mismatch
 # would otherwise break model loading).
 streamlit==1.58.0
@@ -8,6 +8,10 @@ scikit-learn==1.9.0
 scipy==1.17.1
 requests
 python-dotenv
+
+# database: PostgreSQL in production via DATABASE_URL, SQLite locally
+sqlalchemy>=2.0
+psycopg2-binary
 
 # data rebuild (scripts/download_data.py + prepare_data.py read Excel sources)
 openpyxl

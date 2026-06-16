@@ -1,4 +1,5 @@
-"""Create and seed the local SQLite database. Run: python scripts/init_db.py"""
+"""Create and seed the database. Uses PostgreSQL if DATABASE_URL is set, else a
+local SQLite file. Run: python scripts/init_db.py"""
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
