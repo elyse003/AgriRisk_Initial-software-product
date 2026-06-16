@@ -1,5 +1,5 @@
 """WhatsApp Preview — farmer chatbot (Kinyarwanda + English) using the same models."""
-from _ui import setup, load_prices, load_rainfall, load_cpi, load_fert, load_catalogue
+from _ui import setup, load_prices, load_rainfall, load_cpi, load_fert, load_catalogue, footer
 import streamlit as st
 from src.channels.whatsapp_bot import parse_message
 from src.models.input_recommender import recommend_plan
@@ -92,3 +92,5 @@ if msg := st.chat_input("Andika hano… (e.g. ibigori igiciro bugesera)"):
     st.session_state.chat.append(("user", msg))
     st.session_state.chat.append(("assistant", reply(msg)))
     st.rerun()
+
+footer()

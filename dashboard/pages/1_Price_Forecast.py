@@ -4,7 +4,7 @@ Loads the serialized per-crop forecaster (models_store/price_forecaster.pkl,
 built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
-from _ui import setup, load_prices, load_price_forecaster
+from _ui import setup, load_prices, load_price_forecaster, footer
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import CROPS, DISTRICTS
 from src.models.price_forecasting import forecast_next, MIN_HISTORY
@@ -63,3 +63,5 @@ if st.button("Generate Forecast", type="primary"):
     st.caption(src_note + " Next-month estimate from the trained model; confirm with local market conditions.")
 else:
     st.info("Pick a crop and district, then click **Generate Forecast**.")
+
+footer()

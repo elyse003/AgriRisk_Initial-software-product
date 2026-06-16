@@ -1,5 +1,5 @@
 """Seasonal Risk — real rainfall anomaly + latest CPI/fertilizer -> trained model."""
-from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model
+from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model, footer
 import pandas as pd, streamlit as st
 from config.settings import DISTRICTS
 from src.data.preprocessing import label_risk
@@ -47,3 +47,5 @@ if st.button("Assess Risk", type="primary"):
              "Low": "Lower risk — prices likely stable. Normal planting and input investment is reasonable."}[level])
 else:
     st.info("Pick a district and season, then click **Assess Risk**.")
+
+footer()

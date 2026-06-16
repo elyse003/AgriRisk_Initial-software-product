@@ -23,25 +23,28 @@ CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
 :root{ --forest:#1B4332; --emerald:#2D6A4F; --harvest:#C76E1B; --paper:#F6F2E8; --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4; }
-/* Hide the menu / Deploy / footer clutter. The sidebar is pinned open
-   below, so we don't need the toolbar's expand-sidebar arrow. */
-#MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"] { display:none; }
+/* Hide the menu / Deploy / decoration, but keep the toolbar itself so the
+   sidebar reopen arrow survives on mobile (where the sidebar can collapse). */
+#MainMenu, footer, [data-testid="stToolbarActions"], [data-testid="stDecoration"] { display:none; }
 .stApp { background: var(--paper); }
 html, body, [class*="css"] { font-family:'Inter',sans-serif; color:var(--ink); }
 .block-container { padding-top: 2rem; max-width: 1050px; }
-/* Keep the sidebar always open: cancel the collapse transform/offset
-   Streamlit applies on narrow windows or when collapsed, and hide the
-   collapse button so it can't be dismissed. */
-section[data-testid="stSidebar"] {
-    background: var(--forest);
-    transform: none !important;
-    visibility: visible !important;
-    margin-left: 0 !important;
-    min-width: 300px !important;
-}
-[data-testid="stSidebarCollapseButton"], [data-testid="collapsedControl"] { display:none; }
+section[data-testid="stSidebar"] { background: var(--forest); }
 section[data-testid="stSidebar"] * { color:#D8F3DC; }
 section[data-testid="stSidebar"] a { border-radius:8px; }
+/* Desktop: pin the sidebar open so it can't vanish; hide its collapse button. */
+@media (min-width: 769px) {
+  section[data-testid="stSidebar"] {
+    transform: none !important; visibility: visible !important;
+    margin-left: 0 !important; min-width: 300px !important;
+  }
+  [data-testid="stSidebarCollapseButton"], [data-testid="collapsedControl"] { display:none !important; }
+}
+/* Mobile/tablet: let the sidebar collapse to an overlay so it doesn't blanket
+   the page; Streamlit's own close / reopen controls stay usable. */
+@media (max-width: 768px) {
+  section[data-testid="stSidebar"] { min-width: 0 !important; }
+}
 h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--forest); letter-spacing:-.02em; }
 .ar-head { font-size:30px; font-weight:800; }
 .ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'JetBrains Mono',monospace; letter-spacing:.02em; }
@@ -68,7 +71,9 @@ LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
 
 
 def setup(title, subtitle):
-    st.set_page_config(page_title="AgriRisk Rwanda", layout="wide", initial_sidebar_state="expanded")
+    # "auto": expanded on desktop (pinned open by the CSS), collapsed on mobile
+    # so the sidebar doesn't blanket the screen.
+    st.set_page_config(page_title="AgriRisk Rwanda", layout="wide", initial_sidebar_state="auto")
     st.markdown(CSS, unsafe_allow_html=True)
     try:
         st.logo(LOGO_PATH, size="large")
@@ -77,6 +82,60 @@ def setup(title, subtitle):
     st.sidebar.markdown("---")
     st.markdown(f"<div class='ar-head'>{title}</div><div class='ar-sub'>{subtitle}</div>",
                 unsafe_allow_html=True)
+
+
+GITHUB_URL = "https://github.com/elyse003/AgriRisk_Initial-software-product"
+
+
+def footer():
+    """Render the shared site footer. Call at the end of a page (after setup)."""
+    st.markdown(f"""<style>
+.ar-foot {{ margin-top:56px; padding-top:30px; border-top:1px solid var(--line); color:var(--mut); font-size:13.5px; }}
+.ar-foot a {{ color:var(--mut) !important; text-decoration:none !important; }}
+.ar-foot a:hover {{ color:var(--forest) !important; }}
+.ar-foot-grid {{ display:flex; flex-wrap:wrap; gap:28px 48px; justify-content:space-between; }}
+.ar-foot-brand {{ max-width:24em; }}
+.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Bricolage Grotesque',sans-serif;
+                font-weight:800; font-size:17px; color:var(--forest); }}
+.ar-foot .fb .seed {{ width:18px; height:18px; border-radius:50% 50% 50% 0; background:var(--emerald);
+                      transform:rotate(-45deg); }}
+.ar-foot .fcol h5 {{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em;
+                     text-transform:uppercase; color:var(--harvest); margin-bottom:10px; font-weight:700; }}
+.ar-foot .fcol a, .ar-foot .fcol span {{ display:block; margin:6px 0; }}
+.ar-foot-bottom {{ margin-top:26px; padding-top:16px; border-top:1px solid var(--line); display:flex;
+                   justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:12.5px; }}
+</style>
+<div class="ar-foot">
+  <div class="ar-foot-grid">
+    <div class="ar-foot-brand">
+      <div class="fb"><span class="seed"></span>AgriRisk Rwanda</div>
+      <p style="margin-top:10px">Machine-learning decision support for Rwandan agriculture — price
+      forecasts, seasonal risk, disease alerts and input plans for maize, beans and Irish potatoes
+      across all 30 districts, in Kinyarwanda and English.</p>
+    </div>
+    <div class="fcol"><h5>Tools</h5>
+      <a href="/Price_Forecast" target="_self">Price Forecast</a>
+      <a href="/Seasonal_Risk" target="_self">Seasonal Risk</a>
+      <a href="/Disease_Alert" target="_self">Disease Alert</a>
+      <a href="/Input_Recommender" target="_self">Input Recommender</a>
+    </div>
+    <div class="fcol"><h5>Data</h5>
+      <span>WFP market prices</span>
+      <span>World Bank CPI &amp; fertilizer</span>
+      <span>CHIRPS rainfall</span>
+      <span>Open-Meteo &middot; MINAGRI</span>
+    </div>
+    <div class="fcol"><h5>Project</h5>
+      <a href="/" target="_self">Home</a>
+      <a href="/Dashboard" target="_self">Dashboard</a>
+      <a href="{GITHUB_URL}" target="_blank">GitHub</a>
+    </div>
+  </div>
+  <div class="ar-foot-bottom">
+    <span>&copy; 2026 AgriRisk Rwanda &middot; BSc Software Engineering capstone</span>
+    <span>Decision support only — confirm with local extension advice.</span>
+  </div>
+</div>""", unsafe_allow_html=True)
 
 
 # ---------------- cached real-data loaders (prefer data/processed) ----------------

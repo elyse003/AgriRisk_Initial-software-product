@@ -2,7 +2,7 @@
 
 Reached from the landing page's "Open the dashboard" button.
 """
-from _ui import setup
+from _ui import setup, footer
 import streamlit as st
 
 setup("Dashboard", "Choose a tool to get started")
@@ -36,3 +36,5 @@ st.markdown(f"""<style>
 .tc-go{{margin-top:14px;font-weight:600;font-size:14px}}
 </style>
 <div class="tool-grid">{cards}</div>""", unsafe_allow_html=True)
+
+footer()

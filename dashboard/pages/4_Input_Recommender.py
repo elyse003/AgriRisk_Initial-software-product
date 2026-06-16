@@ -1,5 +1,5 @@
 """Input Recommender — a fertilizer plan sized to the farmer's land (real MINAGRI prices)."""
-from _ui import setup
+from _ui import setup, footer
 from src.db.connection import fetch_catalogue
 import streamlit as st
 from config.settings import CROPS, DISTRICTS
@@ -42,3 +42,5 @@ if st.button("Build Fertilizer Plan", type="primary"):
                    "and local extension advice. Prices are subsidised (Smart Nkunganire System).")
 else:
     st.info("Set crop, land size and budget, then click **Build Fertilizer Plan**.")
+
+footer()
