@@ -14,6 +14,7 @@ import pandas as pd
 import streamlit as st
 
 from config.settings import CROPS, DISTRICTS, DISTRICT_COORDS, MODELS_STORE, data_path
+from _i18n import t, LANGUAGES
 
 # JSX design tokens
 FOREST = "#1B4332"; EMERALD = "#2D6A4F"; G600 = "#40916C"; G50 = "#EDF7F0"
@@ -70,6 +71,17 @@ h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--fo
 LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
 
 
+def _language_selector():
+    """Sidebar language switch. Persists in session_state so it applies to every
+    page and can be changed from any page without returning home."""
+    st.session_state.setdefault("lang", "en")
+    names = list(LANGUAGES)                       # ["English", "Kinyarwanda"]
+    current = next(n for n, code in LANGUAGES.items() if code == st.session_state["lang"])
+    choice = st.sidebar.radio("Ururimi / Language", names, index=names.index(current),
+                              horizontal=True, key="_lang_radio")
+    st.session_state["lang"] = LANGUAGES[choice]
+
+
 def setup(title, subtitle):
     # "auto": expanded on desktop (pinned open by the CSS), collapsed on mobile
     # so the sidebar doesn't blanket the screen.
@@ -79,8 +91,9 @@ def setup(title, subtitle):
         st.logo(LOGO_PATH, size="large")
     except Exception:
         st.sidebar.image(LOGO_PATH)
+    _language_selector()
     st.sidebar.markdown("---")
-    st.markdown(f"<div class='ar-head'>{title}</div><div class='ar-sub'>{subtitle}</div>",
+    st.markdown(f"<div class='ar-head'>{t(title)}</div><div class='ar-sub'>{t(subtitle)}</div>",
                 unsafe_allow_html=True)
 
 
@@ -109,31 +122,31 @@ def footer():
   <div class="ar-foot-grid">
     <div class="ar-foot-brand">
       <div class="fb"><span class="seed"></span>AgriRisk Rwanda</div>
-      <p style="margin-top:10px">Machine-learning decision support for Rwandan agriculture — price
-      forecasts, seasonal risk, disease alerts and input plans for maize, beans and Irish potatoes
-      across all 30 districts, in Kinyarwanda and English.</p>
+      <p style="margin-top:10px">{t("Machine learning decision support for Rwandan agriculture: "
+      "price forecasts, seasonal risk, disease alerts and input plans for maize, beans and Irish "
+      "potatoes across all 30 districts, in Kinyarwanda and English.")}</p>
     </div>
-    <div class="fcol"><h5>Tools</h5>
-      <a href="/Price_Forecast" target="_self">Price Forecast</a>
-      <a href="/Seasonal_Risk" target="_self">Seasonal Risk</a>
-      <a href="/Disease_Alert" target="_self">Disease Alert</a>
-      <a href="/Input_Recommender" target="_self">Input Recommender</a>
+    <div class="fcol"><h5>{t("Tools")}</h5>
+      <a href="/Price_Forecast" target="_self">{t("Price Forecast")}</a>
+      <a href="/Seasonal_Risk" target="_self">{t("Seasonal Risk")}</a>
+      <a href="/Disease_Alert" target="_self">{t("Disease Alert")}</a>
+      <a href="/Input_Recommender" target="_self">{t("Input Recommender")}</a>
     </div>
-    <div class="fcol"><h5>Data</h5>
+    <div class="fcol"><h5>{t("Data")}</h5>
       <span>WFP market prices</span>
       <span>World Bank CPI &amp; fertilizer</span>
       <span>CHIRPS rainfall</span>
       <span>Open-Meteo &middot; MINAGRI</span>
     </div>
-    <div class="fcol"><h5>Project</h5>
-      <a href="/" target="_self">Home</a>
-      <a href="/Dashboard" target="_self">Dashboard</a>
+    <div class="fcol"><h5>{t("Project")}</h5>
+      <a href="/" target="_self">{t("Home")}</a>
+      <a href="/Dashboard" target="_self">{t("Dashboard")}</a>
       <a href="{GITHUB_URL}" target="_blank">GitHub</a>
     </div>
   </div>
   <div class="ar-foot-bottom">
     <span>&copy; 2026 AgriRisk Rwanda &middot; BSc Software Engineering capstone</span>
-    <span>Decision support only — confirm with local extension advice.</span>
+    <span>{t("Decision support only. Confirm with local extension advice.")}</span>
   </div>
 </div>""", unsafe_allow_html=True)
 
