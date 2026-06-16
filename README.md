@@ -12,7 +12,7 @@ across all 30 districts of Rwanda:
 - **Input recommender** that ranks affordable fertilizer for a chosen crop, district, and budget.
 
 The application runs as a Streamlit dashboard with a farmer-facing WhatsApp chat in
-Kinyarwanda and English. It is backed by trained machine learning models and a SQLite database.
+Kinyarwanda and English. It is backed by trained machine learning models and a PostgreSQL database (SQLite for local development).
 
 ## Live demo
 
@@ -148,14 +148,38 @@ earlier version whose labels came from a hand-written rule, which let the classi
 "reproduce the rule" and score a meaningless 100%. ~67% is lower but genuine: predicting
 food-price stress from pre-season signals is a real, hard problem.
 
+## Database
+
+The database layer (`src/db/connection.py`) runs on **PostgreSQL in production and
+SQLite locally**, through one SQLAlchemy engine. The six tables match the proposal
+ERD and `src/db/schema.sql`: `users`, `price_records`, `risk_scores`,
+`input_catalogue`, `feedback`, `subscribers`.
+
+- **Local (default):** no setup. With no `DATABASE_URL` set, it uses a SQLite file
+  at `data/agririsk.db`, created and seeded by `python scripts/init_db.py`.
+- **PostgreSQL:** set the `DATABASE_URL` environment variable (or Streamlit secret)
+  to a Postgres connection string and the same code uses Postgres. The tables are
+  created automatically on first run; `init_db()` then seeds the sample rows.
+
+```bash
+# local Postgres via Docker (uses docker-compose.yml: Postgres 15 + the app)
+docker compose up
+
+# or point at any Postgres (e.g. a free Neon / Supabase / Render database)
+export DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DBNAME"
+python scripts/init_db.py
+```
+
+On Streamlit Community Cloud, add `DATABASE_URL` under **Settings → Secrets** to use
+a hosted Postgres (otherwise the app falls back to an ephemeral SQLite file).
+
 ## Deployment plan
 
-- **Prototype (now):** runs locally with Streamlit and a SQLite database, as described above.
-- **Hosting:** deploy the dashboard to Streamlit Community Cloud or a small virtual server.
-- **Database:** move from SQLite to the PostgreSQL schema in `src/db/schema.sql` for multi-user use.
+- **Prototype (now):** runs locally with Streamlit; SQLite by default, PostgreSQL when `DATABASE_URL` is set.
+- **Hosting:** the dashboard is deployed on Streamlit Community Cloud; the static landing page on GitHub Pages.
 - **Farmer channels:** connect the WhatsApp preview to the WhatsApp Business API through Twilio, and
   SMS to Africa's Talking.
-- **Data refresh:** schedule `scripts/prepare_data.py` to update prices, inflation, fertilizer, and rainfall.
+- **Data refresh:** schedule `scripts/download_data.py` + `prepare_data.py` to update prices, inflation, fertilizer, and rainfall.
 
 ## Video demo
 
@@ -182,4 +206,4 @@ Run the system tests with `pip install pytest` then `pytest tests/test_system.py
 
 ## Tech stack
 
-Python, Streamlit, scikit-learn, pandas, Prophet, statsmodels, TensorFlow, XGBoost, SQLite.
+Python, Streamlit, scikit-learn, pandas, Prophet, statsmodels, TensorFlow, XGBoost, PostgreSQL, SQLite, SQLAlchemy.
