@@ -1,10 +1,11 @@
-"""Price Forecast — next-month price per crop/district from the trained model.
+"""Price Forecast, next-month price per crop/district from the trained model.
 
 Loads the serialized per-crop forecaster (models_store/price_forecaster.pkl,
 built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
 from _ui import setup, load_prices, load_price_forecaster, footer
+from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import CROPS, DISTRICTS
 from src.models.price_forecasting import forecast_next, MIN_HISTORY
@@ -15,10 +16,10 @@ prices = load_prices()
 models = load_price_forecaster()
 
 c1, c2 = st.columns(2)
-crop = c1.selectbox("Crop", CROPS, format_func=str.title)
-district = c2.selectbox("District", DISTRICTS)
+crop = c1.selectbox(t("Crop"), CROPS, format_func=crop_label)
+district = c2.selectbox(t("District"), DISTRICTS)
 
-if st.button("Generate Forecast", type="primary"):
+if st.button(t("Generate Forecast"), type="primary"):
     model = (models or {}).get(crop)
     if model is None:
         st.error("The price model isn't available. Run `python scripts/train_models.py` first.")
@@ -47,21 +48,22 @@ if st.button("Generate Forecast", type="primary"):
     log_price(crop, district, str(s.index[-1].date()), cur)
     pct = (fc - cur) / cur * 100
     m1, m2, m3 = st.columns(3)
-    m1.metric("Current", f"{cur:,.0f} RWF/kg")
-    m2.metric("Next-month forecast", f"{fc:,.0f} RWF/kg", f"{pct:+.1f}%")
-    m3.metric("Trend", "Rising" if pct > 1 else "Falling" if pct < -1 else "Stable")
+    m1.metric(t("Current"), f"{cur:,.0f} RWF/kg")
+    m2.metric(t("Next-month forecast"), f"{fc:,.0f} RWF/kg", f"{pct:+.1f}%")
+    m3.metric(t("Trend"), t("Rising") if pct > 1 else t("Falling") if pct < -1 else t("Stable"))
     hist = s.tail(36)
     fut = pd.Series([fc], index=[hist.index[-1] + pd.offsets.MonthBegin(1)])
     st.line_chart(pd.concat([hist.rename("history"),
                              pd.concat([hist.tail(1), fut]).rename("forecast")], axis=1))
+    cl = crop_label(crop)
     if pct > 1:
-        st.success(f"{crop.title()} trending up in {district}. Advise holding stock 2–3 weeks.")
+        st.success(t("{crop} trending up in {district}. Advise holding stock 2 to 3 weeks.").format(crop=cl, district=district))
     elif pct < -1:
-        st.warning(f"{crop.title()} trending down in {district}. Advise selling soon.")
+        st.warning(t("{crop} trending down in {district}. Advise selling soon.").format(crop=cl, district=district))
     else:
-        st.info(f"{crop.title()} stable in {district}. No urgent action.")
-    st.caption(src_note + " Next-month estimate from the trained model; confirm with local market conditions.")
+        st.info(t("{crop} stable in {district}. No urgent action.").format(crop=cl, district=district))
+    st.caption(src_note + " " + t("Next-month estimate from the trained model. Confirm with local market conditions."))
 else:
-    st.info("Pick a crop and district, then click **Generate Forecast**.")
+    st.info(t("Pick a crop and district, then click **Generate Forecast**."))
 
 footer()

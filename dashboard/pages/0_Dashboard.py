@@ -1,8 +1,9 @@
-"""Dashboard hub — a card for each tool. This page (and the tools) keep the sidebar.
+"""Dashboard hub, a card for each tool. This page (and the tools) keep the sidebar.
 
 Reached from the landing page's "Open the dashboard" button.
 """
 from _ui import setup, footer
+from _i18n import t
 import streamlit as st
 
 setup("Dashboard", "Choose a tool to get started")
@@ -18,10 +19,10 @@ TOOLS = [
 
 cards = "".join(
     f'''<a class="tool-card" href="{url}" target="_self">
-        <div class="tc-stage" style="color:{color}">{stage}</div>
-        <div class="tc-title">{title}</div>
-        <div class="tc-desc">{desc}</div>
-        <div class="tc-go" style="color:{color}">Open &rarr;</div>
+        <div class="tc-stage" style="color:{color}">{t(stage)}</div>
+        <div class="tc-title">{t(title)}</div>
+        <div class="tc-desc">{t(desc)}</div>
+        <div class="tc-go" style="color:{color}">{t("Open")} &rarr;</div>
     </a>''' for title, url, desc, color, stage in TOOLS)
 
 st.markdown(f"""<style>

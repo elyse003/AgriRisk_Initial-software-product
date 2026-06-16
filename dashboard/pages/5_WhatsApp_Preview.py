@@ -1,4 +1,4 @@
-"""WhatsApp Preview — farmer chatbot (Kinyarwanda + English) using the same models."""
+"""WhatsApp Preview, farmer chatbot (Kinyarwanda + English) using the same models."""
 from _ui import setup, load_prices, load_rainfall, load_cpi, load_fert, load_catalogue, footer
 import streamlit as st
 from src.channels.whatsapp_bot import parse_message

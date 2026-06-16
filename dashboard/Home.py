@@ -1,4 +1,4 @@
-"""AgriRisk Rwanda landing page — the full-screen app home, no sidebar.
+"""AgriRisk Rwanda landing page, the full-screen app home, no sidebar.
 
 Renders landing/index.html (the same file published to GitHub Pages) natively so
 its links navigate in the same tab. The "Open the dashboard" buttons go to the
