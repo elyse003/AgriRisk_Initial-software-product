@@ -1,0 +1,11 @@
+# Render blueprint for the Twilio webhook (free web service).
+# In Render: New + -> Blueprint -> pick this repo. It builds and starts the
+# FastAPI webhook; copy the resulting URL into your Twilio sandbox.
+services:
+  - type: web
+    name: agririsk-webhook
+    runtime: python
+    plan: free
+    buildCommand: pip install -r webhook/requirements.txt
+    startCommand: uvicorn webhook.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
