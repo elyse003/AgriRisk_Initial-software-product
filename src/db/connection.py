@@ -56,11 +56,11 @@ def database_url() -> str:
         except Exception:
             url = ""
     if url:
-        # accept both postgres:// and postgresql:// and pin the psycopg2 driver
+        # accept both postgres:// and postgresql:// and pin the psycopg (v3) driver
         if url.startswith("postgres://"):
-            url = "postgresql+psycopg2://" + url.split("://", 1)[1]
+            url = "postgresql+psycopg://" + url.split("://", 1)[1]
         elif url.startswith("postgresql://"):
-            url = "postgresql+psycopg2://" + url.split("://", 1)[1]
+            url = "postgresql+psycopg://" + url.split("://", 1)[1]
         return url
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     return f"sqlite:///{DB_PATH}"
