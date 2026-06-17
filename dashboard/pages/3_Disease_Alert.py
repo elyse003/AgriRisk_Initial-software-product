@@ -1,5 +1,5 @@
 """Disease Alert, live Open-Meteo weather + FAO rules (offline fallback)."""
-from _ui import setup, footer
+from _ui import setup
 from _i18n import t, crop_label
 import streamlit as st
 from config.settings import DISTRICT_COORDS, CROPS
@@ -29,4 +29,3 @@ if st.button(t("Check Risk"), type="primary"):
 else:
     st.info(t("Pick a district and click **Check Risk**."))
 
-footer()

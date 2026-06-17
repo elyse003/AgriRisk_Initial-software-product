@@ -1,5 +1,5 @@
 """WhatsApp Preview, farmer chatbot (Kinyarwanda + English) using the same models."""
-from _ui import setup, load_prices, load_rainfall, load_cpi, load_fert, load_catalogue, footer
+from _ui import setup, load_prices, load_rainfall, load_cpi, load_fert, load_catalogue
 import streamlit as st
 from src.channels.whatsapp_bot import parse_message
 from src.models.input_recommender import recommend_plan
@@ -9,7 +9,6 @@ setup("WhatsApp Preview", "Ask about price, risk, disease, or inputs")
 
 st.markdown("**Examples:** `ibigori igiciro bugesera` · `risk musanze` · "
             "`indwara ibirayi musanze` · `ifumbire ibigori 0.5 ha` · `ubufasha`")
-
 
 def reply(msg):
     p = parse_message(msg)
@@ -82,7 +81,6 @@ def reply(msg):
 
     return say("Andika 'ubufasha'.", "Type 'help'.")
 
-
 if "chat" not in st.session_state:
     st.session_state.chat = [("assistant", "Muraho. Andika: igiciro, risk, indwara, cyangwa input.")]
 for role, txt in st.session_state.chat:
@@ -93,4 +91,3 @@ if msg := st.chat_input("Andika hano… (e.g. ibigori igiciro bugesera)"):
     st.session_state.chat.append(("assistant", reply(msg)))
     st.rerun()
 
-footer()
