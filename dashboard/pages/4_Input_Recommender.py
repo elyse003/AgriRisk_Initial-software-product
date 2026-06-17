@@ -22,25 +22,30 @@ if st.button(t("Build Fertilizer Plan"), type="primary"):
     if plan.empty:
         st.warning(t("No fertilizer plan is defined for that crop yet."))
     else:
-        cols = st.columns(len(plan))
+        cards = ""
         for i, (_, r) in enumerate(plan.iterrows()):
-            with cols[i]:
-                with st.container(border=True):
-                    if i == 0:
-                        st.markdown(f"<span class='ar-badge' style='background:#7C3AED;font-size:10px'>{t('AT PLANTING')}</span>",
-                                    unsafe_allow_html=True)
-                    st.markdown(f"**{r.fertilizer}**")
-                    st.caption(r["when"])
-                    st.markdown(f"### {int(r.bags_50kg)} {t('bag(s)')}")
-                    st.caption(f"{int(r.need_kg)} kg {t('needed')} · {int(r.rate_kg_ha)} kg/ha")
-                    st.markdown(f"{int(r.line_cost):,} RWF")
-        if ok:
-            st.success(t("Total for {land:g} ha: {total:,} RWF, within budget, {remaining:,} RWF to spare.")
-                       .format(land=land, total=total, remaining=remaining))
-        else:
-            st.warning(t("Total for {land:g} ha: {total:,} RWF, over budget by {extra:,} RWF. Use the subsidised "
-                         "Smart Nkunganire price, buy in stages, or start with a smaller area.")
-                       .format(land=land, total=total, extra=-remaining))
+            badge = (f"<span class='ar-badge' style='background:#7C3AED;font-size:10px'>{t('AT PLANTING')}</span>"
+                     if i == 0 else "")
+            cards += (
+                f'<div class="ar-card" style="flex:1;min-width:200px">{badge}'
+                f'<div class="ar-label" style="margin-top:{"8px" if i == 0 else "0"}">{r["when"]}</div>'
+                f'<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-weight:700;font-size:18px;color:#1B4332;margin:4px 0">{r.fertilizer}</div>'
+                f'<div class="ar-num" style="font-size:26px">{int(r.bags_50kg)}<small style="font-size:13px;color:#5E7065"> {t("bag(s)")}</small></div>'
+                f'<div class="ar-lbl">{int(r.need_kg)} kg {t("needed")} &middot; {int(r.rate_kg_ha)} kg/ha</div>'
+                f'<div style="font-family:\'JetBrains Mono\',monospace;font-weight:700;color:#C76E1B;margin-top:8px;font-size:15px">{int(r.line_cost):,} RWF</div>'
+                f'</div>')
+        st.markdown(f"<div class='ar-grid'>{cards}</div>", unsafe_allow_html=True)
+
+        tcolor = "#2D6A4F" if ok else "#D97706"
+        msg = (t("Total for {land:g} ha: {total:,} RWF, within budget, {remaining:,} RWF to spare.")
+               .format(land=land, total=total, remaining=remaining) if ok else
+               t("Total for {land:g} ha: {total:,} RWF, over budget by {extra:,} RWF. Use the subsidised "
+                 "Smart Nkunganire price, buy in stages, or start with a smaller area.")
+               .format(land=land, total=total, extra=-remaining))
+        st.markdown(f"""<div style="background:#fff;border:1px solid #DED7C4;border-left:4px solid {tcolor};
+          border-radius:12px;padding:14px 18px;margin-top:8px">
+          <div class="ar-num" style="font-size:24px;color:{tcolor}">{total:,}<small style="font-size:13px;color:#5E7065"> RWF</small></div>
+          <div style="margin-top:4px;font-size:14px;color:#1C2A22">{msg}</div></div>""", unsafe_allow_html=True)
         st.caption(t("Rates follow MINAGRI/RAB recommendations and should be confirmed with soil testing and "
                      "local extension advice. Prices are subsidised (Smart Nkunganire System)."))
 else:

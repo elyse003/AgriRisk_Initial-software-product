@@ -35,19 +35,37 @@ if st.button(t("Assess Risk"), type="primary"):
         level = label_risk(rain_a, cpi_c, fert_c); conf = "rule-based"
     log_risk(district, scode, rain_a, cpi_c, fert_c, level)
     color = {"High": "#DC2626", "Medium": "#D97706", "Low": "#40916C"}[level]
-    st.markdown(f"<div class='ar-card'><span class='ar-badge' style='background:{color}'>{t(level + ' risk')}</span>"
-                f"<span style='color:#5E7065;margin-left:10px'>{district} · {season_label} · {conf}</span></div>",
+
+    # risk hero card
+    st.markdown(f"""<div class="ar-card" style="border-left:5px solid {color}">
+      <div class="ar-label">{district} &middot; {season_label}</div>
+      <div style="display:flex;align-items:baseline;gap:14px;margin-top:6px">
+        <span class="ar-num" style="color:{color}">{t(level + ' risk')}</span>
+        <span style="color:#5E7065;font-size:12.5px;font-family:'JetBrains Mono',monospace">{conf}</span>
+      </div>
+      <div style="color:#5E7065;font-size:13.5px;margin-top:8px;max-width:46em">{t('Risk means how likely staple food prices are to rise sharply over the coming months, predicted from pre-season conditions.')}</div>
+    </div>""", unsafe_allow_html=True)
+
+    # drivers as a stat row
+    driving = t("What's driving this")
+    st.markdown(f"<div class='ar-label' style='margin:18px 0 -4px'>{driving}</div>",
                 unsafe_allow_html=True)
-    st.caption(t("Risk means how likely staple food prices are to rise sharply over the coming "
-                 "months, predicted from pre-season conditions."))
-    st.write("**" + t("What's driving this") + "**")
-    clamp = lambda v: max(0.0, min(v, 1.0))
-    st.progress(clamp(abs(rain_a)/2), text=t("Rainfall compared to normal"))
-    st.progress(clamp(cpi_c/30), text=t("Food price pressure (CPI)"))
-    st.progress(clamp(fert_c/60), text=t("Fertilizer cost pressure"))
-    st.info(t({"High": "High risk. Food prices likely to climb. Advise storing harvest, budgeting for higher input costs, and conservative spending.",
-               "Medium": "Moderate risk. Monitor markets and weather; plan inputs carefully.",
-               "Low": "Lower risk. Prices likely stable. Normal planting and input investment is reasonable."}[level]))
+    st.markdown(f"""<div class="ar-grid">
+      <div class="ar-card"><div class="ar-label">{t('Rainfall compared to normal')}</div>
+        <div class="ar-num">{rain_a:+.2f}<small style="font-size:14px;color:#5E7065"> &sigma;</small></div></div>
+      <div class="ar-card"><div class="ar-label">{t('Food price pressure (CPI)')}</div>
+        <div class="ar-num">{cpi_c:+.1f}<small style="font-size:15px;color:#5E7065">%</small></div></div>
+      <div class="ar-card"><div class="ar-label">{t('Fertilizer cost pressure')}</div>
+        <div class="ar-num">{fert_c:+.1f}<small style="font-size:15px;color:#5E7065">%</small></div></div>
+    </div>""", unsafe_allow_html=True)
+
+    advice = t({"High": "High risk. Food prices likely to climb. Advise storing harvest, budgeting for higher input costs, and conservative spending.",
+                "Medium": "Moderate risk. Monitor markets and weather; plan inputs carefully.",
+                "Low": "Lower risk. Prices likely stable. Normal planting and input investment is reasonable."}[level])
+    st.markdown(f"""<div style="background:#fff;border:1px solid #DED7C4;border-left:4px solid {color};
+      border-radius:12px;padding:14px 18px;margin-top:6px">
+      <div class="ar-label" style="color:{color}">{t('Advice')}</div>
+      <div style="margin-top:5px;font-size:15px;color:#1C2A22">{advice}</div></div>""", unsafe_allow_html=True)
 else:
     st.info(t("Pick a district and season, then click **Assess Risk**."))
 
