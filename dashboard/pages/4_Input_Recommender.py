@@ -1,5 +1,5 @@
 """Input Recommender, a fertilizer plan sized to the farmer's land (real MINAGRI prices)."""
-from _ui import setup, footer
+from _ui import setup
 from _i18n import t, crop_label
 from src.db.connection import fetch_catalogue
 import streamlit as st
@@ -46,4 +46,3 @@ if st.button(t("Build Fertilizer Plan"), type="primary"):
 else:
     st.info(t("Set crop, land size and budget, then click **Build Fertilizer Plan**."))
 
-footer()

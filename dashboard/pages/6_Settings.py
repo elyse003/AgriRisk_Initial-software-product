@@ -3,7 +3,7 @@
 Open to any signed-in user. The theme choice is kept in session_state and
 applied by _ui.setup() (which injects the dark CSS when theme == "dark").
 """
-from _ui import setup, footer
+from _ui import setup
 from _i18n import t
 import streamlit as st
 
@@ -30,5 +30,3 @@ st.write(f"**{t('Name')}:** {user.get('name','')}")
 st.write(f"**{t('Role')}:** {user.get('role','')}")
 if user.get("district"):
     st.write(f"**{t('District')}:** {user['district']}")
-
-footer()

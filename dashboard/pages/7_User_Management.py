@@ -1,5 +1,5 @@
 """User management (super_admin only): view, add, edit, reset, and remove users."""
-from _ui import setup, footer
+from _ui import setup
 from _i18n import t
 from src.db.connection import (list_users, add_user, update_user, set_password,
                                delete_user, role_counts)
@@ -14,10 +14,8 @@ if user.get("role") != "super_admin":
 ROLES = ["farmer", "officer", "super_admin"]
 DISTRICT_OPTS = ["Nationwide"] + DISTRICTS
 
-
 def _idx(options, value, default=0):
     return options.index(value) if value in options else default
-
 
 # ---- role counts ----
 rc = role_counts()
@@ -89,5 +87,3 @@ else:
             delete_user(uid)
             st.success(f"Deleted '{sel.username}'.")
             st.rerun()
-
-footer()

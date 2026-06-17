@@ -1,5 +1,5 @@
 """Seasonal Risk, real rainfall anomaly + latest CPI/fertilizer -> trained model."""
-from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model, footer
+from _ui import setup, load_rainfall, load_cpi, load_fert, load_risk_model
 from _i18n import t
 import pandas as pd, streamlit as st
 from config.settings import DISTRICTS
@@ -51,4 +51,3 @@ if st.button(t("Assess Risk"), type="primary"):
 else:
     st.info(t("Pick a district and season, then click **Assess Risk**."))
 
-footer()
