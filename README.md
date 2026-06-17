@@ -197,7 +197,7 @@ a hosted Postgres (otherwise the app falls back to an ephemeral SQLite file).
 - **Hosting:** the dashboard is deployed on Streamlit Community Cloud; the static landing page on GitHub Pages.
 - **Farmer channels:** connect the WhatsApp preview to the WhatsApp Business API through Twilio, and
   SMS to Africa's Talking.
-- **Data refresh:** schedule `scripts/download_data.py` + `prepare_data.py` to update prices, inflation, fertilizer, and rainfall.
+- **Data refresh:** a GitHub Actions workflow (`.github/workflows/refresh-data.yml`) runs monthly, re-downloading the public sources, rebuilding `data/processed/`, retraining the models, and committing the refreshed artifacts so the deployed app stays current. It can also be triggered by hand from the Actions tab.
 
 ## Video demo
 
