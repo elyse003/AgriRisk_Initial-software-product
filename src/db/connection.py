@@ -11,6 +11,8 @@ quietly so the dashboard keeps working even if the database is briefly down.
 """
 from __future__ import annotations
 
+import hashlib
+import hmac
 import os
 from pathlib import Path
 
@@ -18,6 +20,23 @@ import pandas as pd
 from sqlalchemy import (Column, DateTime, Float, Integer, MetaData, String, Table,
                         UniqueConstraint, create_engine, func, insert, select)
 from sqlalchemy.exc import IntegrityError
+
+
+# ------------------------------------------------------------ password hashing
+def hash_password(password: str, iterations: int = 200_000) -> str:
+    """Salted PBKDF2-SHA256 hash, stored as algo$iters$salt$hash (stdlib only)."""
+    salt = os.urandom(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, iterations)
+    return f"pbkdf2_sha256${iterations}${salt.hex()}${dk.hex()}"
+
+
+def verify_password(password: str, stored: str) -> bool:
+    try:
+        _algo, iters, salt_hex, hash_hex = stored.split("$")
+        dk = hashlib.pbkdf2_hmac("sha256", password.encode(), bytes.fromhex(salt_hex), int(iters))
+        return hmac.compare_digest(dk.hex(), hash_hex)
+    except Exception:
+        return False
 
 ROOT = Path(__file__).resolve().parents[2]
 DB_PATH = ROOT / "data" / "agririsk.db"
@@ -74,6 +93,8 @@ users = Table(
     Column("district", String(60)),
     Column("phone", String(20), unique=True),
     Column("language", String(5), default="rw"),
+    Column("username", String(40), unique=True),
+    Column("password_hash", String(200)),
 )
 price_records = Table(
     "price_records", metadata,
@@ -132,13 +153,15 @@ SAMPLE_SUBSCRIBERS = [
     {"phone_number": "0788000107", "district": "Nyamagabe", "crops": "potatoes,beans", "language": "rw"},
     {"phone_number": "0788000108", "district": "Gatsibo", "crops": "maize", "language": "en"},
 ]
+# Demo accounts (username / password) for the login. Passwords are hashed at
+# seed time; these plaintext values are documented in the README for the demo.
 SAMPLE_USERS = [
-    {"name": "National Administrator (RAB)", "role": "super_admin", "district": "Nationwide", "phone": "0788000001", "language": "en"},
-    {"name": "Extension Officer, Musanze", "role": "officer", "district": "Musanze", "phone": "0788000010", "language": "rw"},
-    {"name": "Extension Officer, Bugesera", "role": "officer", "district": "Bugesera", "phone": "0788000011", "language": "rw"},
-    {"name": "Jean (farmer)", "role": "farmer", "district": "Musanze", "phone": "0788000101", "language": "rw"},
-    {"name": "Aline (farmer)", "role": "farmer", "district": "Bugesera", "phone": "0788000102", "language": "rw"},
-    {"name": "Eric (farmer)", "role": "farmer", "district": "Nyagatare", "phone": "0788000103", "language": "en"},
+    {"name": "National Administrator (RAB)", "role": "super_admin", "district": "Nationwide", "phone": "0788000001", "language": "en", "username": "admin", "password": "admin123"},
+    {"name": "Extension Officer, Musanze", "role": "officer", "district": "Musanze", "phone": "0788000010", "language": "rw", "username": "musanze", "password": "officer123"},
+    {"name": "Extension Officer, Bugesera", "role": "officer", "district": "Bugesera", "phone": "0788000011", "language": "rw", "username": "bugesera", "password": "officer123"},
+    {"name": "Jean (farmer)", "role": "farmer", "district": "Musanze", "phone": "0788000101", "language": "rw", "username": "jean", "password": "farmer123"},
+    {"name": "Aline (farmer)", "role": "farmer", "district": "Bugesera", "phone": "0788000102", "language": "rw", "username": "aline", "password": "farmer123"},
+    {"name": "Eric (farmer)", "role": "farmer", "district": "Nyagatare", "phone": "0788000103", "language": "en", "username": "eric", "password": "farmer123"},
 ]
 
 
@@ -169,7 +192,9 @@ def _seed():
         if conn.execute(select(func.count()).select_from(subscribers)).scalar() == 0:
             conn.execute(insert(subscribers), SAMPLE_SUBSCRIBERS)
         if conn.execute(select(func.count()).select_from(users)).scalar() == 0:
-            conn.execute(insert(users), SAMPLE_USERS)
+            rows = [{**{k: v for k, v in u.items() if k != "password"},
+                     "password_hash": hash_password(u["password"])} for u in SAMPLE_USERS]
+            conn.execute(insert(users), rows)
 
 
 _initialised = False
@@ -284,17 +309,36 @@ def submit_feedback(user_id, module_name, satisfaction_rating):
 # the super admin. The web platform looks a person up on sign-in; the chatbot
 # looks them up by phone number when they send a message.
 # ---------------------------------------------------------------------------
-def add_user(name, role, district=None, phone=None, language="rw"):
+def authenticate(username, password):
+    """Return the user dict (without the hash) if credentials match, else None."""
+    _ensure()
+    try:
+        with engine().connect() as conn:
+            row = conn.execute(select(users).where(users.c.username == username)).mappings().first()
+        if row and verify_password(password, row.get("password_hash") or ""):
+            user = dict(row)
+            user.pop("password_hash", None)
+            return user
+        return None
+    except Exception:
+        return None
+
+
+def add_user(name, role, district=None, phone=None, language="rw", username=None, password=None):
     """Register a user. role is 'farmer', 'officer' or 'super_admin'."""
     _ensure()
     try:
+        values = dict(name=name, role=role, district=district, phone=phone,
+                      language=language, username=username)
+        if password:
+            values["password_hash"] = hash_password(password)
         with engine().begin() as conn:
-            conn.execute(insert(users).values(
-                name=name, role=role, district=district, phone=phone, language=language))
+            conn.execute(insert(users).values(**values))
+        return True
     except IntegrityError:
-        pass   # phone already registered
+        return False   # phone or username already registered
     except Exception:
-        pass
+        return False
 
 
 def get_user_by_phone(phone):

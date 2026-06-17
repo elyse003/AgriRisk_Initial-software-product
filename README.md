@@ -64,15 +64,33 @@ into `data/raw/minagri_input_prices_real.csv`. The deep-learning comparison in t
 notebook additionally needs `prophet`, `statsmodels`, and `tensorflow`, which install
 most easily in Google Colab.
 
+## Accounts and roles
+
+The public landing page is open; the dashboard requires sign-in. Accounts have a
+role that controls access: **super_admin** and **officer** get the full toolset,
+while **farmer** gets a limited view (the same advice reaches farmers by SMS and
+WhatsApp). Passwords are stored as salted PBKDF2 hashes. Demo accounts (created by
+`scripts/init_db.py`):
+
+| Username | Password | Role |
+| --- | --- | --- |
+| `admin` | `admin123` | super_admin |
+| `musanze` | `officer123` | officer |
+| `jean` | `farmer123` | farmer |
+
+Sign-in is session-based (a hard refresh signs you out again), which is fine for
+the prototype. **Settings** holds a light/dark theme toggle and account details;
+the **Ururimi / Language** switch (English / Kinyarwanda) is in the sidebar on
+every page.
+
 ## Using the app
 
-The sidebar holds six screens, reachable in one click:
+The dashboard hub links to each tool, also reachable from the sidebar:
 
-- **Home** shows coverage, active alerts, delivery channels, and model performance.
-- **Price Forecast** takes a crop and district and returns a four-week price estimate with a recommendation.
+- **Price Forecast** takes a crop and district and returns a next-month price estimate with a recommendation.
 - **Seasonal Risk** takes a district and season and returns a risk rating with its contributing factors.
 - **Disease Alert** takes a district and lists crop disease risks from the live weather forecast.
-- **Input Recommender** takes a crop, district, and budget and returns ranked fertilizer options.
+- **Input Recommender** takes a crop, district, and budget and returns a fertilizer plan sized to the land.
 - **WhatsApp Preview** is a farmer chat that answers price, risk, disease, and input questions.
 
 ## Designs
