@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 from sqlalchemy import (Column, DateTime, Float, Integer, MetaData, String, Table,
-                        UniqueConstraint, create_engine, func, insert, select)
+                        UniqueConstraint, create_engine, delete, func, insert, select, update)
 from sqlalchemy.exc import IntegrityError
 
 
@@ -353,10 +353,11 @@ def get_user_by_phone(phone):
 
 
 def list_users(role=None):
-    """All users, optionally filtered to one role."""
+    """All users (with id + username), optionally filtered to one role."""
     _ensure()
     try:
-        q = select(users.c.name, users.c.role, users.c.district, users.c.phone, users.c.language)
+        q = select(users.c.user_id, users.c.username, users.c.name, users.c.role,
+                   users.c.district, users.c.phone, users.c.language).order_by(users.c.role, users.c.name)
         if role:
             q = q.where(users.c.role == role)
         with engine().connect() as conn:
@@ -374,3 +375,44 @@ def role_counts():
         return {r: c for r, c in rows}
     except Exception:
         return {}
+
+
+# ----------------------------------------------------- admin: manage users
+def update_user(user_id, **fields):
+    """Update allowed fields (name, role, district, phone, language) for a user."""
+    allowed = {k: v for k, v in fields.items()
+               if k in ("name", "role", "district", "phone", "language") and v is not None}
+    if not allowed:
+        return False
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            conn.execute(update(users).where(users.c.user_id == user_id).values(**allowed))
+        return True
+    except IntegrityError:
+        return False
+    except Exception:
+        return False
+
+
+def set_password(user_id, new_password):
+    """Reset a user's password (admin action)."""
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            conn.execute(update(users).where(users.c.user_id == user_id)
+                         .values(password_hash=hash_password(new_password)))
+        return True
+    except Exception:
+        return False
+
+
+def delete_user(user_id):
+    """Remove a user account."""
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            conn.execute(delete(users).where(users.c.user_id == user_id))
+        return True
+    except Exception:
+        return False
