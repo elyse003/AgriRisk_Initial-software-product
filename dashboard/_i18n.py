@@ -68,6 +68,8 @@ RW = {
     "Current": "Ubu",
     "Next-month forecast": "Iteganya ry'ukwezi gutaha",
     "Trend": "Icyerekezo",
+    "Advice": "Inama",
+    "Recent and forecast price": "Igiciro cya vuba n'iteganyijwe",
     "Rising": "Birazamuka",
     "Falling": "Biragabanuka",
     "Stable": "Bihagaze",
