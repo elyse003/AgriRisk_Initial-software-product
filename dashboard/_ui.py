@@ -113,17 +113,30 @@ def setup(title, subtitle, allowed_roles=None):
     st.markdown(CSS, unsafe_allow_html=True)
     if st.session_state.get("theme") == "dark":
         st.markdown(DARK_CSS, unsafe_allow_html=True)
+
+    from _auth import current_user, require_login, require_role, sidebar_account
+    user = current_user()
+    if not user:
+        # The sidebar (nav, language, account) only appears once signed in, so the
+        # login / sign-up screen is clean.
+        st.markdown("<style>section[data-testid='stSidebar'],"
+                    "[data-testid='stSidebarCollapsedControl']{display:none !important;}</style>",
+                    unsafe_allow_html=True)
+        require_login()   # renders sign in / sign up, then st.stop()
+
+    # signed in -> full sidebar
     try:
         st.logo(LOGO_PATH, size="large")
     except Exception:
         st.sidebar.image(LOGO_PATH)
     _language_selector()
-
-    from _auth import require_login, require_role, sidebar_account
-    user = require_role(allowed_roles) if allowed_roles else require_login()
     sidebar_account(user)
-
     st.sidebar.markdown("---")
+
+    # role gate after the sidebar, so a blocked user can still navigate elsewhere
+    if allowed_roles:
+        require_role(allowed_roles)
+
     st.markdown(f"<div class='ar-head'>{t(title)}</div><div class='ar-sub'>{t(subtitle)}</div>",
                 unsafe_allow_html=True)
     return user
