@@ -166,6 +166,19 @@ RW = {
     "Username": "Izina ry'ukoresha",
     "Password": "Ijambo banga",
     "Wrong username or password.": "Izina cyangwa ijambo banga sibyo.",
+    "Create account": "Fungura konti",
+    "Full name": "Amazina yombi",
+    "Confirm password": "Emeza ijambo banga",
+    "Phone (optional)": "Telefoni (si itegeko)",
+    "Please fill in name, username and password.":
+        "Uzuza amazina, izina ry'ukoresha n'ijambo banga.",
+    "Passwords do not match.": "Amagambo banga ntahuye.",
+    "Password must be at least 6 characters.":
+        "Ijambo banga rigomba kuba nibura inyuguti 6.",
+    "That username or phone is already taken.":
+        "Iryo zina cyangwa telefoni byamaze gukoreshwa.",
+    "In a real deployment, officer access would be approved by an administrator.":
+        "Mu ikoreshwa nyaryo, kwemererwa nk'umujyanama byemezwa n'umuyobozi.",
     "Log out": "Sohoka",
     "Signed in as": "Winjiye nka",
     "This screen is for extension officers. As a farmer, you get the same advice "
