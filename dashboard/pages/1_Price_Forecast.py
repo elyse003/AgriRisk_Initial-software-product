@@ -11,7 +11,7 @@ from config.settings import CROPS, DISTRICTS
 from src.models.price_forecasting import forecast_next, MIN_HISTORY
 from src.db.connection import log_price
 
-setup("Price Forecast", "Next-month price outlook by crop and district")
+setup("Price Forecast", "Next-month price outlook by crop and district", allowed_roles=("officer", "super_admin"))
 prices = load_prices()
 models = load_price_forecaster()
 

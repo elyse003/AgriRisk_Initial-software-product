@@ -6,7 +6,7 @@ import streamlit as st
 from config.settings import CROPS, DISTRICTS
 from src.models.input_recommender import recommend_plan
 
-setup("Input Recommender", "Fertilizer plan for your land and budget")
+setup("Input Recommender", "Fertilizer plan for your land and budget", allowed_roles=("officer", "super_admin"))
 cat = fetch_catalogue()
 
 c1, c2 = st.columns(2)

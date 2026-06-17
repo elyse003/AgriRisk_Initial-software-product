@@ -6,7 +6,7 @@ from config.settings import DISTRICTS
 from src.data.preprocessing import label_risk
 from src.db.connection import log_risk
 
-setup("Seasonal Risk", "Planting risk by district and season")
+setup("Seasonal Risk", "Planting risk by district and season", allowed_roles=("officer", "super_admin"))
 rain, cpi, fert, model = load_rainfall(), load_cpi(), load_fert(), load_risk_model()
 
 # Rwanda's two main cropping seasons. The rainfall data codes the March-May long

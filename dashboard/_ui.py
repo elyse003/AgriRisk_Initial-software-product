@@ -67,6 +67,25 @@ h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--fo
 </style>
 """
 
+# Dark theme: re-declares the colour tokens and overrides the white surfaces.
+# Injected by setup() when session_state["theme"] == "dark" (toggled in Settings).
+DARK_CSS = """
+<style>
+:root{ --paper:#0F1A15; --ink:#E6F0EA; --mut:#9FB8AC; --line:#26392F; }
+.stApp{ background:#0F1A15 !important; }
+.ar-head, h1, h2, h3 { color:#E6F0EA !important; }
+.ar-card, .tool-card, .ar-foot-brand, [data-testid="stForm"],
+div[data-testid="stVerticalBlockBorderWrapper"] { background:#16241D !important; border-color:#26392F !important; }
+.tc-title { color:#E6F0EA !important; }
+.tc-desc, .ar-lbl, .ar-sub, p, label, [data-testid="stWidgetLabel"],
+[data-testid="stMarkdownContainer"] { color:#CFE0D6 !important; }
+.ar-alert { background:#27200F !important; border-color:#5A3F1E !important; }
+[data-baseweb="select"] > div, [data-baseweb="input"] > div,
+.stTextInput input, .stNumberInput input { background:#16241D !important; color:#E6F0EA !important; }
+[data-testid="stMetricValue"] { color:#E6F0EA !important; }
+</style>
+"""
+
 
 LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
 
@@ -82,19 +101,32 @@ def _language_selector():
     st.session_state["lang"] = LANGUAGES[choice]
 
 
-def setup(title, subtitle):
+def setup(title, subtitle, allowed_roles=None):
+    """Page scaffold: config, CSS/theme, sidebar, login gate, header.
+
+    Returns the logged-in user. If `allowed_roles` is given, callers without one
+    of those roles are stopped with a notice (used to keep tools officer-only).
+    """
     # "auto": expanded on desktop (pinned open by the CSS), collapsed on mobile
     # so the sidebar doesn't blanket the screen.
     st.set_page_config(page_title="AgriRisk Rwanda", layout="wide", initial_sidebar_state="auto")
     st.markdown(CSS, unsafe_allow_html=True)
+    if st.session_state.get("theme") == "dark":
+        st.markdown(DARK_CSS, unsafe_allow_html=True)
     try:
         st.logo(LOGO_PATH, size="large")
     except Exception:
         st.sidebar.image(LOGO_PATH)
     _language_selector()
+
+    from _auth import require_login, require_role, sidebar_account
+    user = require_role(allowed_roles) if allowed_roles else require_login()
+    sidebar_account(user)
+
     st.sidebar.markdown("---")
     st.markdown(f"<div class='ar-head'>{t(title)}</div><div class='ar-sub'>{t(subtitle)}</div>",
                 unsafe_allow_html=True)
+    return user
 
 
 GITHUB_URL = "https://github.com/elyse003/AgriRisk_Initial-software-product"

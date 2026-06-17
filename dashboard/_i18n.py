@@ -158,6 +158,35 @@ RW = {
     "WhatsApp Preview": "Igerageza rya WhatsApp",
     "Ask about price, risk, disease, or inputs":
         "Baza ku giciro, ibyago, indwara, cyangwa ifumbire",
+
+    # ---- auth / settings ----
+    "Sign in": "Injira",
+    "Sign in to the dashboard": "Injira ku mbonerahamwe",
+    "For extension officers and administrators": "Ku bajyanama b'ubuhinzi n'abayobozi",
+    "Username": "Izina ry'ukoresha",
+    "Password": "Ijambo banga",
+    "Wrong username or password.": "Izina cyangwa ijambo banga sibyo.",
+    "Log out": "Sohoka",
+    "Signed in as": "Winjiye nka",
+    "This screen is for extension officers. As a farmer, you get the same advice "
+    "by SMS and WhatsApp.":
+        "Iyi paji ni iy'abajyanama b'ubuhinzi. Nk'umuhinzi, ubona inama zimwe "
+        "kuri SMS na WhatsApp.",
+    "Settings": "Igenamiterere",
+    "Your account and preferences": "Konti yawe n'ibyo uhitamo",
+    "Appearance": "Imiboneka",
+    "Theme": "Insanganyamatsiko",
+    "Light": "Urumuri",
+    "Dark": "Umwijima",
+    "Language": "Ururimi",
+    "Account": "Konti",
+    "Name": "Izina",
+    "Role": "Uruhare",
+    "Welcome": "Murakaza neza",
+    "The full dashboard is for extension officers. You can chat with the assistant "
+    "on WhatsApp for price, risk, disease and input advice.":
+        "Imbonerahamwe yuzuye ni iy'abajyanama b'ubuhinzi. Ushobora kuganira "
+        "n'umufasha kuri WhatsApp ku nama z'igiciro, ibyago, indwara n'ifumbire.",
 }
 
 

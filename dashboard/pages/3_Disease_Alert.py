@@ -5,7 +5,7 @@ import streamlit as st
 from config.settings import DISTRICT_COORDS, CROPS
 from src.models.disease_alert import assess_crop, get_all_alerts
 
-setup("Disease Alert", "Crop disease warnings from the local weather")
+setup("Disease Alert", "Crop disease warnings from the local weather", allowed_roles=("officer", "super_admin"))
 district = st.selectbox(t("District"), list(DISTRICT_COORDS))
 
 if st.button(t("Check Risk"), type="primary"):

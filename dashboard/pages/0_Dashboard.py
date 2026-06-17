@@ -6,16 +6,26 @@ from _ui import setup, footer
 from _i18n import t
 import streamlit as st
 
-setup("Dashboard", "Choose a tool to get started")
+user = setup("Dashboard", "Choose a tool to get started")
 
 # (title, page URL, description, accent colour, season stage)
-TOOLS = [
+ALL_TOOLS = [
     ("Price Forecast", "/Price_Forecast", "Next-month price outlook by crop and district.", "#2D6A4F", "At selling"),
     ("Seasonal Risk", "/Seasonal_Risk", "Planting risk from rainfall, food inflation and fertilizer cost.", "#C76E1B", "Before planting"),
     ("Disease Alert", "/Disease_Alert", "Crop disease warnings from the live weather forecast.", "#DC2626", "While growing"),
     ("Input Recommender", "/Input_Recommender", "A fertilizer plan sized to your land and budget.", "#7C3AED", "At planting"),
     ("WhatsApp Preview", "/WhatsApp_Preview", "Farmer chat answering price, risk, disease and input questions.", "#40916C", "For farmers"),
 ]
+
+# Farmers get a limited view: a welcome note and only the WhatsApp assistant
+# (the analytical tools are for extension officers).
+if user["role"] == "farmer":
+    st.info(f"{t('Welcome')}, {user['name']}. " + t(
+        "The full dashboard is for extension officers. You can chat with the assistant "
+        "on WhatsApp for price, risk, disease and input advice."))
+    TOOLS = [x for x in ALL_TOOLS if x[1] == "/WhatsApp_Preview"]
+else:
+    TOOLS = ALL_TOOLS
 
 cards = "".join(
     f'''<a class="tool-card" href="{url}" target="_self">
