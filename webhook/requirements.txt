@@ -1,0 +1,8 @@
+# Webhook service (separate from the Streamlit app). Lightweight: the bot uses
+# pandas only, no ML model loading.
+fastapi
+uvicorn[standard]
+python-multipart
+pandas
+numpy
+python-dotenv
