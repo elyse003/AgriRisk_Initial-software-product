@@ -24,8 +24,18 @@ DB_PATH = ROOT / "data" / "agririsk.db"
 
 
 def database_url() -> str:
-    """Postgres URL from DATABASE_URL, else a local SQLite file."""
+    """Postgres URL from DATABASE_URL, else a local SQLite file.
+
+    On Streamlit Cloud the value is stored as a secret rather than an environment
+    variable, so we also look in st.secrets (ignored outside a Streamlit app).
+    """
     url = (os.getenv("DATABASE_URL") or "").strip()
+    if not url:
+        try:
+            import streamlit as st
+            url = str(st.secrets.get("DATABASE_URL", "")).strip()
+        except Exception:
+            url = ""
     if url:
         # accept both postgres:// and postgresql:// and pin the psycopg2 driver
         if url.startswith("postgres://"):
