@@ -9,9 +9,11 @@ scipy==1.17.1
 requests
 python-dotenv
 
-# database: PostgreSQL in production via DATABASE_URL, SQLite locally
+# database: PostgreSQL in production via DATABASE_URL, SQLite locally.
+# psycopg3 binary wheel installs reliably on Streamlit Cloud (psycopg2-binary
+# can fail to build there and break the whole install).
 sqlalchemy>=2.0
-psycopg2-binary
+psycopg[binary]>=3.1
 
 # data rebuild (scripts/download_data.py + prepare_data.py read Excel sources)
 openpyxl
