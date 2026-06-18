@@ -40,13 +40,13 @@
   .hero{position:relative;min-height:74vh;display:flex;align-items:center;overflow:hidden;
         background:url('../assets/background.jpg') center/cover no-repeat}
   .hero-overlay{position:absolute;inset:0;
-        background:linear-gradient(96deg,rgba(14,30,22,.90),rgba(14,30,22,.64) 45%,rgba(14,30,22,.28))}
-  .hero-inner{position:relative;z-index:2;width:100%;padding:84px 0 78px}
+        background:linear-gradient(180deg,rgba(14,30,22,.62),rgba(14,30,22,.50) 40%,rgba(14,30,22,.78))}
+  .hero-inner{position:relative;z-index:2;width:100%;padding:96px 0 92px;text-align:center}
   .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A7DCBC;margin-bottom:20px}
-  h1{font-family:var(--disp);font-size:clamp(44px,6vw,72px);line-height:1.04;letter-spacing:-.01em;color:#fff}
+  h1{font-family:var(--disp);font-size:clamp(44px,6vw,74px);line-height:1.04;letter-spacing:-.01em;color:#fff}
   .hero h1 .em{color:#F2A65A}
-  .lead{font-size:17.5px;color:rgba(255,255,255,.87);margin:22px 0 30px;max-width:34em}
-  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .lead{font-size:17.5px;color:rgba(255,255,255,.88);margin:22px auto 30px;max-width:36em}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.72)}
   @media(max-width:860px){.hero{min-height:auto}.hero-inner{padding:58px 0 54px}}
 
@@ -57,11 +57,11 @@
   .stage-t{font-family:var(--disp);font-weight:700;fill:var(--forest)}
   .stage-s{font-family:var(--mono);font-weight:500;fill:var(--mut);letter-spacing:.06em}
 
-  /* section frame */
-  section{padding:64px 0;border-top:1px solid var(--line)}
-  .sec-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--harvest);margin-bottom:12px}
-  .sec-h{font-family:var(--disp);font-weight:700;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.02em;color:var(--forest);max-width:18em}
-  .sec-sub{color:var(--mut);margin-top:12px;max-width:42em;font-size:16px}
+  /* section frame — centered headers (like the reference site) */
+  section{padding:72px 0;border-top:1px solid var(--line)}
+  .sec-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--harvest);margin-bottom:12px;text-align:center}
+  .sec-h{font-family:var(--disp);font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.01em;color:var(--forest);max-width:20em;margin:0 auto;text-align:center}
+  .sec-sub{color:var(--mut);margin:14px auto 0;max-width:44em;font-size:16px;text-align:center}
 
   /* module cards */
   .mods{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:38px}
@@ -100,13 +100,46 @@
   details[open] summary::after{transform:rotate(45deg)}
   details p{color:var(--mut);font-size:15px;margin-top:12px;max-width:54em}
 
-  /* cta band + footer */
+  /* cta band */
   .band{background:var(--harvest);border-radius:20px;padding:48px;text-align:center;color:#fff;margin-top:10px}
-  .band h2{font-family:var(--disp);font-weight:800;font-size:clamp(26px,3.6vw,38px);letter-spacing:-.02em}
+  .band h2{font-family:var(--disp);font-weight:400;font-size:clamp(28px,3.8vw,42px);letter-spacing:-.01em}
   .band p{margin:14px auto 26px;max-width:36em;color:#FCEBD8}
   .band .btn-go{background:#fff;color:var(--harvest)}
-  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mut);font-size:13.5px}
-  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+
+  /* contact */
+  .contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:26px;margin-top:38px;text-align:left}
+  @media(max-width:760px){.contact-grid{grid-template-columns:1fr}}
+  .cinfo{display:flex;flex-direction:column;gap:12px}
+  .cinfo .row{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 18px}
+  .cinfo .ic{width:38px;height:38px;flex:0 0 38px;border-radius:10px;background:var(--paper2);display:grid;place-items:center;color:var(--emerald)}
+  .cinfo .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--harvest)}
+  .cinfo .v{font-size:15px;color:var(--ink);margin-top:3px;word-break:break-word}
+  .cform{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+  .cform .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:520px){.cform .frow{grid-template-columns:1fr}}
+  .cform .field{margin-bottom:14px}
+  .cform label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+  .cform input,.cform textarea{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:11px 12px;outline:none}
+  .cform input:focus,.cform textarea:focus{border-color:var(--emerald)}
+  .cform textarea{min-height:118px;resize:vertical}
+  .cform .btn-go{width:100%;text-align:center;border:none;cursor:pointer}
+
+  /* footer (dark, multi-column) */
+  footer{border-top:1px solid var(--line);background:var(--forest);color:#CFE3D6;padding:52px 0 26px}
+  footer a{color:#CFE3D6}
+  footer a:hover{color:#fff}
+  .foot-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:28px}
+  @media(max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.foot-grid{grid-template-columns:1fr}}
+  .foot-brand .b{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:21px;color:#fff}
+  .foot-brand .b .seed{width:18px;height:18px;border-radius:50% 50% 50% 0;background:var(--leaf);transform:rotate(-45deg)}
+  .foot-brand p{font-size:13.5px;margin-top:12px;color:#A9C7B4;max-width:28em;line-height:1.6}
+  .foot-col h5{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7FB494;margin-bottom:12px}
+  .foot-col a,.foot-col span{display:block;font-size:13.5px;margin:7px 0;color:#CFE3D6}
+  .foot-social{display:flex;gap:10px;margin-top:16px}
+  .foot-social a{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.20);display:grid;place-items:center;color:#CFE3D6}
+  .foot-social a:hover{background:rgba(255,255,255,.10);color:#fff}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:34px;padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:12.5px;color:#9CBCA8}
 
   .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease}
   .reveal.in{opacity:1;transform:none}
@@ -145,6 +178,7 @@
       <a href="#numbers">Why it helps</a>
       <a href="#reach">Reaching farmers</a>
       <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
     </div>
     <!-- Replace # with your deployed Streamlit URL (e.g. https://agririsk.streamlit.app) -->
     <a class="btn btn-go" href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard">Open the dashboard</a>
@@ -278,11 +312,56 @@
   </div>
 </section>
 
+<section id="contact" class="wrap">
+  <div class="sec-eyebrow">Get in touch</div>
+  <h2 class="sec-h">Questions, feedback, or a pilot in your district?</h2>
+  <p class="sec-sub">We're a student team building AgriRisk for Rwanda's farmers and extension officers. Send a message and we'll get back to you.</p>
+  <div class="contact-grid">
+    <div class="cinfo reveal">
+      <div class="row"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+        <div><div class="k">Email</div><div class="v"><a href="mailto:irabestverie03@gmail.com">irabestverie03@gmail.com</a></div></div></div>
+      <div class="row"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c0 1 2.5 2 5 2s5-1 5-2v-5"/></svg></div>
+        <div><div class="k">Project</div><div class="v">BSc Software Engineering capstone</div></div></div>
+      <div class="row"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+        <div><div class="k">Coverage</div><div class="v">All 30 districts of Rwanda · Kinyarwanda &amp; English</div></div></div>
+      <div class="row"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg></div>
+        <div><div class="k">Code</div><div class="v"><a href="https://github.com/elyse003/AgriRisk_Initial-software-product" target="_blank">github.com/elyse003</a></div></div></div>
+    </div>
+    <form class="cform reveal" action="mailto:irabestverie03@gmail.com" method="post" enctype="text/plain">
+      <div class="frow">
+        <div class="field"><label>Your name</label><input type="text" name="name" placeholder="Full name"></div>
+        <div class="field"><label>Your email</label><input type="email" name="email" placeholder="you@example.com"></div>
+      </div>
+      <div class="field"><label>Subject</label><input type="text" name="subject" placeholder="How can we help?"></div>
+      <div class="field"><label>Message</label><textarea name="message" placeholder="Write your message…"></textarea></div>
+      <button type="submit" class="btn btn-go">Send message</button>
+    </form>
+  </div>
+</section>
+
 <footer>
-  <div class="wrap foot-in">
-    <div><span class="brand" style="font-size:16px"><span class="seed" style="width:16px;height:16px"></span>AgriRisk Rwanda</span></div>
-    <div>Decision support for Rwandan agriculture · maize, beans, Irish potatoes · 30 districts</div>
-    <div>BSc Software Engineering capstone</div>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="b"><span class="seed"></span>AgriRisk Rwanda</div>
+        <p>Machine-learning decision support for Rwandan agriculture — price forecasts, seasonal risk, disease alerts and input plans for maize, beans and Irish potatoes across all 30 districts, in Kinyarwanda and English.</p>
+        <div class="foot-social">
+          <a href="https://github.com/elyse003/AgriRisk_Initial-software-product" target="_blank" aria-label="GitHub"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.1-1.47-1.1-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg></a>
+          <a href="mailto:irabestverie03@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>
+          <a href="#contact" aria-label="Contact"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8 8 0 01-11.6 7.1L3 20l1.4-6.4A8 8 0 1121 11.5z"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col"><h5>Tools</h5>
+        <a href="#season">Seasonal risk</a><a href="#season">Input plan</a><a href="#season">Disease alerts</a><a href="#season">Price forecast</a></div>
+      <div class="foot-col"><h5>Explore</h5>
+        <a href="#crops">Crops</a><a href="#numbers">Why it helps</a><a href="#reach">Reaching farmers</a><a href="#faq">FAQ</a></div>
+      <div class="foot-col"><h5>Data</h5>
+        <span>WFP market prices</span><span>World Bank CPI</span><span>CHIRPS rainfall</span><span>Open-Meteo · MINAGRI</span></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 AgriRisk Rwanda · BSc Software Engineering capstone</span>
+      <span>Decision support only. Confirm with local extension advice.</span>
+    </div>
   </div>
 </footer>
 
