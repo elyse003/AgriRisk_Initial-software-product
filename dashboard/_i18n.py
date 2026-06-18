@@ -280,6 +280,7 @@ RW = {
     "Price (RWF)": "Igiciro (RWF)",
     "Bulletin": "Itangazo",
     "Sizing": "Ingano",
+    "Chat on WhatsApp": "Ganira kuri WhatsApp",
     "Confirm with soil testing and local extension advice.":
         "Emeza hakozwe isuzuma ry'ubutaka n'abajyanama b'ubuhinzi bo mu karere.",
 }
