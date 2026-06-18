@@ -99,12 +99,13 @@ def require_role(allowed):
 
 
 def sidebar_account(user):
-    """Show who is signed in, plus a logout button, in the sidebar."""
-    st.sidebar.markdown(
-        f"<div style='font-size:12px;color:#74A98C'>{t('Signed in as')}</div>"
+    """Show who is signed in, plus a logout button. Rendered inside the sidebar's
+    bottom container (see _ui.setup), so it uses bare st.* to respect that context."""
+    st.markdown(
+        f"<div style='font-size:12px;color:#74A98C;margin-top:4px'>{t('Signed in as')}</div>"
         f"<div style='font-weight:600;color:#D8F3DC'>{user.get('name','')}</div>"
-        f"<div style='font-size:12px;color:#74A98C'>{user.get('role','')}</div>",
+        f"<div style='font-size:12px;color:#74A98C;margin-bottom:8px'>{user.get('role','')}</div>",
         unsafe_allow_html=True)
-    if st.sidebar.button(t("Log out"), use_container_width=True):
+    if st.button(t("Log out"), use_container_width=True, icon=":material/logout:"):
         logout()
         st.rerun()
