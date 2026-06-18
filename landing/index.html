@@ -32,19 +32,23 @@
   .btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:9px;padding:11px 18px;border:none;cursor:pointer;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
   .btn-go{background:var(--forest);color:#fff}
   .btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,67,50,.25)}
-  .btn-ghost{background:transparent;color:var(--forest);border:1px solid var(--line)}
-  .btn-ghost:hover{border-color:var(--emerald)}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.55)}
+  .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.16)}
   @media(max-width:740px){.nav-links{display:none}}
 
-  /* hero */
-  .hero{padding:78px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
-  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--emerald);margin-bottom:20px}
-  h1{font-family:var(--disp);font-weight:800;font-size:clamp(38px,5.4vw,62px);line-height:1.02;letter-spacing:-.03em;color:var(--forest)}
-  h1 .em{color:var(--harvest)}
-  .lead{font-size:17.5px;color:var(--mut);margin:22px 0 30px;max-width:30em}
+  /* hero — full-bleed farm photo with a green overlay, white text on top */
+  .hero{position:relative;min-height:74vh;display:flex;align-items:center;overflow:hidden;
+        background:url('../assets/background.jpg') center/cover no-repeat}
+  .hero-overlay{position:absolute;inset:0;
+        background:linear-gradient(96deg,rgba(14,30,22,.90),rgba(14,30,22,.64) 45%,rgba(14,30,22,.28))}
+  .hero-inner{position:relative;z-index:2;width:100%;padding:84px 0 78px}
+  .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A7DCBC;margin-bottom:20px}
+  h1{font-family:var(--disp);font-size:clamp(44px,6vw,72px);line-height:1.04;letter-spacing:-.01em;color:#fff}
+  .hero h1 .em{color:#F2A65A}
+  .lead{font-size:17.5px;color:rgba(255,255,255,.87);margin:22px 0 30px;max-width:34em}
   .cta-row{display:flex;gap:12px;flex-wrap:wrap}
-  .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:var(--mut)}
-  @media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:52px}.ring-wrap{order:-1}}
+  .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.72)}
+  @media(max-width:860px){.hero{min-height:auto}.hero-inner{padding:58px 0 54px}}
 
   /* the season ring (signature) */
   .ring-wrap{display:flex;justify-content:center}
@@ -147,8 +151,9 @@
   </div>
 </nav>
 
-<header id="top" class="wrap hero">
-  <div>
+<header id="top" class="hero">
+  <div class="hero-overlay"></div>
+  <div class="wrap hero-inner">
     <div class="eyebrow">Nationwide agricultural intelligence · Rwanda</div>
     <h1>Advice for every<br>stage of the <span class="em">season.</span></h1>
     <p class="lead">A free advisory service for Rwanda's farmers and extension officers. It follows the whole season, from deciding what to plant to selling at the right price, across all 30 districts and the country's staple crops.</p>
@@ -158,7 +163,12 @@
     </div>
     <div class="hero-note">maize · beans · Irish potatoes, in Kinyarwanda and English</div>
   </div>
-  <div class="ring-wrap">
+</header>
+
+<section id="season" class="wrap">
+  <div class="sec-eyebrow">Four tools, one cycle</div>
+  <h2 class="sec-h">Each module answers a question the farmer faces at that point in the season.</h2>
+  <div class="ring-wrap" style="margin:34px auto 6px;max-width:380px">
     <svg class="ring" viewBox="0 0 420 420" role="img" aria-label="The four advisory modules around the farming season">
       <circle cx="210" cy="210" r="150" fill="none" stroke="#DED7C4" stroke-width="2"/>
       <circle cx="210" cy="210" r="150" fill="none" stroke="#C76E1B" stroke-width="3" stroke-linecap="round"
@@ -185,11 +195,6 @@
       <text x="68" y="222" text-anchor="start" class="stage-s" font-size="10">PRICE FORECAST</text>
     </svg>
   </div>
-</header>
-
-<section id="season" class="wrap">
-  <div class="sec-eyebrow">Four tools, one cycle</div>
-  <h2 class="sec-h">Each module answers a question the farmer faces at that point in the season.</h2>
   <div class="mods">
     <div class="mod reveal"><span class="num">01</span><div class="stage">Before planting</div>
       <h3>Seasonal risk</h3>

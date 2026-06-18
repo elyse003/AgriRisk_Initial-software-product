@@ -27,13 +27,15 @@ body = body.replace(
     'href="/Dashboard" target="_self"')
 
 # Streamlit serves raw HTML from a virtual path, so the landing's relative
-# ../assets/<crop>.jpg won't resolve. Inline the crop photos as base64 data URIs
-# (they're small, web-optimised) so they render in-app exactly as on the static page.
-for _f in ("maize.jpg", "beans.jpg", "potatoes.jpg"):
+# ../assets/<file> paths won't resolve. Inline the hero background and crop photos
+# as base64 data URIs (small, web-optimised) so they render in-app exactly as on the
+# static page. The hero background lives in <style>, the crop photos in <body>.
+for _f in ("background.jpg", "maize.jpg", "beans.jpg", "potatoes.jpg"):
     _p = Path(ROOT) / "assets" / _f
     if _p.exists():
-        _b64 = base64.b64encode(_p.read_bytes()).decode()
-        body = body.replace(f"../assets/{_f}", f"data:image/jpeg;base64,{_b64}")
+        _uri = "data:image/jpeg;base64," + base64.b64encode(_p.read_bytes()).decode()
+        style = style.replace(f"../assets/{_f}", _uri)
+        body = body.replace(f"../assets/{_f}", _uri)
 
 # fonts (the <link> in <head> is dropped) + overrides so Streamlit's chrome,
 # background and link styling don't fight the landing design.
@@ -47,7 +49,7 @@ section[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"]{displ
 [data-testid="stMarkdownContainer"] a{text-decoration:none !important;color:inherit !important;}
 [data-testid="stMarkdownContainer"] .btn-go{color:#fff !important;}
 [data-testid="stMarkdownContainer"] .band .btn-go{background:#fff !important;color:#C76E1B !important;}
-[data-testid="stMarkdownContainer"] .btn-ghost{color:#1B4332 !important;}
+[data-testid="stMarkdownContainer"] .hero .btn-ghost{color:#fff !important;}
 [data-testid="stMarkdownContainer"] .brand{color:#1B4332 !important;}
 .reveal{opacity:1 !important;transform:none !important;}
 """
