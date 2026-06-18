@@ -14,16 +14,15 @@ ALL_TOOLS = [
     ("Seasonal Risk", "/Seasonal_Risk", "Planting risk from rainfall, food inflation and fertilizer cost.", "#C76E1B", "Before planting"),
     ("Disease Alert", "/Disease_Alert", "Crop disease warnings from the live weather forecast.", "#DC2626", "While growing"),
     ("Input Recommender", "/Input_Recommender", "A fertilizer plan sized to your land and budget.", "#7C3AED", "At planting"),
-    ("WhatsApp Preview", "/WhatsApp_Preview", "Farmer chat answering price, risk, disease and input questions.", "#40916C", "For farmers"),
 ]
 
-# Farmers get a limited view: a welcome note and only the WhatsApp assistant
+# Farmers get a limited view: a welcome note pointing them to the chat assistant
 # (the analytical tools are for extension officers).
 if user["role"] == "farmer":
     st.info(f"{t('Welcome')}, {user['name']}. " + t(
-        "The full dashboard is for extension officers. You can chat with the assistant "
-        "on WhatsApp for price, risk, disease and input advice."))
-    TOOLS = [x for x in ALL_TOOLS if x[1] == "/WhatsApp_Preview"]
+        "The full dashboard is for extension officers. Tap the chat button (bottom-right) "
+        "to ask the assistant about price, risk, disease and inputs."))
+    TOOLS = []
 else:
     TOOLS = ALL_TOOLS
 
@@ -41,8 +40,8 @@ st.markdown(f"""<style>
 .tool-card{{display:block;background:#fff;border:1px solid #DED7C4;border-radius:16px;
   padding:24px;text-decoration:none !important;transition:transform .14s ease, box-shadow .14s ease}}
 .tool-card:hover{{transform:translateY(-3px);box-shadow:0 14px 34px rgba(27,67,50,.10)}}
-.tc-stage{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
-.tc-title{{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:21px;color:#1B4332;margin:8px 0 6px}}
+.tc-stage{{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
+.tc-title{{font-family:'Instrument Serif',serif;font-weight:400;font-size:23px;color:#1B4332;margin:6px 0 6px}}
 .tc-desc{{color:#5E7065;font-size:14.5px;line-height:1.5}}
 .tc-go{{margin-top:14px;font-weight:600;font-size:14px}}
 </style>

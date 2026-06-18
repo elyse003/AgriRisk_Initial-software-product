@@ -28,10 +28,10 @@ season_label = c2.selectbox(t("Season"), [t(lbl) for lbl, _ in SEASONS])
 scode = SEASON_CODE[season_label]
 
 page_header(
-    f"MODULE 02 · {t('Seasonal Risk').upper()}",
+    t('Seasonal Risk').upper(),
     f"<em>{t('Seasonal')}</em> {t('planting risk')} · {district}",
-    t("Classifier combining pre-processed district rainfall anomalies with food "
-      "CPI and fertilizer cost pressure to flag how likely staple prices are to spike."),
+    t("How likely staple food prices are to rise sharply this season — from rainfall, "
+      "food prices and fertilizer costs."),
     meta_strong=season_label, meta_sub=t("recalculated weekly"))
 
 if st.button(t("Assess Risk"), type="primary"):
@@ -66,21 +66,20 @@ if st.button(t("Assess Risk"), type="primary"):
 
     # ---- gauge + classification + driver bars ----
     drivers = [
-        (t("Rainfall vs normal"), f"{rain_a:+.2f} σ", float(weights[0]), "var(--ag-slate)"),
-        (t("Food price pressure (CPI)"), f"{cpi_c:+.1f}%", float(weights[1]), "var(--ag-terra)"),
-        (t("Fertilizer cost pressure"), f"{fert_c:+.1f}%", float(weights[2]), "var(--ag-sage)"),
+        (t("Rainfall vs normal"), f"{rain_a:+.2f}", float(weights[0]), "var(--ag-slate)"),
+        (t("Food price pressure"), f"{cpi_c:+.1f}%", float(weights[1]), "var(--ag-terra)"),
+        (t("Fertilizer cost"), f"{fert_c:+.1f}%", float(weights[2]), "var(--ag-sage)"),
     ]
     bars = "".join(driver_bar(*d) for d in drivers)
     st.markdown(f"""<div class="ag-pagein" style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:22px">
       <div class="ag-card" style="background:{tbg};border-color:{tcol}">
         <div style="padding:24px;display:flex;gap:26px;align-items:center">
           <div style="flex-shrink:0">{gauge_svg(score, tcol)}</div>
-          <div><div class="kicker" style="color:var(--ag-ink-soft)">{t('CLASSIFICATION OUTPUT')}</div>
+          <div><div class="kicker" style="color:var(--ag-ink-soft)">{t('RISK LEVEL')}</div>
             <div style="font-family:var(--f-serif);font-size:52px;line-height:1;font-style:italic;color:{tcol};margin-bottom:10px">{level_txt}</div>
             <div style="font-size:13.5px;color:var(--ag-ink-soft);line-height:1.55;max-width:360px">{explain}</div>
-            <div style="font-family:var(--f-mono);font-size:11px;color:var(--ag-mute);margin-top:10px">{conf}</div>
           </div></div></div>
-      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('CONTRIBUTING')} <strong>{t('FEATURES')}</strong></div></div>
+      <div class="ag-card"><div class="ag-card-head"><div class="title"><strong>{t('WHAT IS DRIVING THIS')}</strong></div></div>
         <div class="ag-card-body" style="padding-top:4px">{bars}</div></div>
     </div>""", unsafe_allow_html=True)
 
@@ -96,42 +95,17 @@ if st.button(t("Assess Risk"), type="primary"):
     rain_trend = trend_svg(rseries, "var(--ag-slate)", unit_pct=False, months=rmonths) if len(rseries) > 2 else ""
     cpi_trend = trend_svg(cseries, "var(--ag-terra)", unit_pct=True, months=rmonths[:len(cseries)]) if len(cseries) > 2 else ""
     st.markdown(f"""<div class="ag-pagein" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px">
-      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('RAINFALL ANOMALY')} · <strong>{t('RECENT')}</strong></div>
-        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">σ vs mean</div></div>
+      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('RAINFALL vs NORMAL')} · <strong>{t('RECENT')}</strong></div></div>
         <div class="ag-card-body" style="padding-top:8px">{rain_trend}
-          <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">CHIRPS · HDX Rwanda district anomalies</div></div></div>
-      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('FOOD CPI · Y/Y')} · <strong>{t('RECENT')}</strong></div>
+          <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{t('Rainfall record')}</div></div></div>
+      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('FOOD PRICES')} · <strong>{t('RECENT')}</strong></div>
         <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">%</div></div>
         <div class="ag-card-body" style="padding-top:8px">{cpi_trend}
-          <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">FRED · Rwanda food CPI</div></div></div>
-    </div>""", unsafe_allow_html=True)
-
-    # ---- benchmark table from metrics.json ----
-    rf = metrics.get("risk_random_forest", {})
-    gb = metrics.get("risk_gradient_boosting", {})
-    base = metrics.get("risk_majority_baseline")
-    def row(name, m, key):
-        acc = f"{m['accuracy']*100:.1f}%" if m.get("accuracy") is not None else "—"
-        f1 = f"{m['macro_f1']:.2f}" if m.get("macro_f1") is not None else "—"
-        is_dep = key in deployed
-        status = (f"<span style='display:inline-block;padding:2px 8px;border-radius:999px;font-family:var(--f-mono);"
-                  f"font-size:10.5px;background:var(--ag-sage-bg);color:var(--ag-sage)'>deployed</span>"
-                  if is_dep else "<span class='muted'>candidate</span>")
-        mut = "" if is_dep else " muted"
-        return f"<tr><td>{name}</td><td class='num{mut}'>{acc}</td><td class='num{mut}'>{f1}</td><td>{status}</td></tr>"
-    base_row = (f"<tr><td>Majority baseline</td><td class='num muted'>{base*100:.1f}%</td>"
-                f"<td class='num muted'>—</td><td class='muted'>baseline</td></tr>") if base is not None else ""
-    st.markdown(f"""<div class="ag-two-col ag-pagein">
-      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('MODEL')} <strong>{t('BENCHMARKS')}</strong></div></div>
-        <table class="ag-data"><thead><tr><th>{t('Model')}</th><th class="num">{t('Accuracy')}</th><th class="num">Macro-F1</th><th>{t('Status')}</th></tr></thead>
-        <tbody>{row('Random Forest', rf, 'RandomForest')}{row('Gradient Boosting', gb, 'GradientBoosting')}{base_row}</tbody></table></div>
-      <div class="ag-note"><strong>RQ2.</strong> {t('Does combining rainfall anomalies with food CPI beat either source alone?')}
-        {t('Trained on')} {metrics.get('n_risk_rows', '—')} {t('district-quarter records.')}</div>
+          <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{t('Food price index')}</div></div></div>
     </div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Features')}:</span> rainfall anomaly · food CPI · fertilizer index</div>
-      <div><span class="label">{t('Deployed')}:</span> {deployed}</div>
+      <div><span class="label">{t('Based on')}:</span> {t('Rainfall, food prices and fertilizer costs')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Decision support only. Confirm with local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:

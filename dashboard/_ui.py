@@ -346,7 +346,16 @@ SIDEBAR_CSS = """
 section[data-testid="stSidebar"]{ background:#FFFFFF; border-right:1px solid var(--line); }
 section[data-testid="stSidebar"] *{ color:var(--ink); }
 section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist Mono',monospace; font-size:10px;
-  letter-spacing:.14em; text-transform:uppercase; color:#9AAE9F; margin:16px 14px 4px; }
+  letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:16px 14px 4px; }
+/* brand at the top of the sidebar (logo.png text is light, so we draw our own) */
+section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; gap:11px; padding:2px 8px 14px; }
+section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:0 0 26px;
+  border-radius:50% 50% 50% 0; background:var(--emerald); transform:rotate(-45deg);
+  box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
+section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Instrument Serif',serif; font-size:24px;
+  color:var(--forest); line-height:1; }
+section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Geist Mono',monospace; font-size:9.5px;
+  letter-spacing:.08em; text-transform:uppercase; color:#6E8377; margin-top:3px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 6px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] p{ font-size:14.5px; font-weight:500; color:#3A4A41; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]:hover{ background:#EEF5EE; }
@@ -383,6 +392,9 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
 def render_sidebar_nav(user):
     """Custom icon navigation in the sidebar (replaces Streamlit's auto page list)."""
     sb = st.sidebar
+    sb.markdown("<div class='ag-brand'><span class='seed'></span>"
+                "<div><div class='nm'>AgriRisk</div><div class='sub'>Rwanda · 30 districts</div></div></div>",
+                unsafe_allow_html=True)
     sb.markdown(f"<div class='nav-sec'>{t('Console')}</div>", unsafe_allow_html=True)
     for path, label, icon in NAV_CONSOLE:
         sb.page_link(path, label=t(label), icon=icon)
@@ -463,12 +475,8 @@ def setup(title, subtitle, allowed_roles=None, header=True):
                     unsafe_allow_html=True)
         require_login()   # renders sign in / sign up, then st.stop()
 
-    # signed in -> full sidebar: logo, custom icon nav, then a bottom group
+    # signed in -> full sidebar: brand + custom icon nav, then a bottom group
     # (language + account + logout) that the CSS pins to the foot of the sidebar.
-    try:
-        st.logo(LOGO_PATH, size="large")
-    except Exception:
-        st.sidebar.image(LOGO_PATH)
     render_sidebar_nav(user)
     # bottom group: render into one sidebar container (the CSS pins it to the foot).
     # Use the container's own methods so placement is reliable regardless of context.
