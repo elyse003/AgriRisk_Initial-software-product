@@ -30,8 +30,8 @@ CSS = """
 .stApp { background: var(--paper); }
 html, body, [class*="css"] { font-family:'Geist',sans-serif; color:var(--ink); }
 .block-container { padding-top: 2rem; max-width: 1050px; }
-section[data-testid="stSidebar"] { background: var(--forest); }
-section[data-testid="stSidebar"] * { color:#D8F3DC; }
+section[data-testid="stSidebar"] { background:#FFFFFF; }
+section[data-testid="stSidebar"] * { color:var(--ink); }
 section[data-testid="stSidebar"] a { border-radius:8px; }
 /* Desktop: pin the sidebar open so it can't vanish; hide its collapse button. */
 @media (min-width: 769px) {
@@ -328,13 +328,6 @@ def driver_bar(label, value, weight, color):
 
 LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
 
-# --- WhatsApp floating button target ---------------------------------------
-# Set WHATSAPP_NUMBER (international digits, no +) in the environment to open a
-# real chat; otherwise the floating button opens the in-app WhatsApp preview.
-WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "").strip()
-WHATSAPP_URL = f"https://wa.me/{WHATSAPP_NUMBER}" if WHATSAPP_NUMBER else "/WhatsApp_Preview"
-_WA_TARGET = "_blank" if WHATSAPP_NUMBER else "_self"
-
 # --- sidebar: custom icon nav (replaces Streamlit's auto page list) ---------
 # (page path, English label key for t(), Material icon)
 NAV_CONSOLE = [
@@ -349,77 +342,96 @@ SIDEBAR_CSS = """
 <style>
 /* hide Streamlit's auto page list; we render our own icon nav */
 [data-testid="stSidebarNav"]{ display:none; }
+/* white sidebar with dark text */
+section[data-testid="stSidebar"]{ background:#FFFFFF; border-right:1px solid var(--line); }
+section[data-testid="stSidebar"] *{ color:var(--ink); }
 section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist Mono',monospace; font-size:10px;
-  letter-spacing:.14em; text-transform:uppercase; color:#74A98C; margin:16px 10px 4px; }
-section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 4px; }
-section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]:hover{ background:rgba(255,255,255,.09); }
-section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] p{ font-size:14.5px; font-weight:500; }
-section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"][aria-current="page"]{ background:#D8F3DC; }
-section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"][aria-current="page"] *{ color:#1B4332 !important; }
-/* pin the bottom group (account + logout) to the foot of the sidebar */
+  letter-spacing:.14em; text-transform:uppercase; color:#9AAE9F; margin:16px 14px 4px; }
+section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 6px; }
+section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] p{ font-size:14.5px; font-weight:500; color:#3A4A41; }
+section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]:hover{ background:#EEF5EE; }
+section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"][aria-current="page"]{ background:#E2F0E5; }
+section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"][aria-current="page"] *{ color:var(--forest) !important; font-weight:600; }
+/* pin the bottom group (language + account + logout) to the foot of the sidebar */
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div > [data-testid="stVerticalBlock"]:first-of-type{
   min-height: calc(100vh - 7.5rem); }
 section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] > div > [data-testid="stVerticalBlock"]:first-of-type > :last-child{
   margin-top:auto; }
-section[data-testid="stSidebar"] .stButton>button{ background:#163d2c; border:1px solid rgba(255,255,255,.16);
+section[data-testid="stSidebar"] .stButton>button{ background:var(--forest); border:none; color:#fff !important;
   font-weight:600; padding:11px; }
-section[data-testid="stSidebar"] .stButton>button:hover{ background:#0f2c20; border-color:rgba(255,255,255,.3); }
-/* WhatsApp floating action button (bottom-right, all dashboard pages) */
-.ag-wa-fab{ position:fixed; right:22px; bottom:22px; width:58px; height:58px; border-radius:50%;
-  background:#25D366; display:grid; place-items:center; z-index:1000;
-  box-shadow:0 8px 22px rgba(0,0,0,.22); transition:transform .15s ease; }
-.ag-wa-fab:hover{ transform:scale(1.07); }
-.ag-wa-fab svg{ width:32px; height:32px; fill:#fff; }
-.ag-wa-fab .ag-wa-tip{ position:absolute; right:70px; white-space:nowrap; background:#1B4332; color:#fff;
-  font-size:12.5px; padding:7px 12px; border-radius:8px; opacity:0; pointer-events:none; transition:opacity .15s ease;
-  font-family:'Geist',sans-serif; }
-.ag-wa-fab:hover .ag-wa-tip{ opacity:1; }
+section[data-testid="stSidebar"] .stButton>button *{ color:#fff !important; }
+section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
+/* floating chat: round button bottom-right + small popover panel.
+   The container collapses to nothing; the button itself is fixed bottom-right. */
+.st-key-ag_chatfab{ position:fixed !important; right:0; bottom:0; width:0 !important; height:0 !important;
+  min-width:0 !important; margin:0 !important; padding:0 !important; z-index:1000; }
+.st-key-ag_chatfab > div{ width:auto !important; }
+.st-key-ag_chatfab button{ position:fixed !important; right:22px !important; bottom:20px !important;
+  width:58px !important; height:58px !important; min-height:58px !important; border-radius:50% !important;
+  background:#1B8A4B !important; color:#fff !important; border:none !important; padding:0 !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.22) !important; }
+.st-key-ag_chatfab button:hover{ background:#15723d !important; }
+.st-key-ag_chatfab button p, .st-key-ag_chatfab button span, .st-key-ag_chatfab button [data-testid="stIconMaterial"]{ color:#fff !important; }
+[data-testid="stPopoverBody"]{ width:344px; max-width:92vw; }
+.ag-chat-head{ font-family:'Instrument Serif',serif; font-size:20px; color:var(--forest);
+  border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.ag-chat-head .dot{ width:8px; height:8px; border-radius:50%; background:#1B8A4B; flex:0 0 8px; }
 </style>
 """
-
-_WA_SVG = ('<svg viewBox="0 0 32 32"><path d="M16.04 4C9.95 4 5 8.95 5 15.04c0 2.13.6 4.12 1.64 '
-           '5.81L5 27l6.3-1.65a11 11 0 004.74 1.07h.01c6.08 0 11.03-4.95 11.03-11.04C27.08 8.95 '
-           '22.13 4 16.04 4zm0 20.18a9.1 9.1 0 01-4.65-1.27l-.33-.2-3.74.98 1-3.65-.22-.37a9.13 '
-           '9.13 0 01-1.4-4.83c0-5.04 4.1-9.14 9.15-9.14 2.44 0 4.73.95 6.45 2.68a9.08 9.08 0 '
-           '012.67 6.46c0 5.04-4.1 9.14-9.13 9.14zm5.01-6.84c-.27-.14-1.62-.8-1.87-.89-.25-.09-.43'
-           '-.14-.61.14-.18.27-.7.89-.86 1.07-.16.18-.32.2-.59.07-.27-.14-1.16-.43-2.2-1.36-.81-.72'
-           '-1.36-1.62-1.52-1.89-.16-.27-.02-.42.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09'
-           '-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.46l-.52-.01c-.18 0-.48'
-           '.07-.73.34-.25.27-.96.94-.96 2.29s.99 2.66 1.12 2.84c.14.18 1.93 2.95 4.68 4.14.65.28 1.16'
-           '.45 1.56.58.65.21 1.25.18 1.72.11.52-.08 1.62-.66 1.85-1.3.23-.64.23-1.18.16-1.3-.07-.11'
-           '-.25-.18-.52-.32z"/></svg>')
 
 
 def render_sidebar_nav(user):
     """Custom icon navigation in the sidebar (replaces Streamlit's auto page list)."""
     sb = st.sidebar
-    sb.markdown("<div class='nav-sec'>Console</div>", unsafe_allow_html=True)
+    sb.markdown(f"<div class='nav-sec'>{t('Console')}</div>", unsafe_allow_html=True)
     for path, label, icon in NAV_CONSOLE:
         sb.page_link(path, label=t(label), icon=icon)
-    sb.markdown("<div class='nav-sec'>Reach</div>", unsafe_allow_html=True)
-    sb.page_link("pages/5_WhatsApp_Preview.py", label=t("WhatsApp Preview"), icon=":material/forum:")
-    sb.markdown("<div class='nav-sec'>Account</div>", unsafe_allow_html=True)
+    sb.markdown(f"<div class='nav-sec'>{t('Account')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
     if (user or {}).get("role") == "super_admin":
         sb.page_link("pages/7_User_Management.py", label=t("User Management"), icon=":material/group:")
 
 
-def whatsapp_fab():
-    """Inject the floating WhatsApp button (bottom-right)."""
-    st.markdown(
-        f'<a class="ag-wa-fab" href="{WHATSAPP_URL}" target="{_WA_TARGET}" '
-        f'aria-label="WhatsApp" title="Chat on WhatsApp">'
-        f'<span class="ag-wa-tip">{t("Chat on WhatsApp")}</span>{_WA_SVG}</a>',
-        unsafe_allow_html=True)
+@st.fragment
+def _chat_body():
+    """Chat UI inside the popover. A fragment, so sending a message reruns only
+    this widget and the popover stays open. Reuses the WhatsApp bot's answer()."""
+    from src.channels.whatsapp_bot import answer
+    st.markdown(f"<div class='ag-chat-head'><span class='dot'></span>{t('AgriRisk Assistant')}</div>",
+                unsafe_allow_html=True)
+    if "chat" not in st.session_state:
+        st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs — "
+                                                 "for example: 'maize price Musanze'."))]
+    box = st.container(height=300)
+    for role, txt in st.session_state.chat:
+        with box.chat_message("user" if role == "user" else "assistant"):
+            st.write(txt)
+    with st.form("ag_chat_form", clear_on_submit=True, border=False):
+        c1, c2 = st.columns([5, 1], vertical_alignment="bottom")
+        q = c1.text_input("msg", label_visibility="collapsed",
+                          placeholder=t("Ask price, risk, disease, inputs…"))
+        send = c2.form_submit_button("➤", use_container_width=True)
+    if send and (q or "").strip():
+        st.session_state.chat.append(("user", q))
+        st.session_state.chat.append(("assistant", answer(q)))
+        st.rerun(scope="fragment")
 
 
-def _language_selector():
+def floating_chat():
+    """Round floating chat button (bottom-right) opening a small assistant popover."""
+    with st.container(key="ag_chatfab"):
+        with st.popover("", icon=":material/forum:"):
+            _chat_body()
+
+
+def _language_selector(dg=None):
     """Sidebar language switch. Persists in session_state so it applies to every
-    page and can be changed from any page without returning home."""
+    page. `dg` is the target container (defaults to the sidebar)."""
+    dg = dg or st.sidebar
     st.session_state.setdefault("lang", "en")
     names = list(LANGUAGES)                       # ["English", "Kinyarwanda"]
     current = next(n for n, code in LANGUAGES.items() if code == st.session_state["lang"])
-    choice = st.radio("Ururimi / Language", names, index=names.index(current),
+    choice = dg.radio("Ururimi / Language", names, index=names.index(current),
                       horizontal=True, key="_lang_radio")
     st.session_state["lang"] = LANGUAGES[choice]
 
@@ -458,10 +470,12 @@ def setup(title, subtitle, allowed_roles=None, header=True):
     except Exception:
         st.sidebar.image(LOGO_PATH)
     render_sidebar_nav(user)
-    with st.sidebar.container():
-        st.markdown(f"<div class='nav-sec'>{t('Preferences')}</div>", unsafe_allow_html=True)
-        _language_selector()
-        sidebar_account(user)
+    # bottom group: render into one sidebar container (the CSS pins it to the foot).
+    # Use the container's own methods so placement is reliable regardless of context.
+    bottom = st.sidebar.container()
+    bottom.markdown(f"<div class='nav-sec'>{t('Preferences')}</div>", unsafe_allow_html=True)
+    _language_selector(bottom)
+    sidebar_account(user, bottom)
 
     # role gate after the sidebar, so a blocked user can still navigate elsewhere
     if allowed_roles:
@@ -470,7 +484,7 @@ def setup(title, subtitle, allowed_roles=None, header=True):
     if header:
         st.markdown(f"<div class='ar-head'>{t(title)}</div><div class='ar-sub'>{t(subtitle)}</div>",
                     unsafe_allow_html=True)
-    whatsapp_fab()
+    floating_chat()
     return user
 
 
