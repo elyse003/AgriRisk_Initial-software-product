@@ -43,7 +43,7 @@ FONT = ("@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;40
         "family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');")
 OVERRIDE = """
 .stApp{background:#F6F2E8 !important;}
-header[data-testid="stHeader"],[data-testid="stToolbar"],#MainMenu,footer{display:none !important;}
+header[data-testid="stHeader"],[data-testid="stToolbar"],#MainMenu{display:none !important;}
 section[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"]{display:none !important;}
 .block-container,[data-testid="stMainBlockContainer"]{padding:0 !important;max-width:100% !important;}
 [data-testid="stMarkdownContainer"] a{text-decoration:none !important;color:inherit !important;}
