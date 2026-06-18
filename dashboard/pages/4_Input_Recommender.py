@@ -16,11 +16,10 @@ setup("Input Recommender", "Fertilizer plan for your land and budget",
 cat = fetch_catalogue()
 
 page_header(
-    f"MODULE 04 · {t('Input Recommender').upper()}",
+    t('Input Recommender').upper(),
     f"<em>{t('Affordable inputs')}</em> · {t('your land and budget')}",
-    t("MINAGRI input prices sized to your land using MINAGRI/RAB application rates, "
-      "then priced against your budget. Limited to the few inputs that matter — per "
-      "Lobell et al. (2020) on decision paralysis."),
+    t("The fertilizer your land needs, priced against your budget — just the few "
+      "inputs that matter most."),
     meta_strong=f"{len(cat)} {t('items')}", meta_sub="MINAGRI · Smart Nkunganire")
 
 c1, c2 = st.columns(2)
@@ -90,8 +89,8 @@ if st.button(t("Build Fertilizer Plan"), type="primary"):
           <tbody>{body}</tbody></table></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Bulletin')}:</span> MINAGRI input prices (Smart Nkunganire)</div>
-      <div><span class="label">{t('Sizing')}:</span> MINAGRI/RAB blanket rates × {land:g} ha</div>
+      <div><span class="label">{t('Prices')}:</span> MINAGRI · Smart Nkunganire</div>
+      <div><span class="label">{t('Sized to')}:</span> {land:g} ha</div>
       <div><span class="label">{t('Note')}:</span> {t('Confirm with soil testing and local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:

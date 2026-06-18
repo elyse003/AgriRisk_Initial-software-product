@@ -15,11 +15,9 @@ setup("Disease Alert", "Crop disease warnings from the local weather",
 district = st.selectbox(t("District"), list(DISTRICT_COORDS))
 
 page_header(
-    f"MODULE 03 · {t('Disease Alert').upper()}",
+    t('Disease Alert').upper(),
     f"<em>{t('Climate-driven')}</em> {t('disease alerts')} · {district}",
-    t("Open-Meteo 14-day forecast crossed with FAO seasonal disease rules for "
-      "maize, beans and potato. Risk rises when temperature, humidity and rainfall "
-      "all sit in a pathogen's favourable window."),
+    t("Crop disease warnings for the next 14 days, based on the local weather forecast."),
     meta_strong=t("14-day horizon"), meta_sub=t("updated hourly"))
 
 if st.button(t("Check Risk"), type="primary"):
@@ -109,17 +107,13 @@ if st.button(t("Check Risk"), type="primary"):
             lo, hi = rule["temp_c"]
             rule_rows += (f"<tr><td>{rule['name']}</td><td>{crop_label(crop)}</td>"
                           f"<td class='muted'>{lo}–{hi}°C · RH ≥ {rule['humidity_pct']}% · ≥ {rule['rain_days']} wet days</td></tr>")
-    st.markdown(f"""<div class="ag-two-col ag-pagein">
-      <div class="ag-card"><div class="ag-card-head"><div class="title">{t('RULE')} <strong>{t('BASE · FAO CALENDARS')}</strong></div></div>
-        <table class="ag-data" style="font-size:12px"><thead><tr><th>{t('Pathogen')}</th><th>{t('Crop')}</th><th>{t('Trigger conditions')}</th></tr></thead>
-        <tbody>{rule_rows}</tbody></table></div>
-      <div class="ag-note"><strong>RQ3.</strong> {t('How well do climate rules flag documented high-risk disease periods?')}
-        {t('Climate rules outperform image classifiers for district-scale advisory.')}</div>
-    </div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="ag-card ag-pagein">
+      <div class="ag-card-head"><div class="title"><strong>{t('DISEASE GUIDE')}</strong></div></div>
+      <table class="ag-data" style="font-size:12px"><thead><tr><th>{t('Disease')}</th><th>{t('Crop')}</th><th>{t('When it strikes')}</th></tr></thead>
+      <tbody>{rule_rows}</tbody></table></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Calendar source')}:</span> FAO IPM Field Guide, East Africa</div>
-      <div><span class="label">{t('Weather')}:</span> Open-Meteo · {district} centroid</div>
+      <div><span class="label">{t('Weather')}:</span> {t('Open-Meteo 14-day forecast')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Decision support only. Confirm with local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:

@@ -103,10 +103,10 @@ def sidebar_account(user, dg=None):
     (defaults to the sidebar) so placement in the pinned bottom group is reliable."""
     dg = dg or st.sidebar
     dg.markdown(
-        f"<div style='font-size:11px;color:#8FA496;margin-top:4px;letter-spacing:.04em;"
+        f"<div style='font-size:11px;color:#5E7065;margin-top:4px;letter-spacing:.04em;"
         f"text-transform:uppercase'>{t('Signed in as')}</div>"
-        f"<div style='font-weight:600;color:#1B4332'>{user.get('name','')}</div>"
-        f"<div style='font-size:12px;color:#8FA496;margin-bottom:8px'>{user.get('role','')}</div>",
+        f"<div style='font-weight:600;color:#1B4332;font-size:15px'>{user.get('name','')}</div>"
+        f"<div style='font-size:12.5px;color:#5E7065;margin-bottom:8px;text-transform:capitalize'>{user.get('role','')}</div>",
         unsafe_allow_html=True)
     if dg.button(t("Log out"), use_container_width=True, icon=":material/logout:"):
         logout()

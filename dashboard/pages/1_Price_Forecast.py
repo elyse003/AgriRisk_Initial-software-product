@@ -8,7 +8,7 @@ Loads the serialized per-crop forecaster (models_store/price_forecaster.pkl,
 built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
-from _ui import (setup, load_prices, load_price_forecaster, load_metrics,
+from _ui import (setup, load_prices, load_price_forecaster,
                  page_header, price_chart_svg, CROP_TINT)
 from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
@@ -20,7 +20,6 @@ setup("Price Forecast", "Next-month price outlook by crop and district",
       allowed_roles=("officer", "super_admin"), header=False)
 prices = load_prices()
 models = load_price_forecaster()
-metrics = load_metrics()
 
 c1, c2 = st.columns(2)
 crop = c1.selectbox(t("Crop"), CROPS, format_func=crop_label)
@@ -29,10 +28,9 @@ cl = crop_label(crop)
 tint = CROP_TINT.get(crop, "#6F5A34")
 
 page_header(
-    f"MODULE 01 · {t('Price Forecast').upper()}",
+    t('Price Forecast').upper(),
     f"{cl} <em>{t('price')}</em> · {district}",
-    t("Gradient-boosted forecast of next month's price from the real WFP market "
-      "series, pooled across districts so sparse local data borrows strength."),
+    t("Where prices are likely to head next month, based on recent market data."),
     meta_strong="RWF/kg", meta_sub=t("monthly"))
 
 if st.button(t("Generate Forecast"), type="primary"):
@@ -76,19 +74,15 @@ if st.button(t("Generate Forecast"), type="primary"):
     dcls = "up" if up else "down" if down else "flat"
     arrow = "▲" if up else "▼" if down else "→"
     trend = t("Rising") if up else t("Falling") if down else t("Stable")
-    mape = (metrics.get("price_mape_by_crop") or {}).get(crop)
 
-    # ---- stat grid (3) ----
-    st.markdown(f"""<div class="ag-stat-grid ag-pagein" style="grid-template-columns:repeat(3,1fr)">
-      <div class="ag-stat"><div class="label">{t('Current')}</div>
+    # ---- stat grid (2) ----
+    st.markdown(f"""<div class="ag-stat-grid ag-pagein" style="grid-template-columns:repeat(2,1fr)">
+      <div class="ag-stat"><div class="label">{t('Current price')}</div>
         <div class="value">{cur:,.0f}<span class="unit">RWF/kg</span></div>
-        <div class="delta flat">{t('Last actual')} · WFP</div></div>
+        <div class="delta flat">{t('Latest market price')}</div></div>
       <div class="ag-stat is-warn"><div class="label">{t('Next-month forecast')}</div>
         <div class="value">{fc:,.0f}<span class="unit">RWF/kg</span></div>
-        <div class="delta {dcls}"><span>{arrow}</span>{pct:+.1f}% · ≈80% band ±{band_pct:.1f}%</div></div>
-      <div class="ag-stat"><div class="label">{t('Model MAPE (held-out)')}</div>
-        <div class="value">{mape if mape is not None else '—'}<span class="unit">%</span></div>
-        <div class="delta up">{t('Target')} &lt; 15%</div></div>
+        <div class="delta {dcls}"><span>{arrow}</span>{pct:+.1f}% · {trend}</div></div>
     </div>""", unsafe_allow_html=True)
 
     # ---- chart card ----
@@ -124,18 +118,15 @@ if st.button(t("Generate Forecast"), type="primary"):
       <div style="display:flex;flex-direction:column;gap:14px">
         <div class="ag-card"><div class="ag-card-head"><div class="title">{t('FORECAST')} <strong>{t('DETAIL')}</strong></div></div>
           <table class="ag-data"><tbody>
-            <tr><td>{t('Current')}</td><td class="num">{cur:,.0f}</td></tr>
+            <tr><td>{t('Current price')}</td><td class="num">{cur:,.0f}</td></tr>
             <tr><td>{t('Next-month forecast')}</td><td class="num" style="color:{tint}">{fc:,.0f}</td></tr>
-            <tr><td class="muted">{t('Low')} (80%)</td><td class="num muted">{lo:,.0f}</td></tr>
-            <tr><td class="muted">{t('High')} (80%)</td><td class="num muted">{hi:,.0f}</td></tr>
+            <tr><td class="muted">{t('Likely low')}</td><td class="num muted">{lo:,.0f}</td></tr>
+            <tr><td class="muted">{t('Likely high')}</td><td class="num muted">{hi:,.0f}</td></tr>
           </tbody></table></div>
-        <div class="ag-note"><strong>RQ1.</strong> {t('Does the model beat a naive carry-forward? Held-out')}
-          MAPE <em>{mape if mape is not None else '—'}%</em> {t('against a 15% target across maize, beans and potatoes.')}</div>
       </div></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Training data')}:</span> WFP monthly prices · 2000–2025</div>
-      <div><span class="label">{t('Method')}:</span> gradient-boosted log-return · pooled by crop</div>
+      <div><span class="label">{t('Source')}:</span> {t('WFP market prices')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Next-month estimate. Confirm with local market conditions.')}</div>
     </div>""", unsafe_allow_html=True)
 else:
