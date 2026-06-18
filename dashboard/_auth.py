@@ -98,14 +98,16 @@ def require_role(allowed):
     return user
 
 
-def sidebar_account(user):
-    """Show who is signed in, plus a logout button. Rendered inside the sidebar's
-    bottom container (see _ui.setup), so it uses bare st.* to respect that context."""
-    st.markdown(
-        f"<div style='font-size:12px;color:#74A98C;margin-top:4px'>{t('Signed in as')}</div>"
-        f"<div style='font-weight:600;color:#D8F3DC'>{user.get('name','')}</div>"
-        f"<div style='font-size:12px;color:#74A98C;margin-bottom:8px'>{user.get('role','')}</div>",
+def sidebar_account(user, dg=None):
+    """Show who is signed in, plus a logout button. `dg` is the target container
+    (defaults to the sidebar) so placement in the pinned bottom group is reliable."""
+    dg = dg or st.sidebar
+    dg.markdown(
+        f"<div style='font-size:11px;color:#8FA496;margin-top:4px;letter-spacing:.04em;"
+        f"text-transform:uppercase'>{t('Signed in as')}</div>"
+        f"<div style='font-weight:600;color:#1B4332'>{user.get('name','')}</div>"
+        f"<div style='font-size:12px;color:#8FA496;margin-bottom:8px'>{user.get('role','')}</div>",
         unsafe_allow_html=True)
-    if st.button(t("Log out"), use_container_width=True, icon=":material/logout:"):
+    if dg.button(t("Log out"), use_container_width=True, icon=":material/logout:"):
         logout()
         st.rerun()

@@ -281,6 +281,12 @@ RW = {
     "Bulletin": "Itangazo",
     "Sizing": "Ingano",
     "Chat on WhatsApp": "Ganira kuri WhatsApp",
+    "AgriRisk Assistant": "Umufasha wa AgriRisk",
+    "Console": "Ibikoresho",
+    "Preferences": "Ibyo uhitamo",
+    "Hello! Ask me about price, risk, disease or inputs — for example: 'maize price Musanze'.":
+        "Muraho! Mbaza ku giciro, ibyago, indwara cyangwa ifumbire — urugero: 'ibigori igiciro Musanze'.",
+    "Ask price, risk, disease, inputs…": "Baza igiciro, ibyago, indwara, ifumbire…",
     "Confirm with soil testing and local extension advice.":
         "Emeza hakozwe isuzuma ry'ubutaka n'abajyanama b'ubuhinzi bo mu karere.",
 }
