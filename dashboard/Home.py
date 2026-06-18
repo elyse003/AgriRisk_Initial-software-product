@@ -6,6 +6,7 @@ Dashboard hub (/Dashboard), which is where the tool sidebar lives.
 
 Run: streamlit run dashboard/Home.py
 """
+import base64
 import re
 from pathlib import Path
 
@@ -25,11 +26,19 @@ body = body.replace(
     'href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard"',
     'href="/Dashboard" target="_self"')
 
+# Streamlit serves raw HTML from a virtual path, so the landing's relative
+# ../assets/<crop>.jpg won't resolve. Inline the crop photos as base64 data URIs
+# (they're small, web-optimised) so they render in-app exactly as on the static page.
+for _f in ("maize.jpg", "beans.jpg", "potatoes.jpg"):
+    _p = Path(ROOT) / "assets" / _f
+    if _p.exists():
+        _b64 = base64.b64encode(_p.read_bytes()).decode()
+        body = body.replace(f"../assets/{_f}", f"data:image/jpeg;base64,{_b64}")
+
 # fonts (the <link> in <head> is dropped) + overrides so Streamlit's chrome,
 # background and link styling don't fight the landing design.
-FONT = ("@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:"
-        "opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&"
-        "family=JetBrains+Mono:wght@500;700&display=swap');")
+FONT = ("@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&"
+        "family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');")
 OVERRIDE = """
 .stApp{background:#F6F2E8 !important;}
 header[data-testid="stHeader"],[data-testid="stToolbar"],#MainMenu,footer{display:none !important;}

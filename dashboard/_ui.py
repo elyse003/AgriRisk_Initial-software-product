@@ -22,13 +22,13 @@ AMBER = "#D97706"; RED = "#DC2626"; PURPLE = "#7C3AED"; MUT = "#5A7A6A"; BRD = "
 
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 :root{ --forest:#1B4332; --emerald:#2D6A4F; --harvest:#C76E1B; --paper:#F6F2E8; --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4; }
 /* Hide the menu / Deploy / decoration, but keep the toolbar itself so the
    sidebar reopen arrow survives on mobile (where the sidebar can collapse). */
 #MainMenu, footer, [data-testid="stToolbarActions"], [data-testid="stDecoration"] { display:none; }
 .stApp { background: var(--paper); }
-html, body, [class*="css"] { font-family:'Inter',sans-serif; color:var(--ink); }
+html, body, [class*="css"] { font-family:'Geist',sans-serif; color:var(--ink); }
 .block-container { padding-top: 2rem; max-width: 1050px; }
 section[data-testid="stSidebar"] { background: var(--forest); }
 section[data-testid="stSidebar"] * { color:#D8F3DC; }
@@ -46,24 +46,24 @@ section[data-testid="stSidebar"] a { border-radius:8px; }
 @media (max-width: 768px) {
   section[data-testid="stSidebar"] { min-width: 0 !important; }
 }
-h1,h2,h3,.ar-head { font-family:'Bricolage Grotesque',sans-serif; color:var(--forest); letter-spacing:-.02em; }
-.ar-head { font-size:30px; font-weight:800; }
-.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'JetBrains Mono',monospace; letter-spacing:.02em; }
+h1,h2,h3,.ar-head { font-family:'Instrument Serif',serif; color:var(--forest); letter-spacing:-.01em; }
+.ar-head { font-size:36px; font-weight:400; }
+.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'Geist Mono',monospace; letter-spacing:.02em; }
 .ar-grid { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
 .ar-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
            box-shadow:0 1px 2px rgba(27,67,50,.04); flex:1; min-width:150px; }
-.ar-num { font-family:'JetBrains Mono',monospace; font-size:30px; font-weight:700; letter-spacing:-.02em; }
+.ar-num { font-family:'Geist Mono',monospace; font-size:30px; font-weight:600; letter-spacing:-.02em; }
 .ar-lbl { color:var(--mut); font-size:13px; margin-top:2px; }
 .ar-alert { background:#FCF3E5; border:1px solid #F0DBBE; border-radius:16px; padding:16px 18px; }
-.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:700; margin-bottom:6px; font-family:'Bricolage Grotesque',sans-serif; }
+.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:400; margin-bottom:6px; font-family:'Instrument Serif',serif; font-size:18px; }
 .ar-alert p { color:#B45309; font-size:13.5px; margin:4px 0; }
 .ar-pill { display:inline-block; background:#fff; border:1px solid var(--line); color:var(--emerald);
-           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'JetBrains Mono',monospace; }
+           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'Geist Mono',monospace; }
 .ar-badge { padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; color:#fff; }
-.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'JetBrains Mono',monospace; }
+.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'Geist Mono',monospace; }
 .stButton>button { font-weight:600; border-radius:9px; background:var(--forest); color:#fff; border:none; }
 .stButton>button:hover { background:#15392a; color:#fff; }
-[data-testid="stMetricValue"] { font-family:'JetBrains Mono',monospace; color:var(--forest); }
+[data-testid="stMetricValue"] { font-family:'Geist Mono',monospace; color:var(--forest); }
 </style>
 """
 
@@ -396,11 +396,11 @@ def footer():
 .ar-foot a:hover {{ color:var(--forest) !important; }}
 .ar-foot-grid {{ display:flex; flex-wrap:wrap; gap:28px 48px; justify-content:space-between; }}
 .ar-foot-brand {{ max-width:24em; }}
-.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Bricolage Grotesque',sans-serif;
-                font-weight:800; font-size:17px; color:var(--forest); }}
+.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Instrument Serif',serif;
+                font-weight:400; font-size:19px; color:var(--forest); }}
 .ar-foot .fb .seed {{ width:18px; height:18px; border-radius:50% 50% 50% 0; background:var(--emerald);
                       transform:rotate(-45deg); }}
-.ar-foot .fcol h5 {{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.12em;
+.ar-foot .fcol h5 {{ font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.12em;
                      text-transform:uppercase; color:var(--harvest); margin-bottom:10px; font-weight:700; }}
 .ar-foot .fcol a, .ar-foot .fcol span {{ display:block; margin:6px 0; }}
 .ar-foot-bottom {{ margin-top:26px; padding-top:16px; border-top:1px solid var(--line); display:flex;
