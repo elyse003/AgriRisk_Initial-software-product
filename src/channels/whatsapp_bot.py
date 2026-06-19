@@ -22,11 +22,12 @@ CROP_WORDS = {
 }
 # intent keywords
 INTENT_WORDS = {
-    "price": ["igiciro", "price", "ibiciro"],
-    "risk": ["risk", "ibyago", "ibyago"],
-    "disease": ["indwara", "disease"],
-    "input": ["input", "ifumbire", "inputs", "imbuto", "fertilizer", "fertiliser"],
-    "help": ["help", "ubufasha"],
+    "price": ["igiciro", "ibiciro", "price", "prices", "isoko", "market", "sell", "selling", "kugurisha"],
+    "risk": ["risk", "risky", "ibyago", "igihembwe", "season", "seasonal", "drought", "amapfa"],
+    "disease": ["indwara", "disease", "diseases", "blight", "fungus", "pest", "uburwayi"],
+    "input": ["input", "inputs", "ifumbire", "imbuto", "fertilizer", "fertiliser",
+              "npk", "urea", "dap", "seed", "manure"],
+    "help": ["help", "ubufasha", "menu"],
 }
 
 
@@ -114,10 +115,12 @@ def answer(text: str) -> str:
         return rw_text if rw else en_text
 
     if intent in (None, "help"):
-        return say("Ndashobora kugufasha: igiciro, ibyago (risk), indwara, cyangwa ifumbire. "
-                   "Urugero: 'ibigori igiciro Bugesera'.",
-                   "I can help with: price, risk, disease, or inputs. "
-                   "For example: 'maize price Bugesera'.")
+        return say("Ndi umufasha w'ubuhinzi gusa. Nshobora kugufasha ku: igiciro, ibyago "
+                   "(risk), indwara, cyangwa ifumbire — ku bigori, ibishyimbo n'ibirayi. "
+                   "Urugero: 'ibigori igiciro Bugesera' cyangwa 'indwara ibirayi Musanze'.",
+                   "I'm a farming assistant only. I can help with crop price, seasonal risk, "
+                   "disease alerts, or input plans — for maize, beans and Irish potatoes. "
+                   "For example: 'maize price Bugesera' or 'disease potato Musanze'.")
 
     if intent == "price":
         if not crop:
@@ -146,10 +149,28 @@ def answer(text: str) -> str:
 
     if intent == "disease":
         if not district:
-            return say("Ni mu karere ka he?", "Which district?")
-        c = crop or ("igihingwa cyawe" if rw else "your crop")
-        return say(f"{district}: reba urupapuro 'Disease Alert' ku {c}.",
-                   f"{district}: see the Disease Alert screen for {c}.")
+            return say("Ni mu karere ka he? Urugero: 'indwara ibirayi Musanze'.",
+                       "Which district? For example: 'disease potato Musanze'.")
+        from config.settings import DISTRICT_COORDS, CROPS
+        from src.models.disease_alert import fetch_forecast, assess_crop
+        coords = DISTRICT_COORDS.get(district)
+        if not coords:
+            return say(f"Nta makuru y'ikirere kuri {district}.", f"No weather data for {district}.")
+        try:
+            daily = fetch_forecast(*coords)
+        except Exception:
+            return say("Sinabashije kubona iteganyagihe ubu. Ongera ugerageze.",
+                       "I couldn't fetch the weather just now. Please try again shortly.")
+        check = [crop] if crop else CROPS
+        order = {"High": 0, "Medium": 1, "Low": 2}
+        alerts = sorted((a for c in check for a in assess_crop(c, daily)),
+                        key=lambda a: order.get(a["risk"], 3))
+        if not alerts:
+            return say(f"{district}: nta byago byinshi by'indwara mu minsi 14 iri imbere.",
+                       f"{district}: no elevated disease risk in the next 14 days.")
+        parts = "; ".join(f"{a['disease']} ({a['crop']}) — {a['risk']}" for a in alerts[:3])
+        tip = alerts[0]["action"]
+        return say(f"{district}: {parts}. {tip}", f"{district}: {parts}. {tip}")
 
     if intent == "input":
         if not crop:
