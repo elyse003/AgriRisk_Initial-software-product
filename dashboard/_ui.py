@@ -46,24 +46,24 @@ section[data-testid="stSidebar"] a { border-radius:8px; }
 @media (max-width: 768px) {
   section[data-testid="stSidebar"] { min-width: 0 !important; }
 }
-h1,h2,h3,.ar-head { font-family:'Instrument Serif',serif; color:var(--forest); letter-spacing:-.01em; }
-.ar-head { font-size:36px; font-weight:400; }
-.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'Geist Mono',monospace; letter-spacing:.02em; }
+h1,h2,h3,.ar-head { font-family:'Geist',sans-serif; color:var(--forest); letter-spacing:-.01em; }
+.ar-head { font-size:32px; font-weight:600; }
+.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'Geist',sans-serif; letter-spacing:.02em; }
 .ar-grid { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
 .ar-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
            box-shadow:0 1px 2px rgba(27,67,50,.04); flex:1; min-width:150px; }
-.ar-num { font-family:'Geist Mono',monospace; font-size:30px; font-weight:600; letter-spacing:-.02em; }
+.ar-num { font-family:'Geist',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.02em; }
 .ar-lbl { color:var(--mut); font-size:13px; margin-top:2px; }
 .ar-alert { background:#FCF3E5; border:1px solid #F0DBBE; border-radius:16px; padding:16px 18px; }
-.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:400; margin-bottom:6px; font-family:'Instrument Serif',serif; font-size:18px; }
+.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:600; margin-bottom:6px; font-family:'Geist',sans-serif; font-size:18px; }
 .ar-alert p { color:#B45309; font-size:13.5px; margin:4px 0; }
 .ar-pill { display:inline-block; background:#fff; border:1px solid var(--line); color:var(--emerald);
-           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'Geist Mono',monospace; }
+           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'Geist',sans-serif; }
 .ar-badge { padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; color:#fff; }
-.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'Geist Mono',monospace; }
+.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'Geist',sans-serif; }
 .stButton>button { font-weight:600; border-radius:9px; background:var(--forest); color:#fff; border:none; }
 .stButton>button:hover { background:#15392a; color:#fff; }
-[data-testid="stMetricValue"] { font-family:'Geist Mono',monospace; color:var(--forest); }
+[data-testid="stMetricValue"] { font-family:'Geist',sans-serif; color:var(--forest); }
 </style>
 """
 
@@ -106,10 +106,15 @@ EDITORIAL_CSS = """
   --ag-amber: oklch(0.66 0.120 80); --ag-amber-bg: oklch(0.95 0.045 80);
   --ag-slate: oklch(0.52 0.055 235); --ag-slate-bg: oklch(0.94 0.025 235);
   --ag-soil: oklch(0.45 0.055 60);
-  --f-serif: "Instrument Serif","Newsreader",Georgia,serif;
+  /* One font everywhere (Geist); --f-brand (Instrument Serif) is for the AgriRisk wordmark only */
+  --f-serif: "Geist", ui-sans-serif, system-ui, sans-serif;
   --f-sans:  "Geist", ui-sans-serif, system-ui, sans-serif;
-  --f-mono:  "Geist Mono", ui-monospace, "JetBrains Mono", monospace;
+  --f-mono:  "Geist", ui-sans-serif, system-ui, sans-serif;
+  --f-brand: "Instrument Serif","Newsreader",Georgia,serif;
 }
+/* Geist display text needs weight to read as a heading (serif was a single weight) */
+.ag-head h1, .ag-stat .value, .ag-rank .nm, .ag-rank .price, .ag-wtile .val,
+.ag-disease .name, .ag-advice .badge{ font-weight:600; }
 .ag-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
   margin:2px 0 22px; border-bottom:1px solid var(--ag-line); padding-bottom:18px; }
 .ag-head h1{ font-family:var(--f-serif); font-weight:400; font-size:42px; line-height:1.05;
@@ -345,7 +350,7 @@ SIDEBAR_CSS = """
 /* white sidebar with dark text */
 section[data-testid="stSidebar"]{ background:#FFFFFF; border-right:1px solid var(--line); }
 section[data-testid="stSidebar"] *{ color:var(--ink); }
-section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist Mono',monospace; font-size:10px;
+section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist',sans-serif; font-size:10px;
   letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:16px 14px 4px; }
 /* brand at the top of the sidebar (logo.png text is light, so we draw our own) */
 section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; gap:11px; padding:2px 8px 14px; }
@@ -354,7 +359,7 @@ section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:
   box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
 section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Instrument Serif',serif; font-size:24px;
   color:var(--forest); line-height:1; }
-section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Geist Mono',monospace; font-size:9.5px;
+section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Geist',sans-serif; font-size:9.5px;
   letter-spacing:.08em; text-transform:uppercase; color:#6E8377; margin-top:3px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 6px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] p{ font-size:14.5px; font-weight:500; color:#3A4A41; }
@@ -382,7 +387,7 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
 .st-key-ag_chatfab button:hover{ background:#15723d !important; }
 .st-key-ag_chatfab button p, .st-key-ag_chatfab button span, .st-key-ag_chatfab button [data-testid="stIconMaterial"]{ color:#fff !important; }
 [data-testid="stPopoverBody"]{ width:344px; max-width:92vw; }
-.ag-chat-head{ font-family:'Instrument Serif',serif; font-size:20px; color:var(--forest);
+.ag-chat-head{ font-family:'Geist',sans-serif; font-weight:600; font-size:18px; color:var(--forest);
   border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
 .ag-chat-head .dot{ width:8px; height:8px; border-radius:50%; background:#1B8A4B; flex:0 0 8px; }
 </style>
@@ -521,7 +526,7 @@ def footer():
                 font-weight:400; font-size:19px; color:var(--forest); }}
 .ar-foot .fb .seed {{ width:18px; height:18px; border-radius:50% 50% 50% 0; background:var(--emerald);
                       transform:rotate(-45deg); }}
-.ar-foot .fcol h5 {{ font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:.12em;
+.ar-foot .fcol h5 {{ font-family:'Geist',sans-serif; font-size:11px; letter-spacing:.12em;
                      text-transform:uppercase; color:var(--harvest); margin-bottom:10px; font-weight:700; }}
 .ar-foot .fcol a, .ar-foot .fcol span {{ display:block; margin:6px 0; }}
 .ar-foot-bottom {{ margin-top:26px; padding-top:16px; border-top:1px solid var(--line); display:flex;
