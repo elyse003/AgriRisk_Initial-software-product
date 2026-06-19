@@ -40,8 +40,8 @@ st.markdown(f"""<style>
 .tool-card{{display:block;background:#fff;border:1px solid #DED7C4;border-radius:16px;
   padding:24px;text-decoration:none !important;transition:transform .14s ease, box-shadow .14s ease}}
 .tool-card:hover{{transform:translateY(-3px);box-shadow:0 14px 34px rgba(27,67,50,.10)}}
-.tc-stage{{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
-.tc-title{{font-family:'Instrument Serif',serif;font-weight:400;font-size:23px;color:#1B4332;margin:6px 0 6px}}
+.tc-stage{{font-family:'Geist',sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
+.tc-title{{font-family:'Geist',sans-serif;font-weight:600;font-size:21px;color:#1B4332;margin:6px 0 6px}}
 .tc-desc{{color:#5E7065;font-size:14.5px;line-height:1.5}}
 .tc-go{{margin-top:14px;font-weight:600;font-size:14px}}
 </style>

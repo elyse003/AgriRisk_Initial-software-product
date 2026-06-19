@@ -13,7 +13,8 @@
     --forest:#1B4332; --emerald:#2D6A4F; --leaf:#40916C; --sage:#74A98C;
     --harvest:#C76E1B; --soil:#8A5A2B; --paper:#F6F2E8; --paper2:#EFEAdb;
     --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4;
-    --disp:'Instrument Serif',serif; --body:'Geist',sans-serif; --mono:'Geist Mono',monospace;
+    /* one font everywhere (Geist); --brand (Instrument Serif) is for the AgriRisk wordmark only */
+    --disp:'Geist',sans-serif; --body:'Geist',sans-serif; --mono:'Geist',sans-serif; --brand:'Instrument Serif',serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -25,7 +26,7 @@
   nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,242,232,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   body{padding-top:66px}
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:19px;color:var(--forest);letter-spacing:-.02em}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--brand);font-weight:400;font-size:22px;color:var(--forest);letter-spacing:-.01em}
   .brand .seed{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--emerald);transform:rotate(-45deg);box-shadow:inset -3px -3px 0 rgba(0,0,0,.08)}
   .nav-links{display:flex;gap:26px;font-size:14px;font-weight:500;color:var(--mut)}
   .nav-links a:hover{color:var(--forest)}
@@ -131,7 +132,7 @@
   .foot-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:28px}
   @media(max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:480px){.foot-grid{grid-template-columns:1fr}}
-  .foot-brand .b{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:21px;color:#fff}
+  .foot-brand .b{display:flex;align-items:center;gap:10px;font-family:var(--brand);font-size:23px;color:#fff}
   .foot-brand .b .seed{width:18px;height:18px;border-radius:50% 50% 50% 0;background:var(--leaf);transform:rotate(-45deg)}
   .foot-brand p{font-size:13.5px;margin-top:12px;color:#A9C7B4;max-width:28em;line-height:1.6}
   .foot-col h5{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7FB494;margin-bottom:12px}
@@ -145,10 +146,10 @@
   .reveal.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
 
-  /* Instrument Serif is single-weight (400): keep all display text at 400 and
-     nudge sizes/letter-spacing so the elegant serif reads well at large sizes */
-  .brand,h1,h2,.sec-h,.mod h3,.mod .num,summary,.band h2,.stage-t{font-weight:400 !important;letter-spacing:-.01em}
-  h1{font-size:clamp(44px,6vw,72px);line-height:1.04}
+  /* Geist headings get weight for hierarchy; the brand wordmark stays the light serif */
+  h1,h2,.sec-h,.mod h3,.mod .num,summary,.band h2,.stage-t{font-weight:600 !important;letter-spacing:-.01em}
+  .brand{font-weight:400 !important}
+  h1{font-size:clamp(40px,5.6vw,66px);line-height:1.05}
   h1 .em{font-style:italic}
   .sec-h{font-size:clamp(30px,3.8vw,42px)}
   .mod h3{font-size:24px}
