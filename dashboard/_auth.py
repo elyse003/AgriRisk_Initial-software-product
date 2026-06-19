@@ -45,12 +45,13 @@ def _signup_form():
         c1, c2 = st.columns(2)
         pw = c1.text_input(t("Password"), type="password")
         pw2 = c2.text_input(t("Confirm password"), type="password")
-        c3, c4 = st.columns(2)
-        role = c3.selectbox(t("Role"), ["officer", "farmer"])   # super_admin is reserved
-        district = c4.selectbox(t("District"), ["Nationwide"] + DISTRICTS)
+        district = st.selectbox(t("District"), ["Nationwide"] + DISTRICTS)
         phone = st.text_input(t("Phone (optional)"))
         submitted = st.form_submit_button(t("Create account"), type="primary")
-    st.caption(t("In a real deployment, officer access would be approved by an administrator."))
+    # New accounts are farmers; an administrator promotes trusted users to officer.
+    role = "farmer"
+    st.caption(t("New accounts are farmers. An administrator can upgrade you to "
+                 "extension officer."))
     if submitted:
         name, username = (name or "").strip(), (username or "").strip()
         if not (name and username and pw):

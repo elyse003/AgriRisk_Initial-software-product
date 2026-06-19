@@ -395,12 +395,22 @@ def render_sidebar_nav(user):
     sb.markdown("<div class='ag-brand'><span class='seed'></span>"
                 "<div><div class='nm'>AgriRisk</div><div class='sub'>Rwanda · 30 districts</div></div></div>",
                 unsafe_allow_html=True)
+    role = (user or {}).get("role")
+
+    # Farmers get a chat-only view: just Home + Settings (the analytical tools are
+    # for extension officers; farmers use the chat button / SMS / WhatsApp).
+    if role == "farmer":
+        sb.markdown(f"<div class='nav-sec'>{t('Menu')}</div>", unsafe_allow_html=True)
+        sb.page_link("pages/0_Dashboard.py", label=t("Home"), icon=":material/home:")
+        sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
+        return
+
     sb.markdown(f"<div class='nav-sec'>{t('Console')}</div>", unsafe_allow_html=True)
     for path, label, icon in NAV_CONSOLE:
         sb.page_link(path, label=t(label), icon=icon)
     sb.markdown(f"<div class='nav-sec'>{t('Account')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
-    if (user or {}).get("role") == "super_admin":
+    if role == "super_admin":
         sb.page_link("pages/7_User_Management.py", label=t("User Management"), icon=":material/group:")
 
 

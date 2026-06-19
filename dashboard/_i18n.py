@@ -310,6 +310,7 @@ RW = {
     "Open-Meteo 14-day forecast": "Iteganyagihe ry'iminsi 14",
     "Prices": "Ibiciro",
     "Sized to": "Bingana na",
+    "Menu": "Ibikubiyemo",
     "Confirm with soil testing and local extension advice.":
         "Emeza hakozwe isuzuma ry'ubutaka n'abajyanama b'ubuhinzi bo mu karere.",
 }
