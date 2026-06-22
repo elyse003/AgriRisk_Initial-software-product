@@ -31,7 +31,7 @@ PROVINCES = {
                       "Rusizi", "Rutsiro"]),
 }
 
-CROP_MENU = "Choose crop:\n1. Maize\n2. Beans\n3. Irish potatoes"
+CROP_MENU = "Choose crop:\n1. Maize\n2. Beans\n3. Potatoes"
 
 
 def _menu(title, rows):

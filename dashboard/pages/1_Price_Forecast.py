@@ -13,7 +13,7 @@ from _ui import (setup, load_prices, load_price_forecaster,
 from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import CROPS, DISTRICTS
-from src.models.price_forecasting import forecast_next, MIN_HISTORY
+from src.models.price_forecasting import price_outlook
 from src.db.connection import log_price
 
 setup("Price Forecast", "Next-month price outlook by crop and district",
@@ -34,34 +34,24 @@ page_header(
     meta_strong="RWF/kg", meta_sub=t("monthly"))
 
 if st.button(t("Generate Forecast"), type="primary"):
-    model = (models or {}).get(crop)
-    if model is None:
+    # one shared outlook so the dashboard, chat and USSD always agree
+    outlook = price_outlook(prices, models, crop, district)
+    if outlook is None:
+        st.error(f"No price data for {cl} in {district}.")
+        st.stop()
+    if outlook["forecast"] is None:
         st.error("The price model isn't available. Run `python scripts/train_models.py` first.")
         st.stop()
 
-    s_district = prices[(prices.crop == crop) & (prices.market == district)].sort_values("date").set_index("date")["price_rwf"]
-    crop_all = prices[prices.crop == crop].sort_values("date")
-    crop_latest = crop_all["date"].max()
-    national = crop_all.set_index("date")["price_rwf"].groupby(level=0).median().sort_index()
-
-    if len(s_district) >= MIN_HISTORY:
-        last_date = s_district.index[-1]
-        if (crop_latest - last_date).days > 540:          # district's own data older than ~18 months
-            s = national
-            src_note = (f"Showing the national recent trend. {district}'s own {cl} prices end "
-                        f"{last_date:%b %Y}, so a current district figure isn't available.")
-        else:
-            s = s_district
-            src_note = f"Based on {district}'s prices through {last_date:%b %Y}."
+    s = outlook["series"]
+    cur, fc, pct = outlook["current"], outlook["forecast"], outlook["pct"]
+    last_date = outlook["last_date"]
+    if outlook["source"] == "district":
+        src_note = f"Based on {district}'s prices through {last_date:%b %Y}."
     else:
-        s = national
-        src_note = f"{district} has little local price history, so this uses the national trend."
-
-    s = s.sort_index()
-    cur = float(s.iloc[-1])
-    fc = forecast_next(model, s)
-    log_price(crop, district, str(s.index[-1].date()), cur)
-    pct = (fc - cur) / cur * 100
+        src_note = (f"Showing the national recent trend — {district} has little or no recent "
+                    f"local {cl} data.")
+    log_price(crop, district, str(last_date.date()), cur)
 
     # empirical 80% band from recent monthly log-return volatility (1.28σ)
     rets = np.log(s).diff().dropna().tail(12)

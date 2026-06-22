@@ -143,7 +143,7 @@ def answer(text: str) -> str:
                    "(risk), indwara, cyangwa ifumbire — ku bigori, ibishyimbo n'ibirayi. "
                    "Urugero: 'ibigori igiciro Bugesera' cyangwa 'indwara ibirayi Musanze'.",
                    "I'm a farming assistant only. I can help with crop price, seasonal risk, "
-                   "disease alerts, or input plans — for maize, beans and Irish potatoes. "
+                   "disease alerts, or input plans — for maize, beans and potatoes. "
                    "For example: 'maize price Bugesera' or 'disease potato Musanze'.")
 
     if intent == "price":
@@ -153,29 +153,17 @@ def answer(text: str) -> str:
         if not district:
             return say(f"Ni mu karere ka he? Urugero: '{crop} igiciro Musanze'.",
                        f"Which district? For example: '{crop} price Musanze'.")
-        from src.models.price_forecasting import forecast_next, MIN_HISTORY
-        df = _prices()
-        ser = (df[(df["crop"] == crop) & (df["market"] == district)]
-               .set_index("date")["price_rwf"].groupby(level=0).mean().sort_index())
-        if len(ser) < MIN_HISTORY:
-            # district series too short: borrow the national series for the crop
-            ser = (df[df["crop"] == crop]
-                   .set_index("date")["price_rwf"].groupby(level=0).median().sort_index())
-        if len(ser) == 0:
+        # SAME canonical outlook the dashboard uses, so the figures always agree
+        from src.models.price_forecasting import price_outlook
+        o = price_outlook(_prices(), _price_forecasters(), crop, district)
+        if o is None:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
-        cur = float(ser.iloc[-1])
-        model = (_price_forecasters() or {}).get(crop)
-        fc = None
-        if model is not None and len(ser) >= MIN_HISTORY:
-            try:
-                fc = forecast_next(model, ser)
-            except Exception:
-                fc = None
+        cur, fc = o["current"], o["forecast"]
         if fc is None:                                   # fall back to the latest price
             return say(f"{crop.title()}, {district}: hafi {cur:,.0f} RWF/kg ubu.",
                        f"{crop.title()}, {district}: about {cur:,.0f} RWF/kg now.")
-        pct = (fc - cur) / cur * 100 if cur else 0.0
+        pct = o["pct"] or 0.0
         tr_rw, tr_en = (("birazamuka", "rising") if pct > 1 else
                         ("biragabanuka", "falling") if pct < -1 else ("bihagaze", "stable"))
         return say(f"{crop.title()}, {district}: ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
