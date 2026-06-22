@@ -599,16 +599,26 @@ def load_metrics():
     p = MODELS_STORE / "metrics.json"
     return json.load(open(p)) if p.exists() else {}
 
+def _safe_pickle(name):
+    """Load a pickled model, returning None on any failure (missing file or an
+    unpickling/version error) so a model problem degrades to the rule-based
+    fallback instead of crashing the whole page on deploy."""
+    p = MODELS_STORE / name
+    if not p.exists():
+        return None
+    try:
+        return pickle.load(open(p, "rb"))
+    except Exception:
+        return None
+
 @st.cache_resource
 def load_risk_model():
-    p = MODELS_STORE / "risk_classifier.pkl"
-    return pickle.load(open(p, "rb")) if p.exists() else None
+    return _safe_pickle("risk_classifier.pkl")
 
 @st.cache_resource
 def load_price_forecaster():
     """dict {crop: fitted model} trained by scripts/train_models.py, or None."""
-    p = MODELS_STORE / "price_forecaster.pkl"
-    return pickle.load(open(p, "rb")) if p.exists() else None
+    return _safe_pickle("price_forecaster.pkl")
 
 @st.cache_data(ttl=300)
 def load_last_updated():
