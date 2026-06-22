@@ -407,6 +407,7 @@ def render_sidebar_nav(user):
     if role == "farmer":
         sb.markdown(f"<div class='nav-sec'>{t('Menu')}</div>", unsafe_allow_html=True)
         sb.page_link("pages/0_Dashboard.py", label=t("Home"), icon=":material/home:")
+        sb.page_link("pages/5_USSD_Preview.py", label=t("USSD Preview"), icon=":material/dialpad:")
         sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
         return
 

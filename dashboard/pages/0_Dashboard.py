@@ -20,8 +20,9 @@ ALL_TOOLS = [
 # (the analytical tools are for extension officers).
 if user["role"] == "farmer":
     st.info(f"{t('Welcome')}, {user['name']}. " + t(
-        "The full dashboard is for extension officers. Tap the chat button (bottom-right) "
-        "to ask the assistant about price, risk, disease and inputs."))
+        "The full dashboard is for extension officers. Tap the chat button (bottom-right), "
+        "or open USSD Preview to try the *384# menu — both answer price, risk, disease and "
+        "input questions."))
     TOOLS = []
 else:
     TOOLS = ALL_TOOLS

@@ -13,7 +13,7 @@ import streamlit as st
 from src.channels.ussd_menu import ussd_session
 
 setup("USSD Preview", "Feature-phone menu demo",
-      allowed_roles=("officer", "super_admin"), header=False)
+      allowed_roles=("farmer", "officer", "super_admin"), header=False)
 
 page_header(
     "USSD PREVIEW",

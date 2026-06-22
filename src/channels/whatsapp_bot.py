@@ -102,6 +102,30 @@ def _catalogue():
     return pd.read_csv(data_path("minagri_input_prices.csv"))
 
 
+@lru_cache(maxsize=1)
+def _price_forecasters():
+    """The trained per-crop price models {crop: model}, or None if not built yet."""
+    import pickle
+    from config.settings import MODELS_STORE
+    p = MODELS_STORE / "price_forecaster.pkl"
+    try:
+        return pickle.load(open(p, "rb")) if p.exists() else None
+    except Exception:
+        return None
+
+
+@lru_cache(maxsize=1)
+def _risk_clf():
+    """The trained seasonal-risk classifier, or None if not built yet."""
+    import pickle
+    from config.settings import MODELS_STORE
+    p = MODELS_STORE / "risk_classifier.pkl"
+    try:
+        return pickle.load(open(p, "rb")) if p.exists() else None
+    except Exception:
+        return None
+
+
 def answer(text: str) -> str:
     """Return the bilingual reply for a farmer's message."""
     from src.models.input_recommender import recommend_plan
@@ -129,12 +153,33 @@ def answer(text: str) -> str:
         if not district:
             return say(f"Ni mu karere ka he? Urugero: '{crop} igiciro Musanze'.",
                        f"Which district? For example: '{crop} price Musanze'.")
-        ser = _prices().query("crop == @crop and market == @district")["price_rwf"]
+        from src.models.price_forecasting import forecast_next, MIN_HISTORY
+        df = _prices()
+        ser = (df[(df["crop"] == crop) & (df["market"] == district)]
+               .set_index("date")["price_rwf"].groupby(level=0).mean().sort_index())
+        if len(ser) < MIN_HISTORY:
+            # district series too short: borrow the national series for the crop
+            ser = (df[df["crop"] == crop]
+                   .set_index("date")["price_rwf"].groupby(level=0).median().sort_index())
         if len(ser) == 0:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
-        return say(f"{crop.title()}, {district}: hafi {ser.iloc[-1]:,.0f} RWF/kg",
-                   f"{crop.title()}, {district}: about {ser.iloc[-1]:,.0f} RWF/kg")
+        cur = float(ser.iloc[-1])
+        model = (_price_forecasters() or {}).get(crop)
+        fc = None
+        if model is not None and len(ser) >= MIN_HISTORY:
+            try:
+                fc = forecast_next(model, ser)
+            except Exception:
+                fc = None
+        if fc is None:                                   # fall back to the latest price
+            return say(f"{crop.title()}, {district}: hafi {cur:,.0f} RWF/kg ubu.",
+                       f"{crop.title()}, {district}: about {cur:,.0f} RWF/kg now.")
+        pct = (fc - cur) / cur * 100 if cur else 0.0
+        tr_rw, tr_en = (("birazamuka", "rising") if pct > 1 else
+                        ("biragabanuka", "falling") if pct < -1 else ("bihagaze", "stable"))
+        return say(f"{crop.title()}, {district}: ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
+                   f"{crop.title()}, {district}: now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
 
     if intent == "risk":
         if not district:
@@ -143,9 +188,20 @@ def answer(text: str) -> str:
         rain, cpi, fert = _rainfall(), _cpi(), _fert()
         r = rain[rain.district == district]
         ra = float(r.rainfall_anomaly.iloc[-1]) if len(r) else 0.0
-        lvl = label_risk(ra, float(cpi.cpi_change.dropna().iloc[-1]),
-                         float(fert.fert_change.dropna().iloc[-1]))
-        return say(f"{district}: ibyago bingana {lvl}", f"{district}: risk {lvl}")
+        cc = float(cpi.cpi_change.dropna().iloc[-1])
+        ff = float(fert.fert_change.dropna().iloc[-1])
+        model = _risk_clf()
+        lvl = None
+        if model is not None:
+            try:
+                X = pd.DataFrame([[ra, cc, ff]],
+                                 columns=["rainfall_anomaly", "cpi_change", "fert_change"])
+                lvl = str(model.predict(X)[0])
+            except Exception:
+                lvl = None
+        if lvl is None:                                  # fall back to the rule-based label
+            lvl = label_risk(ra, cc, ff)
+        return say(f"{district}: ibyago bingana {lvl}.", f"{district}: risk {lvl}.")
 
     if intent == "disease":
         if not district:
