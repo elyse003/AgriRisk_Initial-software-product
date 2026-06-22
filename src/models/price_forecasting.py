@@ -107,3 +107,46 @@ def forecast_next(model, series: pd.Series) -> float:
     f = make_features(series).iloc[[-1]]
     ret = float(model.predict(f[FEATURES])[0])
     return float(f["y"].iloc[0] * np.exp(ret))
+
+
+# ---------------------------------------------------------------------------
+# Canonical outlook shared by EVERY channel (dashboard, chat, USSD) so they
+# always agree. The single source of truth for which series is used and what
+# the next-month figure is.
+# ---------------------------------------------------------------------------
+def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
+                  stale_days: int = 540) -> dict | None:
+    """Next-month price outlook for one crop/district.
+
+    Picks the district's own monthly series when it has enough history and isn't
+    stale; otherwise falls back to the crop's national (cross-market median)
+    series. Returns dict(series, current, forecast, pct, source, last_date) or
+    None when there's no data. `models` is {crop: fitted model}.
+    """
+    crop_all = prices[prices["crop"] == crop]
+    if crop_all.empty:
+        return None
+    s_d = (crop_all[crop_all["market"] == district]
+           .set_index("date")["price_rwf"].groupby(level=0).mean().sort_index())
+    national = (crop_all.set_index("date")["price_rwf"]
+                .groupby(level=0).median().sort_index())
+    crop_latest = crop_all["date"].max()
+
+    if len(s_d) >= MIN_HISTORY and (crop_latest - s_d.index[-1]).days <= stale_days:
+        s, source = s_d, "district"
+    else:
+        s, source = national, "national"
+    if len(s) == 0:
+        return None
+
+    cur = float(s.iloc[-1])
+    model = (models or {}).get(crop)
+    fc = None
+    if model is not None and len(s) >= MIN_HISTORY:
+        try:
+            fc = forecast_next(model, s)
+        except Exception:
+            fc = None
+    pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
+    return {"series": s, "current": cur, "forecast": fc, "pct": pct,
+            "source": source, "last_date": s.index[-1]}
