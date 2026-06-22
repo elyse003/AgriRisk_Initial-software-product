@@ -413,6 +413,8 @@ def render_sidebar_nav(user):
     sb.markdown(f"<div class='nav-sec'>{t('Console')}</div>", unsafe_allow_html=True)
     for path, label, icon in NAV_CONSOLE:
         sb.page_link(path, label=t(label), icon=icon)
+    sb.markdown(f"<div class='nav-sec'>{t('Channels')}</div>", unsafe_allow_html=True)
+    sb.page_link("pages/5_USSD_Preview.py", label=t("USSD Preview"), icon=":material/dialpad:")
     sb.markdown(f"<div class='nav-sec'>{t('Account')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
     if role == "super_admin":
