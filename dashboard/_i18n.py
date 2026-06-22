@@ -311,6 +311,18 @@ RW = {
     "Prices": "Ibiciro",
     "Sized to": "Bingana na",
     "Menu": "Ibikubiyemo",
+    # ---- USSD preview ----
+    "Channels": "Imiyoboro",
+    "USSD Preview": "Igerageza rya USSD",
+    "simulator": "igerageza",
+    "Dial again": "Hamagara nanone",
+    "Send": "Ohereza",
+    "Cancel": "Hagarika",
+    "Your reply": "Igisubizo cyawe",
+    "Enter a number": "Andika umubare",
+    "Reply with a number.": "Subiza n'umubare.",
+    "Session ended.": "Igiterane kirangiye.",
+    "Dial the code to open the menu.": "Hamagara iyi kode kugira ngo ufungure menu.",
     "Confirm with soil testing and local extension advice.":
         "Emeza hakozwe isuzuma ry'ubutaka n'abajyanama b'ubuhinzi bo mu karere.",
 }
