@@ -126,6 +126,17 @@ def _risk_clf():
         return None
 
 
+@lru_cache(maxsize=1)
+def _esoko():
+    """Esoko farmgate prices, or None if none ingested yet."""
+    from config.settings import DATA_PROCESSED
+    p = DATA_PROCESSED / "esoko_farmgate_prices.csv"
+    try:
+        return pd.read_csv(p, parse_dates=["date"]) if p.exists() else None
+    except Exception:
+        return None
+
+
 def answer(text: str) -> str:
     """Return the bilingual reply for a farmer's message."""
     from src.models.input_recommender import recommend_plan
@@ -155,19 +166,21 @@ def answer(text: str) -> str:
                        f"Which district? For example: '{crop} price Musanze'.")
         # SAME canonical outlook the dashboard uses, so the figures always agree
         from src.models.price_forecasting import price_outlook
-        o = price_outlook(_prices(), _price_forecasters(), crop, district)
+        o = price_outlook(_prices(), _price_forecasters(), crop, district, esoko=_esoko())
         if o is None:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
         cur, fc = o["current"], o["forecast"]
+        lvl_rw = "ku murima" if o["level"] == "farmgate" else "ku isoko"
+        lvl_en = "farmgate" if o["level"] == "farmgate" else "market"
         if fc is None:                                   # fall back to the latest price
-            return say(f"{crop.title()}, {district}: hafi {cur:,.0f} RWF/kg ubu.",
-                       f"{crop.title()}, {district}: about {cur:,.0f} RWF/kg now.")
+            return say(f"{crop.title()}, {district} ({lvl_rw}): hafi {cur:,.0f} RWF/kg ubu.",
+                       f"{crop.title()}, {district} ({lvl_en}): about {cur:,.0f} RWF/kg now.")
         pct = o["pct"] or 0.0
         tr_rw, tr_en = (("birazamuka", "rising") if pct > 1 else
                         ("biragabanuka", "falling") if pct < -1 else ("bihagaze", "stable"))
-        return say(f"{crop.title()}, {district}: ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
-                   f"{crop.title()}, {district}: now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
+        return say(f"{crop.title()}, {district} ({lvl_rw}): ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
+                   f"{crop.title()}, {district} ({lvl_en}): now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
 
     if intent == "risk":
         if not district:

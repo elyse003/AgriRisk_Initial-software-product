@@ -290,6 +290,8 @@ RW = {
     # ---- simplified result-page labels ----
     "Current price": "Igiciro cy'ubu",
     "Latest market price": "Igiciro cya vuba ku isoko",
+    "Farmgate price": "Igiciro ku murima",
+    "Market price": "Igiciro ku isoko",
     "Likely low": "Hasi gishoboka",
     "Likely high": "Hejuru gishoboka",
     "Source": "Inkomoko",

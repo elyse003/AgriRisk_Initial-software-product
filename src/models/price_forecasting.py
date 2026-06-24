@@ -114,14 +114,27 @@ def forecast_next(model, series: pd.Series) -> float:
 # always agree. The single source of truth for which series is used and what
 # the next-month figure is.
 # ---------------------------------------------------------------------------
+def _esoko_farmgate(esoko, crop: str, district: str):
+    """Latest Esoko farmgate price for one crop/district, or None."""
+    if esoko is None or len(esoko) == 0:
+        return None
+    m = esoko[(esoko["crop"] == crop) & (esoko["district"] == district)]
+    if m.empty:
+        return None
+    return float(m.sort_values("date")["price_rwf"].iloc[-1])
+
+
 def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
-                  stale_days: int = 540) -> dict | None:
-    """Next-month price outlook for one crop/district.
+                  esoko=None, stale_days: int = 540) -> dict | None:
+    """Next-month price outlook for one crop/district — the single source of
+    truth shared by the dashboard, chat and USSD.
 
     Picks the district's own monthly series when it has enough history and isn't
-    stale; otherwise falls back to the crop's national (cross-market median)
-    series. Returns dict(series, current, forecast, pct, source, last_date) or
-    None when there's no data. `models` is {crop: fitted model}.
+    stale; otherwise the crop's national (cross-market median) series. When real
+    Esoko **farmgate** data exists for the crop/district, the level is re-anchored
+    to it (the WFP-trained model still supplies the next-month *trend*, which is
+    scale-free, so the % move is unchanged). Returns dict(series, current,
+    forecast, pct, source, level, last_date) or None when there's no data.
     """
     crop_all = prices[prices["crop"] == crop]
     if crop_all.empty:
@@ -147,6 +160,19 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
             fc = forecast_next(model, s)
         except Exception:
             fc = None
+
+    # Anchor to the real Esoko farmgate level when available (scale-free trend
+    # is preserved): scale the whole series so the chart stays continuous.
+    level = "retail"
+    fg = _esoko_farmgate(esoko, crop, district)
+    if fg is not None and cur:
+        ratio = fg / cur
+        s = s * ratio
+        cur = fg
+        if fc is not None:
+            fc = float(round(fc * ratio))
+        level = "farmgate"
+
     pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
     return {"series": s, "current": cur, "forecast": fc, "pct": pct,
-            "source": source, "last_date": s.index[-1]}
+            "source": source, "level": level, "last_date": s.index[-1]}

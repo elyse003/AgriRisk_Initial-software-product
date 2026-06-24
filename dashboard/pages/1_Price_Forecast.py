@@ -8,7 +8,7 @@ Loads the serialized per-crop forecaster (models_store/price_forecaster.pkl,
 built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
-from _ui import (setup, load_prices, load_price_forecaster,
+from _ui import (setup, load_prices, load_price_forecaster, load_esoko,
                  page_header, price_chart_svg, CROP_TINT)
 from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
@@ -20,6 +20,7 @@ setup("Price Forecast", "Next-month price outlook by crop and district",
       allowed_roles=("officer", "super_admin"), header=False)
 prices = load_prices()
 models = load_price_forecaster()
+esoko = load_esoko()
 
 c1, c2 = st.columns(2)
 crop = c1.selectbox(t("Crop"), CROPS, format_func=crop_label)
@@ -35,7 +36,7 @@ page_header(
 
 if st.button(t("Generate Forecast"), type="primary"):
     # one shared outlook so the dashboard, chat and USSD always agree
-    outlook = price_outlook(prices, models, crop, district)
+    outlook = price_outlook(prices, models, crop, district, esoko=esoko)
     if outlook is None:
         st.error(f"No price data for {cl} in {district}.")
         st.stop()
@@ -46,11 +47,16 @@ if st.button(t("Generate Forecast"), type="primary"):
     s = outlook["series"]
     cur, fc, pct = outlook["current"], outlook["forecast"], outlook["pct"]
     last_date = outlook["last_date"]
-    if outlook["source"] == "district":
-        src_note = f"Based on {district}'s prices through {last_date:%b %Y}."
+    farmgate = outlook["level"] == "farmgate"
+    price_kind = t("Farmgate price") if farmgate else t("Market price")
+    if farmgate:
+        src_note = (f"Farmgate price from Esoko for {district}; next-month trend from the "
+                    f"WFP-trained model.")
+    elif outlook["source"] == "district":
+        src_note = f"Market (retail) price for {district} through {last_date:%b %Y}."
     else:
-        src_note = (f"Showing the national recent trend — {district} has little or no recent "
-                    f"local {cl} data.")
+        src_note = (f"National retail trend — {district} has little or no recent local "
+                    f"{cl} data.")
     log_price(crop, district, str(last_date.date()), cur)
 
     # empirical 80% band from recent monthly log-return volatility (1.28σ)
@@ -67,9 +73,9 @@ if st.button(t("Generate Forecast"), type="primary"):
 
     # ---- stat grid (2) ----
     st.markdown(f"""<div class="ag-stat-grid ag-pagein" style="grid-template-columns:repeat(2,1fr)">
-      <div class="ag-stat"><div class="label">{t('Current price')}</div>
+      <div class="ag-stat"><div class="label">{price_kind}</div>
         <div class="value">{cur:,.0f}<span class="unit">RWF/kg</span></div>
-        <div class="delta flat">{t('Latest market price')}</div></div>
+        <div class="delta flat">{'Esoko' if farmgate else 'WFP'}</div></div>
       <div class="ag-stat is-warn"><div class="label">{t('Next-month forecast')}</div>
         <div class="value">{fc:,.0f}<span class="unit">RWF/kg</span></div>
         <div class="delta {dcls}"><span>{arrow}</span>{pct:+.1f}% · {trend}</div></div>
