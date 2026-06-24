@@ -574,6 +574,16 @@ def load_prices():
     return pd.read_csv(data_path("wfp_food_prices_rwanda.csv"), parse_dates=["date"])
 
 @st.cache_data
+def load_esoko():
+    """Esoko farmgate prices (date, province, district, crop, price_rwf), or empty
+    if no Esoko data has been ingested yet (scripts/prepare_esoko.py)."""
+    from config.settings import DATA_PROCESSED
+    p = DATA_PROCESSED / "esoko_farmgate_prices.csv"
+    if p.exists():
+        return pd.read_csv(p, parse_dates=["date"])
+    return pd.DataFrame(columns=["date", "province", "district", "crop", "price_rwf"])
+
+@st.cache_data
 def load_cpi():
     df = pd.read_csv(data_path("rwanda_food_cpi.csv"), parse_dates=["date"]).sort_values("date")
     df["cpi_change"] = df["food_cpi"].pct_change(12) * 100
