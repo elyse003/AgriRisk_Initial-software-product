@@ -18,8 +18,15 @@ from fastapi import FastAPI, Form
 from fastapi.responses import JSONResponse, Response
 
 from src.channels.whatsapp_bot import answer
+from src.channels.sms_alerts import handle_keyword
 
 app = FastAPI(title="AgriRisk farmer assistant webhook")
+
+
+def _reply(body: str, sender: str) -> str:
+    """YEGO/STOP opt-in-out first, otherwise the normal model-backed bot answer."""
+    kw = handle_keyword(body, sender)
+    return kw if kw is not None else answer(body)
 
 
 def _twiml(message: str) -> Response:
@@ -34,9 +41,9 @@ def health():
 
 @app.post("/whatsapp")
 async def whatsapp(Body: str = Form(default=""), From: str = Form(default="")):
-    return _twiml(answer(Body))
+    return _twiml(_reply(Body, From))
 
 
 @app.post("/sms")
 async def sms(Body: str = Form(default=""), From: str = Form(default="")):
-    return _twiml(answer(Body))
+    return _twiml(_reply(Body, From))

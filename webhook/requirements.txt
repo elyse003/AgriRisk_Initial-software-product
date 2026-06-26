@@ -1,8 +1,12 @@
-# Webhook service (separate from the Streamlit app). Lightweight: the bot uses
-# pandas only, no ML model loading.
+# Webhook service (separate from the Streamlit app). The bot uses pandas (no ML
+# model loading); SMS opt-in/out (YEGO/STOP) reads/writes the shared subscribers
+# DB, and the CPaaS gateway uses plain HTTP.
 fastapi
 uvicorn[standard]
 python-multipart
 pandas
 numpy
 python-dotenv
+requests
+sqlalchemy>=2.0
+psycopg[binary]>=3.1   # only used when DATABASE_URL points at Postgres (shared DB)
