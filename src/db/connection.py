@@ -267,6 +267,29 @@ def add_subscriber(phone, district, crops, language="rw"):
         return False
 
 
+def remove_subscriber(phone):
+    """Opt-out: delete the subscription for this phone. Returns True if removed."""
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            return conn.execute(
+                delete(subscribers).where(subscribers.c.phone_number == phone)).rowcount > 0
+    except Exception:
+        return False
+
+
+def user_district(phone):
+    """District of a registered user with this phone (to seed a subscription), or None."""
+    _ensure()
+    try:
+        with engine().connect() as conn:
+            row = conn.execute(
+                select(users.c.district).where(users.c.phone == phone)).first()
+            return row[0] if row else None
+    except Exception:
+        return None
+
+
 def log_risk(district, season, rainfall_anomaly, cpi_change, fertilizer_change, risk_level):
     _ensure()
     try:
