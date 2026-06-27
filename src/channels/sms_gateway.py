@@ -19,6 +19,7 @@ Environment variables
 from __future__ import annotations
 
 import os
+import time
 
 import requests
 
@@ -64,18 +65,24 @@ def _send_twilio(to: str, message: str) -> dict:
     return {"provider": "twilio", "status": "sent", "response": r.json()}
 
 
-def send_sms(to: str, message: str, dry_run: bool | None = None) -> dict:
+def send_sms(to: str, message: str, dry_run: bool | None = None, retries: int = 3) -> dict:
     """Send one SMS (or simulate it). Returns a small result dict; never raises
-    on a provider error — it reports it, so a bad number can't stop a batch."""
+    on a provider error — it reports it, so a bad number can't stop a batch.
+    Retries a few times so a transient network/TLS blip doesn't fail the send."""
     if dry_run is None:
         dry_run = not is_live()
     if dry_run:
         print(f"[SMS dry-run] -> {to}: {message}")
         return {"to": to, "status": "dry-run", "message": message}
     provider = os.getenv("SMS_PROVIDER", "africastalking").lower()
-    try:
-        res = _send_twilio(to, message) if provider == "twilio" else _send_africastalking(to, message)
-        res["to"] = to
-        return res
-    except Exception as e:
-        return {"to": to, "status": "error", "error": str(e)}
+    last = ""
+    for attempt in range(max(1, retries)):
+        try:
+            res = _send_twilio(to, message) if provider == "twilio" else _send_africastalking(to, message)
+            res["to"] = to
+            return res
+        except Exception as e:
+            last = str(e)
+            if attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+    return {"to": to, "status": "error", "error": last}
