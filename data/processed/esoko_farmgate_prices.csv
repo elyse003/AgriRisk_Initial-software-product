@@ -1,15 +1,38 @@
 date,province,district,crop,price_rwf
-2026-06-01,Western,Karongi,beans,862.0
+2026-06-01,Northern,Burera,beans,783.0
+2026-06-01,Northern,Gicumbi,beans,1043.0
+2026-06-01,Southern,Huye,beans,780.0
+2026-06-01,Western,Karongi,beans,870.0
 2026-06-01,Kigali City,Kicukiro,beans,850.0
-2026-06-01,Eastern,Kirehe,beans,950.0
-2026-06-01,Eastern,Ngoma,beans,783.0
+2026-06-01,Eastern,Kirehe,beans,979.0
+2026-06-01,Northern,Musanze,beans,925.0
+2026-06-01,Eastern,Ngoma,beans,736.0
+2026-06-01,Eastern,Nyagatare,beans,700.0
+2026-06-01,Southern,Nyamagabe,beans,775.0
+2026-06-01,Kigali City,Nyarugenge,beans,883.0
 2026-06-01,Western,Rusizi,beans,897.0
+2026-06-01,Western,Rutsiro,beans,988.0
 2026-06-01,Eastern,Rwamagana,beans,850.0
+2026-06-01,Northern,Burera,maize,500.0
+2026-06-01,Northern,Gicumbi,maize,500.0
+2026-06-01,Southern,Huye,maize,400.0
 2026-06-01,Western,Karongi,maize,500.0
 2026-06-01,Eastern,Kirehe,maize,500.0
+2026-06-01,Northern,Musanze,maize,470.0
 2026-06-01,Eastern,Ngoma,maize,470.0
+2026-06-01,Eastern,Nyagatare,maize,400.0
+2026-06-01,Southern,Nyamagabe,maize,400.0
+2026-06-01,Kigali City,Nyarugenge,maize,400.0
+2026-06-01,Eastern,Rwamagana,maize,400.0
+2026-06-01,Northern,Burera,potatoes,467.0
+2026-06-01,Northern,Gicumbi,potatoes,767.0
 2026-06-01,Southern,Huye,potatoes,600.0
+2026-06-01,Western,Karongi,potatoes,624.0
 2026-06-01,Kigali City,Kicukiro,potatoes,415.0
-2026-06-01,Eastern,Kirehe,potatoes,675.0
+2026-06-01,Eastern,Kirehe,potatoes,612.0
+2026-06-01,Northern,Musanze,potatoes,590.0
+2026-06-01,Southern,Nyamagabe,potatoes,600.0
+2026-06-01,Kigali City,Nyarugenge,potatoes,750.0
 2026-06-01,Western,Rusizi,potatoes,700.0
+2026-06-01,Western,Rutsiro,potatoes,550.0
 2026-06-01,Eastern,Rwamagana,potatoes,550.0

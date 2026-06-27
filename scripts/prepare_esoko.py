@@ -32,14 +32,28 @@ OUT = PROCESSED / "esoko_farmgate_prices.csv"
 # '# confirm' rows are best-effort (the same sector name exists in several
 # districts) -- correct the district if a market is actually elsewhere.
 MARKET_TO_DISTRICT = {
+    # --- confident ---
     "kamembe": ("Rusizi", "Western"),
-    "butare": ("Huye", "Southern"),
+    "bugarama": ("Rusizi", "Western"),
+    "nkora": ("Rutsiro", "Western"),
     "kibuye": ("Karongi", "Western"),
+    "butare": ("Huye", "Southern"),
+    "gasarenda": ("Nyamagabe", "Southern"),
     "kibungo": ("Ngoma", "Eastern"),
-    "kicukiro-center": ("Kicukiro", "Kigali City"),
     "karenge": ("Rwamagana", "Eastern"),
+    "matimba": ("Nyagatare", "Eastern"),
+    "musanze": ("Musanze", "Northern"),
+    "kicukiro-center": ("Kicukiro", "Kigali City"),
+    "gahanga": ("Kicukiro", "Kigali City"),
+    "nyabugogo": ("Nyarugenge", "Kigali City"),
+    # --- best-effort: CONFIRM these (same sector name can exist in >1 district) ---
     "gahoromani": ("Kirehe", "Eastern"),     # confirm
     "karambi": ("Huye", "Southern"),         # confirm
+    "birambo": ("Karongi", "Western"),       # confirm
+    "kirambo": ("Burera", "Northern"),       # confirm
+    "mulindi": ("Gicumbi", "Northern"),      # confirm
+    "nyagahinga": ("Burera", "Northern"),    # confirm
+    "mubyangabo": ("Musanze", "Northern"),   # confirm (uncertain)
 }
 
 
