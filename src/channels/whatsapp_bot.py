@@ -137,6 +137,16 @@ def _esoko():
         return None
 
 
+@lru_cache(maxsize=1)
+def _ratios():
+    """{crop: farmgate/retail ratio} for expressing non-Esoko districts in farmgate."""
+    from src.models.price_forecasting import crop_ratios
+    try:
+        return crop_ratios(_prices(), _esoko())
+    except Exception:
+        return None
+
+
 def answer(text: str) -> str:
     """Return the bilingual reply for a farmer's message."""
     from src.models.input_recommender import recommend_plan
@@ -166,13 +176,15 @@ def answer(text: str) -> str:
                        f"Which district? For example: '{crop} price Musanze'.")
         # SAME canonical outlook the dashboard uses, so the figures always agree
         from src.models.price_forecasting import price_outlook
-        o = price_outlook(_prices(), _price_forecasters(), crop, district, esoko=_esoko())
+        o = price_outlook(_prices(), _price_forecasters(), crop, district,
+                          esoko=_esoko(), ratios=_ratios())
         if o is None:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
         cur, fc = o["current"], o["forecast"]
-        lvl_rw = "ku murima" if o["level"] == "farmgate" else "ku isoko"
-        lvl_en = "farmgate" if o["level"] == "farmgate" else "market"
+        real = o["level"] == "farmgate"                  # real Esoko vs estimated farmgate
+        lvl_rw = "ku murima" if real else "ku murima (~)"
+        lvl_en = "farmgate" if real else "farmgate ~"
         if fc is None:                                   # fall back to the latest price
             return say(f"{crop.title()}, {district} ({lvl_rw}): hafi {cur:,.0f} RWF/kg ubu.",
                        f"{crop.title()}, {district} ({lvl_en}): about {cur:,.0f} RWF/kg now.")

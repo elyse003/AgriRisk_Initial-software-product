@@ -30,6 +30,11 @@ MIN_HISTORY = 14                     # months needed before a feature row is usa
 FEATURES = ([f"ret{l}" for l in RET_LAGS]
             + ["dev_roll3", "dev_year", "month_sin", "month_cos"])
 
+# Fallback farmgate/retail ratio per crop (measured from Esoko vs WFP; used to
+# express districts WITHOUT Esoko coverage in farmgate terms, since this is a
+# farmer tool). Overridden by the live measured ratios when available.
+DEFAULT_FG_RATIO = {"maize": 0.82, "beans": 0.86, "potatoes": 1.0}
+
 
 def mape(y_true, y_pred) -> float:
     """Mean Absolute Percentage Error (%), the proposal's primary metric."""
@@ -159,6 +164,15 @@ def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
     return out
 
 
+def crop_ratios(prices, esoko) -> dict:
+    """{crop: farmgate/retail ratio} — measured from the overlap where possible,
+    else the baked-in default. Used to express non-Esoko districts in farmgate."""
+    r = dict(DEFAULT_FG_RATIO)
+    for c, info in farmgate_retail_ratio(prices, esoko).items():
+        r[c] = info["ratio"]
+    return r
+
+
 def esoko_as_prices(esoko) -> pd.DataFrame | None:
     """Esoko farmgate (date, district, crop, price_rwf) -> the WFP price schema
     (crop, market, date, price_rwf) for pooling into training. Districts are
@@ -173,16 +187,16 @@ def esoko_as_prices(esoko) -> pd.DataFrame | None:
 
 
 def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
-                  esoko=None, stale_days: int = 540) -> dict | None:
-    """Next-month price outlook for one crop/district — the single source of
+                  esoko=None, ratios=None, stale_days: int = 540) -> dict | None:
+    """Next-month FARMGATE outlook for one crop/district — the single source of
     truth shared by the dashboard, chat and USSD.
 
-    Picks the district's own monthly series when it has enough history and isn't
-    stale; otherwise the crop's national (cross-market median) series. When real
-    Esoko **farmgate** data exists for the crop/district, the level is re-anchored
-    to it (the WFP-trained model still supplies the next-month *trend*, which is
-    scale-free, so the % move is unchanged). Returns dict(series, current,
-    forecast, pct, source, level, last_date) or None when there's no data.
+    This is a farmer tool, so EVERYTHING is expressed in farmgate terms: the real
+    Esoko farmgate level where we have it, otherwise an estimate = WFP retail x
+    the crop's measured farmgate/retail ratio. The WFP-trained model supplies the
+    scale-free next-month *trend* (the % move), applied to the farmgate level.
+    Returns dict(series, current, forecast, pct, source, level, last_date) with
+    level in {"farmgate", "farmgate_est"}, or None when there's no data.
     """
     crop_all = prices[prices["crop"] == crop]
     if crop_all.empty:
@@ -209,17 +223,21 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
         except Exception:
             fc = None
 
-    # Anchor to the real Esoko farmgate level when available (scale-free trend
-    # is preserved): scale the whole series so the chart stays continuous.
-    level = "retail"
+    # Express in FARMGATE: real Esoko where we have it, else estimate from the WFP
+    # retail level via the crop's farmgate/retail ratio. Scale the whole series so
+    # the chart stays continuous; the scale-free trend (% move) is preserved.
     fg = _esoko_farmgate(esoko, crop, district)
     if fg is not None and cur:
-        ratio = fg / cur
-        s = s * ratio
-        cur = fg
+        target, level = fg, "farmgate"
+    else:
+        k = (ratios or DEFAULT_FG_RATIO).get(crop, DEFAULT_FG_RATIO.get(crop, 1.0))
+        target, level = (cur * k if cur else cur), "farmgate_est"
+    if cur:
+        scale = target / cur
+        s = s * scale
+        cur = target
         if fc is not None:
-            fc = float(round(fc * ratio))
-        level = "farmgate"
+            fc = float(round(fc * scale))
 
     pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
     return {"series": s, "current": cur, "forecast": fc, "pct": pct,

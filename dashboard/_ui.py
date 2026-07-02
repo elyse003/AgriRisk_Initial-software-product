@@ -584,6 +584,12 @@ def load_esoko():
     return pd.DataFrame(columns=["date", "province", "district", "crop", "price_rwf"])
 
 @st.cache_data
+def load_farmgate_ratios():
+    """{crop: farmgate/retail ratio} used to express non-Esoko districts in farmgate."""
+    from src.models.price_forecasting import crop_ratios
+    return crop_ratios(load_prices(), load_esoko())
+
+@st.cache_data
 def load_cpi():
     df = pd.read_csv(data_path("rwanda_food_cpi.csv"), parse_dates=["date"]).sort_values("date")
     df["cpi_change"] = df["food_cpi"].pct_change(12) * 100
