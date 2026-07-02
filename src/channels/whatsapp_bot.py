@@ -323,25 +323,62 @@ def _slots_complete(m: dict) -> bool:
     return False                                # None/help: keep any crop we learned
 
 
+def _variety_prompt(crop: str, vs: list, rw: bool) -> str:
+    """The 'Which type?' menu for beans/potatoes (numbered, 0 = all types)."""
+    rows = ["0) " + ("Byose" if rw else "All types")]
+    rows += [f"{i + 1}) {v}" for i, v in enumerate(vs)]
+    body = "  \n".join(rows)                              # markdown hard-breaks -> one per line
+    crop_rw = {"beans": "ibishyimbo", "potatoes": "ibirayi"}.get(crop, crop)
+    if rw:
+        return f"Ni ubuhe bwoko bw'{crop_rw}? Andika umubare cyangwa izina:  \n{body}"
+    return f"Which type of {crop}? Reply with the number or name:  \n{body}"
+
+
+def _resolve_variety(text: str, vs: list, crop: str):
+    """Map a reply to the type menu -> a variety, or None for 'all types'."""
+    tl = (text or "").strip().lower()
+    if tl in ("0", "all", "any", "all types", "byose", "zose", "bwose"):
+        return None
+    if tl.isdigit():
+        i = int(tl)
+        return vs[i - 1] if 1 <= i <= len(vs) else None
+    return _detect_variety(text, crop)                   # a typed name, else None (all)
+
+
 def converse(text: str, state: dict | None = None):
     """Stateful chat wrapper: (reply, new_state).
 
     Remembers unfilled slots across turns so a follow-up like 'potatoes' (after
     'Which crop?') or 'Musanze' (after 'Which district?') continues the pending
-    request. Explicit new values in `text` always override what was remembered,
-    and the state resets once a request is fully answered. The advisory logic is
-    the shared answer()/price_outlook, so replies match the dashboard and USSD.
+    request. For beans & potatoes it also asks 'Which type?' (like the USSD menu)
+    before quoting a price. Explicit new values in `text` override what was
+    remembered, and the state resets once a request is fully answered. The
+    advisory logic is the shared answer()/price_outlook, so replies match the
+    dashboard and USSD.
     """
     state = state or {}
     p = parse_message(text or "")
+    rw = p["lang"] == "rw"
+    intent = p["intent"] or state.get("intent")
     crop = p["crop"] or state.get("crop")
-    merged = {
-        "intent": p["intent"] or state.get("intent"),
-        "crop": crop,
-        "district": p["district"] or state.get("district"),
-        "land_ha": p["land_ha"] or state.get("land_ha"),
-        "budget": p["budget"] or state.get("budget"),
-        "variety": (_detect_variety(text, crop) if crop else None) or state.get("variety"),
-    }
+    district = p["district"] or state.get("district")
+    variety = (_detect_variety(text, crop) if crop else None) or state.get("variety")
+    land_ha = p["land_ha"] or state.get("land_ha")
+    budget = p["budget"] or state.get("budget")
+    if intent is None and crop and district:             # crop + district across turns -> price
+        intent = "price"
+
+    # guided type step: beans & potatoes have varieties -> ask which one, once
+    if intent == "price" and district and variety is None and crop in ("beans", "potatoes"):
+        vs = crop_varieties(crop)
+        if vs and state.get("variety_asked"):
+            variety = _resolve_variety(text, vs, crop)   # this turn is the menu reply
+        elif vs:
+            return _variety_prompt(crop, vs, rw), {
+                "intent": intent, "crop": crop, "district": district,
+                "land_ha": land_ha, "budget": budget, "variety": None, "variety_asked": True}
+
+    merged = {"intent": intent, "crop": crop, "district": district,
+              "land_ha": land_ha, "budget": budget, "variety": variety}
     reply = answer(text, ctx=merged)
     return reply, ({} if _slots_complete(merged) else merged)
