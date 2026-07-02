@@ -15,7 +15,7 @@ No telecom or regulatory onboarding is needed to build or demo this.
 """
 from __future__ import annotations
 
-from src.channels.whatsapp_bot import answer
+from src.channels.whatsapp_bot import answer, crop_varieties
 
 CROP_BY_NUM = {"1": "maize", "2": "beans", "3": "potatoes"}
 
@@ -56,6 +56,21 @@ def _district_from(prov_key, sel):
         return None
 
 
+def _variety_menu(varieties):
+    rows = [("0", "All types")] + [(str(i + 1), v) for i, v in enumerate(varieties)]
+    return _menu("Choose type:", rows)
+
+
+def _variety_from(varieties, sel):
+    """Returns (variety_or_None, ok); '0' = All types (None)."""
+    if sel == "0":
+        return None, True
+    try:
+        return varieties[int(sel) - 1], True
+    except (ValueError, IndexError):
+        return None, False
+
+
 def ussd_session(text: str):
     """Return (screen, ended) for the accumulated USSD input chain `text`."""
     parts = text.split("*") if text else []
@@ -86,6 +101,16 @@ def ussd_session(text: str):
         district = _district_from(parts[2], parts[3])
         if not district:
             return "Invalid choice. Dial again.", True
+        # beans & potatoes have varieties/grades -> pick a type (maize has none)
+        varieties = crop_varieties(crop) if crop in ("beans", "potatoes") else []
+        if varieties:
+            if len(parts) == 4:
+                return _variety_menu(varieties), False
+            variety, ok = _variety_from(varieties, parts[4])
+            if not ok:
+                return "Invalid choice. Dial again.", True
+            q = f"{crop} {variety} price {district}" if variety else f"{crop} price {district}"
+            return answer(q), True
         return answer(f"{crop} price {district}"), True
 
     # 2) SEASONAL RISK: province -> district -> result

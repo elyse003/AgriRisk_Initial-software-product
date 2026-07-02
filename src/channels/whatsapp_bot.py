@@ -147,6 +147,29 @@ def _ratios():
         return None
 
 
+def crop_varieties(crop):
+    """Variety/grade names for a crop from Esoko (beans & potatoes), sorted; [] otherwise.
+    Shared so the dashboard, chat and USSD offer the SAME types."""
+    e = _esoko()
+    if e is None or "variety" not in getattr(e, "columns", []):
+        return []
+    return sorted(v for v in e[e["crop"] == crop]["variety"].dropna().unique() if v != "Grain")
+
+
+def _detect_variety(text, crop):
+    """Find a variety name mentioned in a free-text message (e.g. 'beans colta ...')."""
+    vs = crop_varieties(crop)
+    tl = (text or "").lower()
+    for v in sorted(vs, key=len, reverse=True):          # longest first ('Kinigi Grade 1')
+        if v.lower() in tl:
+            return v
+    for v in vs:                                         # else a distinctive first word
+        w = v.lower().split()[0]
+        if w and w != "standard" and w in tl:
+            return v
+    return None
+
+
 def answer(text: str) -> str:
     """Return the bilingual reply for a farmer's message."""
     from src.models.input_recommender import recommend_plan
@@ -176,8 +199,9 @@ def answer(text: str) -> str:
                        f"Which district? For example: '{crop} price Musanze'.")
         # SAME canonical outlook the dashboard uses, so the figures always agree
         from src.models.price_forecasting import price_outlook
+        variety = _detect_variety(text, crop)            # e.g. "beans colta price Gicumbi"
         o = price_outlook(_prices(), _price_forecasters(), crop, district,
-                          esoko=_esoko(), ratios=_ratios())
+                          esoko=_esoko(), ratios=_ratios(), variety=variety)
         if o is None:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
@@ -185,14 +209,15 @@ def answer(text: str) -> str:
         real = o["level"] == "farmgate"                  # real Esoko vs estimated farmgate
         lvl_rw = "ku murima" if real else "ku murima (~)"
         lvl_en = "farmgate" if real else "farmgate ~"
+        name = f"{crop.title()} {variety}" if variety else crop.title()
         if fc is None:                                   # fall back to the latest price
-            return say(f"{crop.title()}, {district} ({lvl_rw}): hafi {cur:,.0f} RWF/kg ubu.",
-                       f"{crop.title()}, {district} ({lvl_en}): about {cur:,.0f} RWF/kg now.")
+            return say(f"{name}, {district} ({lvl_rw}): hafi {cur:,.0f} RWF/kg ubu.",
+                       f"{name}, {district} ({lvl_en}): about {cur:,.0f} RWF/kg now.")
         pct = o["pct"] or 0.0
         tr_rw, tr_en = (("birazamuka", "rising") if pct > 1 else
                         ("biragabanuka", "falling") if pct < -1 else ("bihagaze", "stable"))
-        return say(f"{crop.title()}, {district} ({lvl_rw}): ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
-                   f"{crop.title()}, {district} ({lvl_en}): now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
+        return say(f"{name}, {district} ({lvl_rw}): ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
+                   f"{name}, {district} ({lvl_en}): now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
 
     if intent == "risk":
         if not district:
