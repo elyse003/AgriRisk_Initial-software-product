@@ -119,14 +119,20 @@ def forecast_next(model, series: pd.Series) -> float:
 # always agree. The single source of truth for which series is used and what
 # the next-month figure is.
 # ---------------------------------------------------------------------------
-def _esoko_farmgate(esoko, crop: str, district: str):
-    """Latest Esoko farmgate price for one crop/district, or None."""
+def _esoko_farmgate(esoko, crop: str, district: str, variety=None):
+    """Latest Esoko farmgate price for one crop/district (and variety if given),
+    or None. With no variety it averages the latest month across varieties."""
     if esoko is None or len(esoko) == 0:
         return None
     m = esoko[(esoko["crop"] == crop) & (esoko["district"] == district)]
+    if variety and "variety" in m.columns:
+        mv = m[m["variety"] == variety]
+        if not mv.empty:
+            m = mv
     if m.empty:
         return None
-    return float(m.sort_values("date")["price_rwf"].iloc[-1])
+    latest = m["date"].max()
+    return float(m[m["date"] == latest]["price_rwf"].mean())
 
 
 def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
@@ -187,7 +193,7 @@ def esoko_as_prices(esoko) -> pd.DataFrame | None:
 
 
 def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
-                  esoko=None, ratios=None, stale_days: int = 540) -> dict | None:
+                  esoko=None, ratios=None, variety=None, stale_days: int = 540) -> dict | None:
     """Next-month FARMGATE outlook for one crop/district — the single source of
     truth shared by the dashboard, chat and USSD.
 
@@ -226,7 +232,7 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
     # Express in FARMGATE: real Esoko where we have it, else estimate from the WFP
     # retail level via the crop's farmgate/retail ratio. Scale the whole series so
     # the chart stays continuous; the scale-free trend (% move) is preserved.
-    fg = _esoko_farmgate(esoko, crop, district)
+    fg = _esoko_farmgate(esoko, crop, district, variety)
     if fg is not None and cur:
         target, level = fg, "farmgate"
     else:

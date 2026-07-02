@@ -295,6 +295,8 @@ RW = {
     "farmgate price": "igiciro ku murima",
     "farmgate · monthly": "ku murima · buri kwezi",
     "estimated": "iteganyijwe",
+    "Type": "Ubwoko",
+    "All types (average)": "Ubwoko bwose (impuzandengo)",
     "Likely low": "Hasi gishoboka",
     "Likely high": "Hejuru gishoboka",
     "Source": "Inkomoko",

@@ -1,38 +1,103 @@
-date,province,district,crop,price_rwf
-2026-06-01,Northern,Burera,beans,783.0
-2026-06-01,Northern,Gicumbi,beans,1043.0
-2026-06-01,Southern,Huye,beans,780.0
-2026-06-01,Western,Karongi,beans,870.0
-2026-06-01,Kigali City,Kicukiro,beans,850.0
-2026-06-01,Eastern,Kirehe,beans,979.0
-2026-06-01,Northern,Musanze,beans,925.0
-2026-06-01,Eastern,Ngoma,beans,736.0
-2026-06-01,Eastern,Nyagatare,beans,700.0
-2026-06-01,Southern,Nyamagabe,beans,775.0
-2026-06-01,Kigali City,Nyarugenge,beans,883.0
-2026-06-01,Western,Rusizi,beans,897.0
-2026-06-01,Western,Rutsiro,beans,988.0
-2026-06-01,Eastern,Rwamagana,beans,850.0
-2026-06-01,Northern,Burera,maize,500.0
-2026-06-01,Northern,Gicumbi,maize,500.0
-2026-06-01,Southern,Huye,maize,400.0
-2026-06-01,Western,Karongi,maize,500.0
-2026-06-01,Eastern,Kirehe,maize,500.0
-2026-06-01,Northern,Musanze,maize,470.0
-2026-06-01,Eastern,Ngoma,maize,470.0
-2026-06-01,Eastern,Nyagatare,maize,400.0
-2026-06-01,Southern,Nyamagabe,maize,400.0
-2026-06-01,Kigali City,Nyarugenge,maize,400.0
-2026-06-01,Eastern,Rwamagana,maize,400.0
-2026-06-01,Northern,Burera,potatoes,467.0
-2026-06-01,Northern,Gicumbi,potatoes,767.0
-2026-06-01,Southern,Huye,potatoes,600.0
-2026-06-01,Western,Karongi,potatoes,624.0
-2026-06-01,Kigali City,Kicukiro,potatoes,415.0
-2026-06-01,Eastern,Kirehe,potatoes,612.0
-2026-06-01,Northern,Musanze,potatoes,590.0
-2026-06-01,Southern,Nyamagabe,potatoes,600.0
-2026-06-01,Kigali City,Nyarugenge,potatoes,750.0
-2026-06-01,Western,Rusizi,potatoes,700.0
-2026-06-01,Western,Rutsiro,potatoes,550.0
-2026-06-01,Eastern,Rwamagana,potatoes,550.0
+date,province,district,crop,variety,price_rwf
+2026-06-01,Northern,Burera,beans,Ibinyarwanda,700.0
+2026-06-01,Northern,Burera,beans,Mushingiriro,825.0
+2026-06-01,Northern,Gicumbi,beans,Colta,1200.0
+2026-06-01,Northern,Gicumbi,beans,Ibinyarwanda,800.0
+2026-06-01,Northern,Gicumbi,beans,Kiryumukwe,1100.0
+2026-06-01,Northern,Gicumbi,beans,Mutiki,1100.0
+2026-06-01,Southern,Huye,beans,Ibinyarwanda,700.0
+2026-06-01,Southern,Huye,beans,Kiryumukwe,800.0
+2026-06-01,Southern,Huye,beans,Mushingiriro,800.0
+2026-06-01,Southern,Huye,beans,Mutiki,800.0
+2026-06-01,Southern,Huye,beans,Shyushya,800.0
+2026-06-01,Western,Karongi,beans,Ibinyarwanda,850.0
+2026-06-01,Western,Karongi,beans,Mushingiriro,869.0
+2026-06-01,Western,Karongi,beans,Mutiki,901.0
+2026-06-01,Western,Karongi,beans,Shyushya,850.0
+2026-06-01,Kigali City,Kicukiro,beans,Colta,950.0
+2026-06-01,Kigali City,Kicukiro,beans,Mutiki,850.0
+2026-06-01,Kigali City,Kicukiro,beans,Shyushya,750.0
+2026-06-01,Eastern,Kirehe,beans,Colta,1150.0
+2026-06-01,Eastern,Kirehe,beans,Ibinyarwanda,750.0
+2026-06-01,Eastern,Kirehe,beans,Kiryumukwe,1150.0
+2026-06-01,Eastern,Kirehe,beans,Mutiki,1050.0
+2026-06-01,Eastern,Kirehe,beans,Shyushya,850.0
+2026-06-01,Northern,Musanze,beans,Colta,1233.0
+2026-06-01,Northern,Musanze,beans,Ibinyarwanda,885.0
+2026-06-01,Northern,Musanze,beans,Injyamane,977.0
+2026-06-01,Northern,Musanze,beans,Kiryumukwe,964.0
+2026-06-01,Northern,Musanze,beans,Mushingiriro,880.0
+2026-06-01,Northern,Musanze,beans,Shyushya,837.0
+2026-06-01,Eastern,Ngoma,beans,Ibinyarwanda,707.0
+2026-06-01,Eastern,Ngoma,beans,Mushingiriro,750.0
+2026-06-01,Eastern,Ngoma,beans,Shyushya,750.0
+2026-06-01,Eastern,Nyagatare,beans,Colta,700.0
+2026-06-01,Eastern,Nyagatare,beans,Kiryumukwe,700.0
+2026-06-01,Eastern,Nyagatare,beans,Shyushya,700.0
+2026-06-01,Southern,Nyamagabe,beans,Ibinyarwanda,750.0
+2026-06-01,Southern,Nyamagabe,beans,Mushingiriro,800.0
+2026-06-01,Kigali City,Nyarugenge,beans,Colta,950.0
+2026-06-01,Kigali City,Nyarugenge,beans,Ibinyarwanda,675.0
+2026-06-01,Kigali City,Nyarugenge,beans,Injyamane,1225.0
+2026-06-01,Kigali City,Nyarugenge,beans,Mushingiriro,925.0
+2026-06-01,Kigali City,Nyarugenge,beans,Mutiki,825.0
+2026-06-01,Kigali City,Nyarugenge,beans,Shyushya,700.0
+2026-06-01,Western,Rusizi,beans,Colta,970.0
+2026-06-01,Western,Rusizi,beans,Ibinyarwanda,775.0
+2026-06-01,Western,Rusizi,beans,Kiryumukwe,970.0
+2026-06-01,Western,Rusizi,beans,Mushingiriro,900.0
+2026-06-01,Western,Rusizi,beans,Shyushya,750.0
+2026-06-01,Western,Rutsiro,beans,Ibinyarwanda,950.0
+2026-06-01,Western,Rutsiro,beans,Kiryumukwe,950.0
+2026-06-01,Western,Rutsiro,beans,Mushingiriro,950.0
+2026-06-01,Western,Rutsiro,beans,Shyushya,1100.0
+2026-06-01,Eastern,Rwamagana,beans,Ibinyarwanda,800.0
+2026-06-01,Eastern,Rwamagana,beans,Kiryumukwe,800.0
+2026-06-01,Eastern,Rwamagana,beans,Mutiki,900.0
+2026-06-01,Eastern,Rwamagana,beans,Shyushya,900.0
+2026-06-01,Northern,Burera,maize,Grain,500.0
+2026-06-01,Northern,Gicumbi,maize,Grain,500.0
+2026-06-01,Southern,Huye,maize,Grain,400.0
+2026-06-01,Western,Karongi,maize,Grain,425.0
+2026-06-01,Eastern,Kirehe,maize,Grain,500.0
+2026-06-01,Northern,Musanze,maize,Grain,470.0
+2026-06-01,Eastern,Ngoma,maize,Grain,470.0
+2026-06-01,Eastern,Nyagatare,maize,Grain,400.0
+2026-06-01,Southern,Nyamagabe,maize,Grain,400.0
+2026-06-01,Kigali City,Nyarugenge,maize,Grain,400.0
+2026-06-01,Eastern,Rwamagana,maize,Grain,400.0
+2026-06-01,Northern,Burera,potatoes,Kinigi Grade 1,600.0
+2026-06-01,Northern,Burera,potatoes,Kinigi Grade 2,500.0
+2026-06-01,Northern,Burera,potatoes,Kirundo,366.0
+2026-06-01,Northern,Burera,potatoes,Kuruseke,400.0
+2026-06-01,Northern,Burera,potatoes,Peko,400.0
+2026-06-01,Northern,Gicumbi,potatoes,Kinigi Grade 1,800.0
+2026-06-01,Northern,Gicumbi,potatoes,Kirundo,700.0
+2026-06-01,Southern,Huye,potatoes,Kinigi Grade 1,600.0
+2026-06-01,Southern,Huye,potatoes,Kinigi Grade 2,600.0
+2026-06-01,Southern,Huye,potatoes,Kuruza,450.0
+2026-06-01,Western,Karongi,potatoes,Kinigi Grade 1,800.0
+2026-06-01,Western,Karongi,potatoes,Kinigi Grade 2,700.0
+2026-06-01,Western,Karongi,potatoes,Kirundo,550.0
+2026-06-01,Western,Karongi,potatoes,Kuruseke,545.0
+2026-06-01,Western,Karongi,potatoes,Kuruza,530.0
+2026-06-01,Western,Karongi,potatoes,Standard,500.0
+2026-06-01,Kigali City,Kicukiro,potatoes,Kinigi Grade 2,450.0
+2026-06-01,Kigali City,Kicukiro,potatoes,Kirundo,380.0
+2026-06-01,Eastern,Kirehe,potatoes,Kinigi Grade 2,750.0
+2026-06-01,Eastern,Kirehe,potatoes,Kirundo,583.0
+2026-06-01,Eastern,Kirehe,potatoes,Standard,450.0
+2026-06-01,Northern,Musanze,potatoes,Kinigi Grade 1,720.0
+2026-06-01,Northern,Musanze,potatoes,Kinigi Grade 2,559.0
+2026-06-01,Northern,Musanze,potatoes,Kirundo,544.0
+2026-06-01,Northern,Musanze,potatoes,Kuruseke,520.0
+2026-06-01,Southern,Nyamagabe,potatoes,Kinigi Grade 1,600.0
+2026-06-01,Southern,Nyamagabe,potatoes,Kuruza,600.0
+2026-06-01,Kigali City,Nyarugenge,potatoes,Kinigi Grade 1,925.0
+2026-06-01,Kigali City,Nyarugenge,potatoes,Kinigi Grade 2,700.0
+2026-06-01,Kigali City,Nyarugenge,potatoes,Kirundo,500.0
+2026-06-01,Western,Rusizi,potatoes,Kirundo,660.0
+2026-06-01,Western,Rusizi,potatoes,Kuruza,567.0
+2026-06-01,Western,Rutsiro,potatoes,Kuruseke,550.0
+2026-06-01,Eastern,Rwamagana,potatoes,Kirundo,590.0
+2026-06-01,Eastern,Rwamagana,potatoes,Kuruseke,500.0

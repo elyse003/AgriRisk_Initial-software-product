@@ -71,6 +71,21 @@ def to_crop(name: str):
     return None
 
 
+def to_variety(name: str, crop: str) -> str:
+    """Variety/grade from the product name (beans & potatoes have several;
+    maize is grain). e.g. 'Ibishyimbo Colta' -> 'Colta', 'Ibirayi- Kinigi
+    Grade 1' -> 'Kinigi Grade 1'."""
+    if crop == "maize":
+        return "Grain"
+    n = str(name or "").strip()
+    low = n.lower()
+    for pref in ("ibishyimbo", "ibirayi", "ibigori"):
+        if low.startswith(pref):
+            n = n[len(pref):]
+            break
+    return n.lstrip(" -/:").strip() or "Standard"
+
+
 def prepare(src):
     df = pd.read_excel(src) if str(src).lower().endswith((".xlsx", ".xls")) else pd.read_csv(src)
     cols = {str(c).lower().strip(): c for c in df.columns}
@@ -97,6 +112,7 @@ def prepare(src):
     d["crop"] = d["product"].map(to_crop)
     d = d.dropna(subset=["crop", "farmgate", "date"])
     d = d[d["farmgate"] > 0]
+    d["variety"] = [to_variety(p, c) for p, c in zip(d["product"], d["crop"])]
 
     unknown = sorted(set(d.loc[~d["market"].isin(MARKET_TO_DISTRICT), "market"]))
     if unknown:
@@ -106,19 +122,21 @@ def prepare(src):
     d["province"] = d["market"].map(lambda m: MARKET_TO_DISTRICT[m][1])
     d["date"] = d["date"].values.astype("datetime64[M]")   # one figure per month
 
-    agg = (d.groupby(["date", "province", "district", "crop"])["farmgate"]
+    agg = (d.groupby(["date", "province", "district", "crop", "variety"])["farmgate"]
              .mean().round().reset_index().rename(columns={"farmgate": "price_rwf"}))
 
     if OUT.exists():                                       # accumulate across downloads
         prev = pd.read_csv(OUT, parse_dates=["date"])
-        agg = pd.concat([prev, agg], ignore_index=True)
+        if "variety" in prev.columns:                      # skip old schema (no variety)
+            agg = pd.concat([prev, agg], ignore_index=True)
     agg = (agg.sort_values("date")
-              .drop_duplicates(["date", "district", "crop"], keep="last")
-              .sort_values(["crop", "district", "date"]))
+              .drop_duplicates(["date", "district", "crop", "variety"], keep="last")
+              .sort_values(["crop", "district", "variety", "date"]))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     agg.to_csv(OUT, index=False)
     print(f"wrote {OUT}\n  {len(agg)} rows · {agg['crop'].nunique()} crops · "
-          f"{agg['district'].nunique()} districts · {agg['date'].min():%Y-%m}..{agg['date'].max():%Y-%m}")
+          f"{agg['district'].nunique()} districts · {agg['variety'].nunique()} varieties · "
+          f"{agg['date'].min():%Y-%m}..{agg['date'].max():%Y-%m}")
     return agg
 
 

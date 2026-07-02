@@ -29,16 +29,26 @@ district = c2.selectbox(t("District"), DISTRICTS)
 cl = crop_label(crop)
 tint = CROP_TINT.get(crop, "#6F5A34")
 
+# beans & potatoes have varieties/grades in the Esoko data — let the user pick one
+variety = None
+if crop in ("beans", "potatoes") and "variety" in esoko.columns:
+    vlist = sorted(v for v in esoko[esoko["crop"] == crop]["variety"].dropna().unique()
+                   if v not in ("Grain",))
+    if vlist:
+        _all = t("All types (average)")
+        pick = st.selectbox(t("Type"), [_all] + vlist)
+        variety = None if pick == _all else pick
+
 page_header(
     t('Price Forecast').upper(),
-    f"{cl} <em>{t('farmgate price')}</em> · {district}",
+    f"{cl}{f' · {variety}' if variety else ''} <em>{t('farmgate price')}</em> · {district}",
     t("What a farmer is likely to be paid next month — the farmgate price, from "
       "recent market data."),
     meta_strong="RWF/kg", meta_sub=t("farmgate · monthly"))
 
 if st.button(t("Generate Forecast"), type="primary"):
     # one shared outlook so the dashboard, chat and USSD always agree (all farmgate)
-    outlook = price_outlook(prices, models, crop, district, esoko=esoko, ratios=ratios)
+    outlook = price_outlook(prices, models, crop, district, esoko=esoko, ratios=ratios, variety=variety)
     if outlook is None:
         st.error(f"No price data for {cl} in {district}.")
         st.stop()

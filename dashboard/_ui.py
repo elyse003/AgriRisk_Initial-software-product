@@ -581,7 +581,7 @@ def load_esoko():
     p = DATA_PROCESSED / "esoko_farmgate_prices.csv"
     if p.exists():
         return pd.read_csv(p, parse_dates=["date"])
-    return pd.DataFrame(columns=["date", "province", "district", "crop", "price_rwf"])
+    return pd.DataFrame(columns=["date", "province", "district", "crop", "variety", "price_rwf"])
 
 @st.cache_data
 def load_farmgate_ratios():
