@@ -450,10 +450,16 @@ def _chat_body():
 
 
 def floating_chat():
-    """Round floating chat button (bottom-right) opening a small assistant popover."""
-    with st.container(key="ag_chatfab"):
-        with st.popover("", icon=":material/forum:"):
-            _chat_body()
+    """Round floating chat button (bottom-right) opening a small assistant popover.
+
+    Wrapped so a chat/import hiccup can never blank out the host page — the rest
+    of the page (e.g. the USSD Preview) still renders."""
+    try:
+        with st.container(key="ag_chatfab"):
+            with st.popover("", icon=":material/forum:"):
+                _chat_body()
+    except Exception:
+        pass
 
 
 def _language_selector(dg=None):
