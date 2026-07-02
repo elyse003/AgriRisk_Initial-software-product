@@ -426,12 +426,13 @@ def render_sidebar_nav(user):
 def _chat_body():
     """Chat UI inside the popover. A fragment, so sending a message reruns only
     this widget and the popover stays open. Reuses the WhatsApp bot's answer()."""
-    from src.channels.whatsapp_bot import answer
+    from src.channels.whatsapp_bot import converse
     st.markdown(f"<div class='ag-chat-head'><span class='dot'></span>{t('AgriRisk Assistant')}</div>",
                 unsafe_allow_html=True)
     if "chat" not in st.session_state:
         st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs — "
                                                  "for example: 'maize price Musanze'."))]
+    st.session_state.setdefault("chat_ctx", {})
     box = st.container(height=300)
     for role, txt in st.session_state.chat:
         with box.chat_message("user" if role == "user" else "assistant"):
@@ -442,8 +443,9 @@ def _chat_body():
                           placeholder=t("Ask price, risk, disease, inputs…"))
         send = c2.form_submit_button("➤", use_container_width=True)
     if send and (q or "").strip():
+        reply, st.session_state.chat_ctx = converse(q, st.session_state.chat_ctx)
         st.session_state.chat.append(("user", q))
-        st.session_state.chat.append(("assistant", answer(q)))
+        st.session_state.chat.append(("assistant", reply))
         st.rerun(scope="fragment")
 
 

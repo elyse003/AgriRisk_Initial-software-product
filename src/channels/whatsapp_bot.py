@@ -170,17 +170,34 @@ def _detect_variety(text, crop):
     return None
 
 
-def answer(text: str) -> str:
-    """Return the bilingual reply for a farmer's message."""
+def answer(text: str, ctx: dict | None = None) -> str:
+    """Return the bilingual reply for a farmer's message.
+
+    `ctx` carries unfilled slots (intent/crop/district/...) from an earlier turn
+    so a stateful caller (the in-app chat) can follow up: after "Which crop?" a
+    bare "potatoes" is understood as the crop for the pending question. Callers
+    with their own state (USSD menus) leave ctx=None and behave exactly as before.
+    """
     from src.models.input_recommender import recommend_plan
     from src.data.preprocessing import label_risk
 
     p = parse_message(text or "")
+    if ctx:                                          # inherit anything this turn didn't name
+        for k in ("intent", "crop", "district", "land_ha", "budget"):
+            if not p.get(k):
+                p[k] = ctx.get(k)
     crop, district, intent = p["crop"], p["district"], p["intent"]
     rw = p["lang"] == "rw"
 
     def say(rw_text, en_text):
         return rw_text if rw else en_text
+
+    # a crop/district named without a topic -> ask which topic (and remember the crop),
+    # rather than falling through to the generic "off-topic" decline.
+    if intent is None and (crop or district):
+        subj = crop.title() if crop else district
+        return say(f"{subj}: urashaka iki — igiciro, ibyago (risk), indwara, cyangwa ifumbire?",
+                   f"{subj}: what would you like — price, seasonal risk, disease, or inputs?")
 
     if intent in (None, "help"):
         return say("Ndi umufasha w'ubuhinzi gusa. Nshobora kugufasha ku: igiciro, ibyago "
@@ -199,7 +216,7 @@ def answer(text: str) -> str:
                        f"Which district? For example: '{crop} price Musanze'.")
         # SAME canonical outlook the dashboard uses, so the figures always agree
         from src.models.price_forecasting import price_outlook
-        variety = _detect_variety(text, crop)            # e.g. "beans colta price Gicumbi"
+        variety = _detect_variety(text, crop) or (ctx or {}).get("variety")  # e.g. "beans colta price Gicumbi"
         o = price_outlook(_prices(), _price_forecasters(), crop, district,
                           esoko=_esoko(), ratios=_ratios(), variety=variety)
         if o is None:
@@ -289,3 +306,42 @@ def answer(text: str) -> str:
         return out
 
     return say("Andika 'ubufasha'.", "Type 'help'.")
+
+
+def _slots_complete(m: dict) -> bool:
+    """True when the merged slots are enough to fully answer — so the chat can
+    stop carrying context. Mirrors the 'ask for the missing piece' checks above."""
+    intent = m.get("intent")
+    if intent == "price":
+        return bool(m.get("crop") and m.get("district"))
+    if intent == "risk":
+        return bool(m.get("district"))
+    if intent == "disease":
+        return bool(m.get("district"))          # crop optional (checks all crops)
+    if intent == "input":
+        return bool(m.get("crop") and m.get("land_ha"))
+    return False                                # None/help: keep any crop we learned
+
+
+def converse(text: str, state: dict | None = None):
+    """Stateful chat wrapper: (reply, new_state).
+
+    Remembers unfilled slots across turns so a follow-up like 'potatoes' (after
+    'Which crop?') or 'Musanze' (after 'Which district?') continues the pending
+    request. Explicit new values in `text` always override what was remembered,
+    and the state resets once a request is fully answered. The advisory logic is
+    the shared answer()/price_outlook, so replies match the dashboard and USSD.
+    """
+    state = state or {}
+    p = parse_message(text or "")
+    crop = p["crop"] or state.get("crop")
+    merged = {
+        "intent": p["intent"] or state.get("intent"),
+        "crop": crop,
+        "district": p["district"] or state.get("district"),
+        "land_ha": p["land_ha"] or state.get("land_ha"),
+        "budget": p["budget"] or state.get("budget"),
+        "variety": (_detect_variety(text, crop) if crop else None) or state.get("variety"),
+    }
+    reply = answer(text, ctx=merged)
+    return reply, ({} if _slots_complete(merged) else merged)
