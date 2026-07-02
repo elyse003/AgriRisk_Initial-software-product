@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config.settings import DATA_PROCESSED, MODELS_STORE, CROPS
-from src.models.price_forecasting import train_crop_model
+from src.models.price_forecasting import train_crop_model, esoko_as_prices, MIN_HISTORY
 from src.models import risk_classifier as rc
 
 
@@ -29,8 +29,27 @@ def _load(name, **kw):
     return pd.read_csv(DATA_PROCESSED / name, **kw)
 
 
-def train_price():
+def train_price(include_esoko=False):
     prices = _load("wfp_food_prices_rwanda.csv", parse_dates=["date"])
+    if include_esoko:
+        # Stage 2: pool Esoko farmgate series (kept separate via the "(Esoko)"
+        # market suffix). Returns are scale-free, so farmgate & retail dynamics
+        # both train the model. Series shorter than MIN_HISTORY months contribute
+        # nothing yet, so this is safe now and grows more useful over time.
+        ep = DATA_PROCESSED / "esoko_farmgate_prices.csv"
+        if ep.exists():
+            e = pd.read_csv(ep, parse_dates=["date"])
+            months = int(e["date"].dt.to_period("M").nunique())
+            ea = esoko_as_prices(e)
+            if ea is not None:
+                prices = pd.concat([prices, ea], ignore_index=True)
+            note = ("" if months >= MIN_HISTORY else
+                    f" — too shallow to add usable series yet (need >= {MIN_HISTORY} months); "
+                    "will help automatically as it grows")
+            print(f"  +Esoko farmgate pooled: {len(ea) if ea is not None else 0} rows, "
+                  f"{months} month(s){note}")
+        else:
+            print("  --include-esoko set but no data/processed/esoko_farmgate_prices.csv (skipping)")
     models, mape = {}, {}
     for crop in CROPS:
         model, score, n = train_crop_model(prices, crop)
@@ -65,9 +84,9 @@ def train_risk():
     return rf_m, gb_m, len(df), majority
 
 
-def main():
+def main(include_esoko=False):
     print("Training production models on real data ...")
-    mape = train_price()
+    mape = train_price(include_esoko=include_esoko)
     rf_m, gb_m, n_risk, majority = train_risk()
     metrics = {
         "price_mape_by_crop": {k: round(v, 2) for k, v in mape.items()},
@@ -83,4 +102,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(include_esoko="--include-esoko" in sys.argv)

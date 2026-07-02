@@ -124,6 +124,54 @@ def _esoko_farmgate(esoko, crop: str, district: str):
     return float(m.sort_values("date")["price_rwf"].iloc[-1])
 
 
+def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
+    """Robust farmgate/retail ratio per crop (the WFP<->Esoko calibration).
+
+    For each Esoko farmgate observation, divide by the matching WFP RETAIL price
+    (the district's own month if present, else the crop's national median for
+    that month, else the latest national), and take the median per crop. Returns
+    {crop: {"ratio": k, "n": obs, "months": esoko_months}} — e.g. ratio 0.85 means
+    "farmgate is about 85% of retail".
+    """
+    out = {}
+    if esoko is None or len(esoko) == 0:
+        return out
+    for c in sorted(esoko["crop"].unique()):
+        e, w = esoko[esoko["crop"] == c], prices[prices["crop"] == c]
+        if e.empty or w.empty:
+            continue
+        wm = w.assign(m=w["date"].values.astype("datetime64[M]"))
+        nat = wm.groupby("m")["price_rwf"].median()
+        dist = wm.groupby(["market", "m"])["price_rwf"].mean()
+        ratios = []
+        for _, r in e.iterrows():
+            m = pd.Timestamp(r["date"]).to_period("M").to_timestamp()
+            retail = dist.get((r["district"], m))
+            if retail is None or pd.isna(retail):
+                retail = nat.get(m)
+            if (retail is None or pd.isna(retail)) and len(nat):
+                retail = float(nat.iloc[-1])
+            if retail and retail > 0:
+                ratios.append(float(r["price_rwf"]) / float(retail))
+        if ratios:
+            out[c] = {"ratio": round(float(np.median(ratios)), 3), "n": len(ratios),
+                      "months": int(e["date"].dt.to_period("M").nunique())}
+    return out
+
+
+def esoko_as_prices(esoko) -> pd.DataFrame | None:
+    """Esoko farmgate (date, district, crop, price_rwf) -> the WFP price schema
+    (crop, market, date, price_rwf) for pooling into training. Districts are
+    SUFFIXED "(Esoko)" so each Esoko series stays separate from the WFP retail
+    series for the same district (never mixing farmgate & retail levels, which
+    would create spurious returns)."""
+    if esoko is None or len(esoko) == 0:
+        return None
+    e = esoko.copy()
+    e["market"] = e["district"].astype(str) + " (Esoko)"
+    return e[["crop", "market", "date", "price_rwf"]]
+
+
 def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
                   esoko=None, stale_days: int = 540) -> dict | None:
     """Next-month price outlook for one crop/district — the single source of
