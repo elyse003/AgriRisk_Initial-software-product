@@ -100,21 +100,22 @@ if crop and district:
     nxt = hist.index[-1] + pd.offsets.MonthBegin(1)
     svg = price_chart_svg(list(hist.index), [float(v) for v in hist.values],
                           nxt, fc, lo, hi, tint, real_flags=real_flags)
-    real_leg = (f'<span><span class="swatch" style="background:{tint};border-radius:50%"></span>'
-                f'{t("Actual farmgate (Esoko)")}</span>' if n_real else "")
-    st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
-      <div class="ag-card-head"><div class="title">24 {t('MONTHS HISTORY')} · <strong>1 {t('MONTH FORECAST')}</strong></div>
-        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district}</div></div>
-      <div class="ag-card-body">
-        <div class="ag-legend">
-          <span><span class="swatch" style="background:var(--ag-ink)"></span>{t('Farmgate history')}</span>
-          {real_leg}
-          <span><span class="swatch" style="background:{tint}"></span>{cl} {t('forecast')}</span>
-          <span><span class="swatch" style="background:{tint};opacity:.25"></span>≈80% {t('band')}</span>
-        </div>{svg}
-        <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">
-          {t("Solid dots are real Esoko farmgate months; the rest of the line is estimated from market prices.")}</div>
-      </div></div>""", unsafe_allow_html=True)
+    # Build the legend as one joined string. An empty conditional on its own line
+    # would read as a blank line and break Streamlit's HTML block (raw-text dump).
+    legend = f'<span><span class="swatch" style="background:var(--ag-ink)"></span>{t("Farmgate history")}</span>'
+    if n_real:
+        legend += (f'<span><span class="swatch" style="background:{tint};border-radius:50%"></span>'
+                   f'{t("Actual farmgate (Esoko)")}</span>')
+    legend += f'<span><span class="swatch" style="background:{tint}"></span>{cl} {t("forecast")}</span>'
+    legend += f'<span><span class="swatch" style="background:{tint};opacity:.25"></span>≈80% {t("band")}</span>'
+    note = t("Solid dots are real Esoko farmgate months; the rest of the line is estimated from market prices.")
+    st.markdown(
+        f'<div class="ag-card ag-pagein" style="margin-bottom:18px">'
+        f'<div class="ag-card-head"><div class="title">24 {t("MONTHS HISTORY")} · <strong>1 {t("MONTH FORECAST")}</strong></div>'
+        f'<div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district}</div></div>'
+        f'<div class="ag-card-body"><div class="ag-legend">{legend}</div>{svg}'
+        f'<div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{note}</div>'
+        f'</div></div>', unsafe_allow_html=True)
 
     # ---- two-col: advice + forecast table / RQ note ----
     tone = "hold" if up else "sell" if down else "flat"

@@ -319,7 +319,7 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None)
                      f'stroke="var(--ag-surface)" stroke-width="1.2"/>'
                      for i, v in enumerate(vals) if real_flags[i])
 
-    return f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block;font-family:var(--f-mono)">
+    svg = f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block;font-family:var(--f-mono)">
       <rect x="{X(hist_i):.1f}" y="{padT}" width="{X(n-1)-X(hist_i):.1f}" height="{ih}" fill="var(--ag-bg-deep)" opacity="0.55"/>
       <line x1="{X(hist_i):.1f}" x2="{X(hist_i):.1f}" y1="{padT}" y2="{padT+ih}" stroke="oklch(0.7 0.015 60)" stroke-dasharray="3 3"/>
       <text x="{X(hist_i)+6:.1f}" y="{padT+11}" fill="var(--ag-mute)" font-size="9.5" letter-spacing="0.06em">FORECAST &#8594;</text>
@@ -331,6 +331,9 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None)
       <circle cx="{X(n-1):.1f}" cy="{Y(fc_val):.1f}" r="4.5" fill="var(--ag-surface)" stroke="{tint}" stroke-width="2"/>
       {hov}
     </svg>"""
+    # a whitespace-only line (e.g. when realmk is empty) reads as a blank line and
+    # ends Streamlit's HTML block, dumping the rest as raw text — so drop them.
+    return "".join(ln for ln in svg.splitlines() if ln.strip())
 
 
 def trend_svg(data, color, unit_pct=True, months=None):
@@ -365,12 +368,13 @@ def trend_svg(data, color, unit_pct=True, months=None):
                 f'<text x="{tx:.1f}" y="{ty+11.5:.1f}" text-anchor="middle" fill="var(--ag-bg)" font-size="9.5">{lab}</text></g>'
                 f'<rect class="hit" x="{hitx:.1f}" y="{padT}" width="{step:.1f}" height="{ih}" fill="transparent"/>'
                 f'</g>')
-    return f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block">
+    svg = f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block">
       <line x1="{padL}" x2="{W-padR}" y1="{Y(0):.1f}" y2="{Y(0):.1f}" stroke="oklch(0.85 0.015 60)" stroke-dasharray="2 3"/>
       <text x="{padL-6}" y="{Y(0)+3:.1f}" font-size="9" fill="var(--ag-mute)" text-anchor="end" font-family="var(--f-mono)">0</text>
       <path class="ag-draw" d="{path}" fill="none" stroke="{color}" stroke-width="1.7" stroke-linejoin="round"/>{pts}
       <text x="{X(len(data)-1):.1f}" y="{Y(last)-10:.1f}" font-family="var(--f-mono)" font-size="10" fill="{color}" text-anchor="end">{'+' if last>0 else ''}{last:.1f}{suff}</text>
       {mt}{hov}</svg>"""
+    return "".join(ln for ln in svg.splitlines() if ln.strip())
 
 
 def gauge_svg(score, color):
