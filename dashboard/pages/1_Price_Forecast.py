@@ -46,7 +46,8 @@ page_header(
       "recent market data."),
     meta_strong="RWF/kg", meta_sub=t("farmgate · monthly"))
 
-if st.button(t("Generate Forecast"), type="primary"):
+# live: recompute + redraw whenever any filter (crop / district / type) changes — no button
+if crop and district:
     # one shared outlook so the dashboard, chat and USSD always agree (all farmgate)
     outlook = price_outlook(prices, models, crop, district, esoko=esoko, ratios=ratios, variety=variety)
     if outlook is None:

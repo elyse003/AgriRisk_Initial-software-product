@@ -34,7 +34,8 @@ page_header(
       "food prices and fertilizer costs."),
     meta_strong=season_label, meta_sub=t("recalculated weekly"))
 
-if st.button(t("Assess Risk"), type="primary"):
+# live: recompute + redraw whenever the district or season filter changes — no button
+if district and season_label:
     r = rain[(rain.district == district) & (rain.season == scode)]
     rain_a = float(r.rainfall_anomaly.iloc[-1]) if len(r) else float(rain.rainfall_anomaly.mean())
     cpi_c = float(cpi.cpi_change.dropna().iloc[-1]); fert_c = float(fert.fert_change.dropna().iloc[-1])

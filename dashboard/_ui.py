@@ -218,6 +218,18 @@ table.ag-data td.muted{ color:var(--ag-mute); }
 .ag-rank .budget-note{ margin-top:14px; padding:8px 10px; border-radius:6px; font-size:11.5px; font-family:var(--f-mono); }
 .ag-pagein{ animation:agIn 320ms cubic-bezier(.2,.7,.2,1) both; }
 @keyframes agIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+/* live line charts: the path draws itself in on every (re)render, so changing a
+   filter gives immediate visual feedback. */
+.ag-draw{ stroke-dasharray:2200; stroke-dashoffset:2200; animation:agDraw 900ms cubic-bezier(.3,.7,.2,1) forwards; }
+@keyframes agDraw{ to{ stroke-dashoffset:0; } }
+/* the forecast leg is itself dashed, so it fades in (delayed) instead of drawing */
+.ag-fade{ opacity:0; animation:agFade .5s ease-out .7s forwards; }
+@keyframes agFade{ to{ opacity:1; } }
+/* CSS-only hover: a vertical crosshair, a dot and a value pill reveal as the
+   cursor scrubs across the chart (no JS needed inside st.markdown). */
+.ag-hp .cross,.ag-hp .hdot,.ag-hp .htip{ opacity:0; transition:opacity .09s ease; pointer-events:none; }
+.ag-hp:hover .cross,.ag-hp:hover .hdot,.ag-hp:hover .htip{ opacity:1; }
+.ag-hp .hit{ cursor:crosshair; }
 @media (max-width:820px){ .ag-two-col{ grid-template-columns:1fr; } }
 </style>
 """
@@ -268,15 +280,46 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint):
         lab = "now" if i == hist_i else ("next" if i == n - 1 else pd.Timestamp(xs[i]).strftime("%b '%y"))
         col = "var(--ag-terra)" if i == n - 1 else "var(--ag-mute)"
         xt += f'<text x="{X(i):.1f}" y="{H-padB+16}" font-size="9.5" fill="{col}" text-anchor="middle">{lab}</text>'
+
+    # interactive hover layer: as the cursor scrubs across, each month reveals a
+    # crosshair, a dot and a value pill. Pure CSS (:hover) — no JS in st.markdown.
+    step = iw / (n - 1)
+    ally = list(vals) + [fc_val]
+    hov = ""
+    for i, v in enumerate(ally):
+        cx, cy = X(i), Y(v)
+        fore = i == n - 1
+        if fore:
+            lab = f"next ~{v:,.0f}"
+        else:
+            lab = f"{pd.Timestamp(xs[i]).strftime('%b '+chr(39)+'%y')}  {v:,.0f}"
+        tipw = max(52, len(lab) * 5.9 + 16)
+        tx = min(max(cx, padL + tipw / 2), W - padR - tipw / 2)   # keep pill on-canvas
+        ty = cy - 30 if cy - 30 > padT else cy + 14               # flip below near the top
+        dotc = tint if fore else "var(--ag-ink)"
+        hitx = min(max(cx - step / 2, 0), W - step)
+        hov += (f'<g class="ag-hp">'
+                f'<line class="cross" x1="{cx:.1f}" x2="{cx:.1f}" y1="{padT}" y2="{padT+ih}" '
+                f'stroke="{dotc}" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>'
+                f'<circle class="hdot" cx="{cx:.1f}" cy="{cy:.1f}" r="4" fill="var(--ag-surface)" '
+                f'stroke="{dotc}" stroke-width="2"/>'
+                f'<g class="htip"><rect x="{tx-tipw/2:.1f}" y="{ty:.1f}" width="{tipw:.1f}" height="20" '
+                f'rx="5" fill="var(--ag-ink)"/>'
+                f'<text x="{tx:.1f}" y="{ty+13.5:.1f}" text-anchor="middle" fill="var(--ag-bg)" '
+                f'font-size="10.5">{lab}</text></g>'
+                f'<rect class="hit" x="{hitx:.1f}" y="{padT}" width="{step:.1f}" height="{ih}" fill="transparent"/>'
+                f'</g>')
+
     return f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block;font-family:var(--f-mono)">
       <rect x="{X(hist_i):.1f}" y="{padT}" width="{X(n-1)-X(hist_i):.1f}" height="{ih}" fill="var(--ag-bg-deep)" opacity="0.55"/>
       <line x1="{X(hist_i):.1f}" x2="{X(hist_i):.1f}" y1="{padT}" y2="{padT+ih}" stroke="oklch(0.7 0.015 60)" stroke-dasharray="3 3"/>
       <text x="{X(hist_i)+6:.1f}" y="{padT+11}" fill="var(--ag-mute)" font-size="9.5" letter-spacing="0.06em">FORECAST &#8594;</text>
       {yt}{xt}
       <path d="{band}" fill="{tint}" opacity="0.16"/>
-      <path d="{hpath}" fill="none" stroke="var(--ag-ink)" stroke-width="1.7" stroke-linejoin="round"/>
-      <path d="M {X(hist_i):.1f} {Y(vals[-1]):.1f} L {X(n-1):.1f} {Y(fc_val):.1f}" fill="none" stroke="{tint}" stroke-width="2.2" stroke-dasharray="6 4"/>
+      <path class="ag-draw" d="{hpath}" fill="none" stroke="var(--ag-ink)" stroke-width="1.7" stroke-linejoin="round"/>
+      <path class="ag-fade" d="M {X(hist_i):.1f} {Y(vals[-1]):.1f} L {X(n-1):.1f} {Y(fc_val):.1f}" fill="none" stroke="{tint}" stroke-width="2.2" stroke-dasharray="6 4"/>
       <circle cx="{X(n-1):.1f}" cy="{Y(fc_val):.1f}" r="4.5" fill="var(--ag-surface)" stroke="{tint}" stroke-width="2"/>
+      {hov}
     </svg>"""
 
 
@@ -296,12 +339,28 @@ def trend_svg(data, color, unit_pct=True, months=None):
     months = months or ["" for _ in data]
     mt = "".join(f'<text x="{X(i):.1f}" y="{H-padB+14}" font-size="9" font-family="var(--f-mono)" fill="var(--ag-mute)" text-anchor="middle">{m}</text>'
                  for i, m in enumerate(months) if m)
+    # hover scrubber: each point reveals a dot + value pill on hover (CSS-only)
+    step = iw / max(1, len(data) - 1)
+    hov = ""
+    for i, v in enumerate(data):
+        cx, cy = X(i), Y(v)
+        lab = f"{'+' if v > 0 else ''}{v:.1f}{suff}"
+        tipw = max(34, len(lab) * 6.2 + 12)
+        tx = min(max(cx, padL + tipw / 2), W - padR - tipw / 2)
+        ty = cy - 26 if cy - 26 > padT else cy + 12
+        hitx = min(max(cx - step / 2, 0), W - step)
+        hov += (f'<g class="ag-hp">'
+                f'<circle class="hdot" cx="{cx:.1f}" cy="{cy:.1f}" r="3.5" fill="var(--ag-surface)" stroke="{color}" stroke-width="2"/>'
+                f'<g class="htip"><rect x="{tx-tipw/2:.1f}" y="{ty:.1f}" width="{tipw:.1f}" height="17" rx="4" fill="var(--ag-ink)"/>'
+                f'<text x="{tx:.1f}" y="{ty+11.5:.1f}" text-anchor="middle" fill="var(--ag-bg)" font-size="9.5">{lab}</text></g>'
+                f'<rect class="hit" x="{hitx:.1f}" y="{padT}" width="{step:.1f}" height="{ih}" fill="transparent"/>'
+                f'</g>')
     return f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block">
       <line x1="{padL}" x2="{W-padR}" y1="{Y(0):.1f}" y2="{Y(0):.1f}" stroke="oklch(0.85 0.015 60)" stroke-dasharray="2 3"/>
       <text x="{padL-6}" y="{Y(0)+3:.1f}" font-size="9" fill="var(--ag-mute)" text-anchor="end" font-family="var(--f-mono)">0</text>
-      <path d="{path}" fill="none" stroke="{color}" stroke-width="1.7" stroke-linejoin="round"/>{pts}
+      <path class="ag-draw" d="{path}" fill="none" stroke="{color}" stroke-width="1.7" stroke-linejoin="round"/>{pts}
       <text x="{X(len(data)-1):.1f}" y="{Y(last)-10:.1f}" font-family="var(--f-mono)" font-size="10" fill="{color}" text-anchor="end">{'+' if last>0 else ''}{last:.1f}{suff}</text>
-      {mt}</svg>"""
+      {mt}{hov}</svg>"""
 
 
 def gauge_svg(score, color):
