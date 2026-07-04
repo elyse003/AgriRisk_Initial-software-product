@@ -394,10 +394,12 @@ def risk_meter(level):
     return f'<div class="risk-meter">{segs}</div>'
 
 
-def driver_bar(label, value, weight, color):
-    return (f'<div class="ag-driver"><div class="top"><span>{label}</span><span class="v">{value}</span></div>'
+def driver_bar(label, value, weight, color, note=""):
+    note_html = (f'<div style="font-size:11px;color:var(--ag-mute);margin-top:3px;line-height:1.4">{note}</div>'
+                 if note else "")
+    return (f'<div class="ag-driver" style="margin-bottom:12px"><div class="top"><span>{label}</span><span class="v">{value}</span></div>'
             f'<div class="track"><div class="bar"><span style="width:{weight*100:.0f}%;background:{color}"></span></div>'
-            f'<span class="pct">{weight*100:.0f}%</span></div></div>')
+            f'<span class="pct">{weight*100:.0f}%</span></div>{note_html}</div>')
 
 
 LOGO_PATH = os.path.join(ROOT, "assets", "logo.png")
