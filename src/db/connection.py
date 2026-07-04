@@ -375,6 +375,22 @@ def get_user_by_phone(phone):
         return None
 
 
+def get_user_by_username(username):
+    """Fetch a user dict (without the password hash) by username, or None. Used to
+    restore a signed-in session from a token after a full page reload."""
+    _ensure()
+    try:
+        with engine().connect() as conn:
+            row = conn.execute(select(users).where(users.c.username == username)).mappings().first()
+        if not row:
+            return None
+        user = dict(row)
+        user.pop("password_hash", None)
+        return user
+    except Exception:
+        return None
+
+
 def list_users(role=None):
     """All users (with id + username), optionally filtered to one role."""
     _ensure()

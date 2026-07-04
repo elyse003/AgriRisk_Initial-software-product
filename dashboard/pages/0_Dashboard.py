@@ -4,9 +4,11 @@ Reached from the landing page's "Open the dashboard" button.
 """
 from _ui import setup
 from _i18n import t
+from _auth import auth_qs
 import streamlit as st
 
 user = setup("Dashboard", "Choose a tool to get started")
+qs = auth_qs()   # carry the login token so a card click (full reload) stays signed in
 
 # (title, page URL, description, accent colour, season stage)
 ALL_TOOLS = [
@@ -28,7 +30,7 @@ else:
     TOOLS = ALL_TOOLS
 
 cards = "".join(
-    f'''<a class="tool-card" href="{url}" target="_self">
+    f'''<a class="tool-card" href="{url}{qs}" target="_self">
         <div class="tc-stage" style="color:{color}">{t(stage)}</div>
         <div class="tc-title">{t(title)}</div>
         <div class="tc-desc">{t(desc)}</div>

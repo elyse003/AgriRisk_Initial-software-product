@@ -5,21 +5,110 @@ the tool pages by role. Auth lives in st.session_state, so it lasts for the
 session and clears on a hard refresh. This is capstone-grade auth (hashed
 passwords, role checks), not a hardened production identity system.
 """
+import base64
+import hashlib
+import hmac
+import os
+import time
+
 import streamlit as st
 
 from _i18n import t
 from config.settings import DISTRICTS
-from src.db.connection import authenticate, add_user
+from src.db.connection import authenticate, add_user, get_user_by_username
 
 OFFICERS = ("officer", "super_admin")
 
+# ---------------------------------------------------------------------------
+# Session persistence across full page reloads.
+# Login lives in st.session_state, which a full browser reload wipes. Some
+# in-app links (the dashboard tool cards, the footer) are plain <a href> anchors
+# that DO reload — which used to drop the user back to the sign-in screen. To
+# avoid that, we mint a short signed token on login and carry it in those links
+# (auth_qs()); current_user() restores the session from it after a reload.
+# ---------------------------------------------------------------------------
+_TOKEN_TTL = 14 * 24 * 3600          # 14 days
+_QP = "t"                            # query-param name that carries the token
+
+
+def _secret() -> bytes:
+    s = (os.getenv("AGRIRISK_SECRET") or "").strip()
+    if not s:
+        try:
+            s = str(st.secrets.get("AGRIRISK_SECRET", "")).strip()
+        except Exception:
+            s = ""
+    return (s or "agririsk-dev-secret").encode()
+
+
+def _make_token(user: dict) -> str:
+    """Signed, expiring token: base64('username.expiry.hmac')."""
+    payload = f"{user.get('username', '')}.{int(time.time()) + _TOKEN_TTL}"
+    sig = hmac.new(_secret(), payload.encode(), hashlib.sha256).hexdigest()[:32]
+    return base64.urlsafe_b64encode(f"{payload}.{sig}".encode()).decode()
+
+
+def _user_from_token(token: str):
+    try:
+        raw = base64.urlsafe_b64decode(token.encode()).decode()
+        username, exp, sig = raw.rsplit(".", 2)
+        expect = hmac.new(_secret(), f"{username}.{exp}".encode(), hashlib.sha256).hexdigest()[:32]
+        if not hmac.compare_digest(sig, expect) or int(exp) < time.time():
+            return None
+        return get_user_by_username(username)
+    except Exception:
+        return None
+
 
 def current_user():
-    return st.session_state.get("auth_user")
+    user = st.session_state.get("auth_user")
+    if user:
+        return user
+    # restore from a token in the URL (survives the full reload some links cause)
+    try:
+        token = st.query_params.get(_QP)
+    except Exception:
+        token = None
+    if token:
+        user = _user_from_token(token)
+        if user:
+            st.session_state["auth_user"] = user
+            st.session_state["auth_token"] = token
+            return user
+    return None
+
+
+def auth_token() -> str:
+    """The current user's token (for embedding in reload-style links), or ''."""
+    if not st.session_state.get("auth_user"):
+        return ""
+    tok = st.session_state.get("auth_token")
+    if not tok:
+        tok = _make_token(st.session_state["auth_user"])
+        st.session_state["auth_token"] = tok
+    return tok
+
+
+def auth_qs() -> str:
+    """'?t=<token>' to append to a plain-anchor link so a reload keeps the login."""
+    tok = auth_token()
+    return f"?{_QP}={tok}" if tok else ""
+
+
+def _start_session(user):
+    st.session_state["auth_user"] = user
+    st.session_state["auth_token"] = _make_token(user)
+    st.query_params[_QP] = st.session_state["auth_token"]   # so a refresh restores it
 
 
 def logout():
     st.session_state.pop("auth_user", None)
+    st.session_state.pop("auth_token", None)
+    try:
+        if _QP in st.query_params:
+            del st.query_params[_QP]
+    except Exception:
+        pass
 
 
 def _login_form():
@@ -30,7 +119,7 @@ def _login_form():
     if submitted:
         user = authenticate((username or "").strip(), password or "")
         if user:
-            st.session_state["auth_user"] = user
+            _start_session(user)
             st.rerun()
         else:
             st.error(t("Wrong username or password."))
@@ -69,7 +158,7 @@ def _signup_form():
         if not ok:
             st.error(t("That username or phone is already taken."))
             return
-        st.session_state["auth_user"] = authenticate(username, pw)
+        _start_session(authenticate(username, pw))
         st.rerun()
 
 

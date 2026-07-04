@@ -596,6 +596,8 @@ GITHUB_URL = "https://github.com/elyse003/AgriRisk_Initial-software-product"
 
 def footer():
     """Render the shared site footer. Call at the end of a page (after setup)."""
+    from _auth import auth_qs
+    qs = auth_qs()   # keep the login through a footer link (plain <a> = full reload)
     st.markdown(f"""<style>
 .ar-foot {{ margin-top:56px; padding-top:30px; border-top:1px solid var(--line); color:var(--mut); font-size:13.5px; }}
 .ar-foot a {{ color:var(--mut) !important; text-decoration:none !important; }}
@@ -621,10 +623,10 @@ def footer():
       "potatoes across all 30 districts, in Kinyarwanda and English.")}</p>
     </div>
     <div class="fcol"><h5>{t("Tools")}</h5>
-      <a href="/Price_Forecast" target="_self">{t("Price Forecast")}</a>
-      <a href="/Seasonal_Risk" target="_self">{t("Seasonal Risk")}</a>
-      <a href="/Disease_Alert" target="_self">{t("Disease Alert")}</a>
-      <a href="/Input_Recommender" target="_self">{t("Input Recommender")}</a>
+      <a href="/Price_Forecast{qs}" target="_self">{t("Price Forecast")}</a>
+      <a href="/Seasonal_Risk{qs}" target="_self">{t("Seasonal Risk")}</a>
+      <a href="/Disease_Alert{qs}" target="_self">{t("Disease Alert")}</a>
+      <a href="/Input_Recommender{qs}" target="_self">{t("Input Recommender")}</a>
     </div>
     <div class="fcol"><h5>{t("Data")}</h5>
       <span>WFP market prices</span>
@@ -634,7 +636,7 @@ def footer():
     </div>
     <div class="fcol"><h5>{t("Project")}</h5>
       <a href="/" target="_self">{t("Home")}</a>
-      <a href="/Dashboard" target="_self">{t("Dashboard")}</a>
+      <a href="/Dashboard{qs}" target="_self">{t("Dashboard")}</a>
       <a href="{GITHUB_URL}" target="_blank">GitHub</a>
     </div>
   </div>

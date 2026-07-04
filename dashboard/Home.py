@@ -25,6 +25,11 @@ body = re.sub(r"<script>.*?</script>", "", body, flags=re.S)   # drop JS (Stream
 body = body.replace(
     'href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard"',
     'href="/Dashboard" target="_self"')
+# if already signed in, carry the token so opening the dashboard keeps the session
+from _auth import auth_qs
+_qs = auth_qs()
+if _qs:
+    body = body.replace('href="/Dashboard" target="_self"', f'href="/Dashboard{_qs}" target="_self"')
 
 # Streamlit serves raw HTML from a virtual path, so the landing's relative
 # ../assets/<file> paths won't resolve. Inline the hero background and crop photos
