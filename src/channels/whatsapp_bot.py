@@ -249,9 +249,8 @@ def answer(text: str, ctx: dict | None = None) -> str:
         lvl = None
         if model is not None:
             try:
-                X = pd.DataFrame([[ra, cc, ff]],
-                                 columns=["rainfall_anomaly", "cpi_change", "fert_change"])
-                lvl = str(model.predict(X)[0])
+                from src.models.risk_classifier import feature_row
+                lvl = str(model.predict(feature_row(ra, cc, ff, district))[0])
             except Exception:
                 lvl = None
         if lvl is None:                                  # fall back to the rule-based label

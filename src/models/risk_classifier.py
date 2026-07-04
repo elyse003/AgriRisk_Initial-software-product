@@ -19,9 +19,24 @@ import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 
-FEATURES = ["rainfall_anomaly", "cpi_change", "fert_change"]
+from config.district_agro import AGRO_FEATURES, agro_features, agro_row
+
+# Weather/market signals (dynamic) + district agro-ecological profile (static:
+# altitude, soil fertility/pH, drainage) so the model can tell districts apart by
+# terrain and soil, not only by rainfall.
+BASE_FEATURES = ["rainfall_anomaly", "cpi_change", "fert_change"]
+FEATURES = BASE_FEATURES + AGRO_FEATURES
 LABEL = "risk_level"
 OUTCOME_HORIZON = 6   # months ahead used to measure realized price stress
+
+
+def feature_row(rainfall_anomaly, cpi_change, fert_change, district):
+    """One-row feature frame (in FEATURES order) for a live prediction — joins the
+    district's static agro profile onto the dynamic signals. Shared by the
+    dashboard and the chatbot so every channel scores identically."""
+    vals = {"rainfall_anomaly": rainfall_anomaly, "cpi_change": cpi_change,
+            "fert_change": fert_change, **agro_row(district)}
+    return pd.DataFrame([[vals[f] for f in FEATURES]], columns=FEATURES)
 
 
 def build_risk_dataset(prices: pd.DataFrame, rain: pd.DataFrame,
@@ -49,6 +64,8 @@ def build_risk_dataset(prices: pd.DataFrame, rain: pd.DataFrame,
     df = rain[rain["season"] != "off"].merge(outcome, on=["district", "date"], how="inner")
     df = pd.merge_asof(df.sort_values("date"), cpi[["date", "cpi_change"]], on="date")
     df = pd.merge_asof(df.sort_values("date"), fert[["date", "fert_change"]], on="date")
+    # static district agro-ecological profile (altitude, soil fertility/pH, drainage)
+    df = df.merge(agro_features(), on="district", how="left")
     df = df.dropna(subset=FEATURES + ["future_change"])
 
     # LABEL: terciles of realized future price change

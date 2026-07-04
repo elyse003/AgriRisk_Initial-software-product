@@ -10,7 +10,9 @@ from _ui import (setup, load_rainfall, load_cpi, load_fert, load_risk_model, loa
 from _i18n import t
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import DISTRICTS
+from config.district_agro import agro_profile
 from src.data.preprocessing import label_risk
+from src.models import risk_classifier as rc
 from src.db.connection import log_risk
 
 setup("Seasonal Risk", "Planting risk by district and season",
@@ -41,7 +43,8 @@ if district and season_label:
     cpi_c = float(cpi.cpi_change.dropna().iloc[-1]); fert_c = float(fert.fert_change.dropna().iloc[-1])
 
     if model is not None:
-        X = pd.DataFrame([[rain_a, cpi_c, fert_c]], columns=["rainfall_anomaly", "cpi_change", "fert_change"])
+        # dynamic signals + this district's static soil/terrain profile (shared with the bot)
+        X = rc.feature_row(rain_a, cpi_c, fert_c, district)
         level = str(model.predict(X)[0])
         proba = model.predict_proba(X)[0]
         classes = list(model.classes_)
@@ -49,12 +52,14 @@ if district and season_label:
         wmap = {"High": 1.0, "Medium": 0.55, "Low": 0.2}
         score = float(sum(proba[i] * wmap.get(classes[i], 0.5) for i in range(len(classes))))
         imp = getattr(model, "feature_importances_", None)
-        weights = (np.asarray(imp, float) / np.sum(imp)) if imp is not None else np.array([0.4, 0.35, 0.25])
+        w = (np.asarray(imp, float) / np.sum(imp)) if imp is not None else np.array([0.4, 0.35, 0.25, 0, 0, 0, 0])
+        # rain / cpi / fert are the first three features; the rest are soil & terrain
+        weights = [float(w[0]), float(w[1]), float(w[2]), float(np.sum(w[3:]))]
         deployed = type(model).__name__
     else:
         level = label_risk(rain_a, cpi_c, fert_c); conf = "rule-based"
         score = {"High": 0.85, "Medium": 0.55, "Low": 0.25}[level]
-        weights = np.array([0.4, 0.35, 0.25]); deployed = "rule-based"
+        weights = [0.4, 0.32, 0.22, 0.06]; deployed = "rule-based"
 
     log_risk(district, scode, rain_a, cpi_c, fert_c, level)
     tone = "terra" if level == "High" else "amber" if level == "Medium" else "sage"
@@ -66,10 +71,12 @@ if district and season_label:
                  "Low": "Conditions look stable. Normal planting and input investment is reasonable."}[level])
 
     # ---- gauge + classification + driver bars ----
+    ap = agro_profile(district)
     drivers = [
         (t("Rainfall vs normal"), f"{rain_a:+.2f}", float(weights[0]), "var(--ag-slate)"),
         (t("Food price pressure"), f"{cpi_c:+.1f}%", float(weights[1]), "var(--ag-terra)"),
         (t("Fertilizer cost"), f"{fert_c:+.1f}%", float(weights[2]), "var(--ag-sage)"),
+        (t("Soil &amp; terrain"), ap["soil"], float(weights[3]), "var(--ag-soil)"),
     ]
     bars = "".join(driver_bar(*d) for d in drivers)
     st.markdown(f"""<div class="ag-pagein" style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:22px">
@@ -83,6 +90,33 @@ if district and season_label:
       <div class="ag-card"><div class="ag-card-head"><div class="title"><strong>{t('WHAT IS DRIVING THIS')}</strong></div></div>
         <div class="ag-card-body" style="padding-top:4px">{bars}</div></div>
     </div>""", unsafe_allow_html=True)
+
+    # ---- district soil & terrain profile (now part of the model) ----
+    ph_note = t("acidic — lime helps") if ap["ph"] < 5.3 else (t("slightly acidic") if ap["ph"] < 6.0 else t("near neutral"))
+    fert_lbl = {1: t("very low"), 2: t("low"), 3: t("moderate"), 4: t("good"), 5: t("rich")}[ap["fertility"]]
+    drain_lbl = {1: t("poor"), 2: t("poor"), 3: t("moderate"), 4: t("free-draining"), 5: t("free-draining")}[ap["drainage"]]
+    cells = [
+        (t("Agro-zone"), ap["zone"]),
+        (t("Altitude"), f"{ap['altitude_m']:,} m"),
+        (t("Dominant soil"), ap["soil"]),
+        (t("Soil fertility"), fert_lbl),
+        (t("Soil pH"), f"{ap['ph']:.1f} · {ph_note}"),
+        (t("Drainage"), drain_lbl),
+    ]
+    cell_html = "".join(
+        f"<div style='padding:12px 14px;border:1px solid var(--ag-line);border-radius:10px;background:var(--ag-surface)'>"
+        f"<div style='font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;color:var(--ag-mute);text-transform:uppercase'>{k}</div>"
+        f"<div style='font-size:14.5px;color:var(--ag-ink);margin-top:3px'>{v}</div></div>" for k, v in cells)
+    st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:22px">
+      <div class="ag-card-head"><div class="title">{t('SOIL &amp; TERRAIN')} · <strong>{district}</strong></div>
+        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{t('agro-ecological zone')}</div></div>
+      <div class="ag-card-body">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">{cell_html}</div>
+        <div style="font-size:11.5px;color:var(--ag-mute);margin-top:12px;line-height:1.5">
+          {t("The model now factors in each district's soil and terrain (about {pct}% of its estimate here). "
+             "Price-spike risk is still driven mostly by rainfall and market prices; soil and altitude "
+             "matter more for yield and input planning.").format(pct=round(weights[3]*100))}</div>
+      </div></div>""", unsafe_allow_html=True)
 
     # ---- two trend charts (real data) ----
     rseries = (rain[rain.district == district].sort_values("date").rainfall_anomaly.tail(12)
