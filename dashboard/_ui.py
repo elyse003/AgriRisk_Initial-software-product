@@ -106,11 +106,11 @@ EDITORIAL_CSS = """
   --ag-amber: oklch(0.66 0.120 80); --ag-amber-bg: oklch(0.95 0.045 80);
   --ag-slate: oklch(0.52 0.055 235); --ag-slate-bg: oklch(0.94 0.025 235);
   --ag-soil: oklch(0.45 0.055 60);
-  /* One font everywhere (Geist); --f-brand (Instrument Serif) is for the AgriRisk wordmark only */
+  /* One font everywhere (Geist); the AgriRisk wordmark is the same font, italic + bold */
   --f-serif: "Geist", ui-sans-serif, system-ui, sans-serif;
   --f-sans:  "Geist", ui-sans-serif, system-ui, sans-serif;
   --f-mono:  "Geist", ui-sans-serif, system-ui, sans-serif;
-  --f-brand: "Instrument Serif","Newsreader",Georgia,serif;
+  --f-brand: "Geist", ui-sans-serif, system-ui, sans-serif;
 }
 /* Geist display text needs weight to read as a heading (serif was a single weight) */
 .ag-head h1, .ag-stat .value, .ag-rank .nm, .ag-rank .price, .ag-wtile .val,
@@ -428,8 +428,8 @@ section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; ga
 section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:0 0 26px;
   border-radius:50% 50% 50% 0; background:var(--emerald); transform:rotate(-45deg);
   box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
-section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Instrument Serif',serif; font-size:24px;
-  color:var(--forest); line-height:1; }
+section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Geist',sans-serif; font-style:italic;
+  font-weight:700; font-size:22px; letter-spacing:-.01em; color:var(--forest); line-height:1; }
 section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Geist',sans-serif; font-size:9.5px;
   letter-spacing:.08em; text-transform:uppercase; color:#6E8377; margin-top:3px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 6px; }
@@ -606,8 +606,8 @@ def footer():
 .ar-foot a:hover {{ color:var(--forest) !important; }}
 .ar-foot-grid {{ display:flex; flex-wrap:wrap; gap:28px 48px; justify-content:space-between; }}
 .ar-foot-brand {{ max-width:24em; }}
-.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Instrument Serif',serif;
-                font-weight:400; font-size:19px; color:var(--forest); }}
+.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif;
+                font-style:italic; font-weight:700; letter-spacing:-.01em; font-size:19px; color:var(--forest); }}
 .ar-foot .fb .seed {{ width:18px; height:18px; border-radius:50% 50% 50% 0; background:var(--emerald);
                       transform:rotate(-45deg); }}
 .ar-foot .fcol h5 {{ font-family:'Geist',sans-serif; font-size:11px; letter-spacing:.12em;

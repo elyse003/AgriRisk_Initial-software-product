@@ -72,18 +72,19 @@ if district:
     st.caption(t("Live 14-day weather forecast.") if live else t("Offline mode: showing a sample forecast."))
 
     # ---- weather context strip ----
-    def tile(icon, label, value, note, color):
-        return (f'<div class="ag-wtile"><div class="lab"><span style="color:{color}">{icon}</span>{label}</div>'
+    def tile(label, value, note, color):
+        return (f'<div class="ag-wtile"><div class="lab">'
+                f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{color};margin-right:7px"></span>{label}</div>'
                 f'<div class="val">{value}</div><div class="note">{note}</div></div>')
     rain_tone = "var(--ag-slate)" if rain_total >= 40 else "var(--ag-terra)"
     rh_tone = "var(--ag-terra)" if rh_mean >= 85 else "var(--ag-sage)"
     temp_tone = "var(--ag-terra)" if 13 <= temp_mean <= 24 else "var(--ag-amber)"
     tiles = (
-        tile("☔", t("14-day rainfall"), f"{rain_total:.0f}mm",
+        tile(t("14-day rainfall"), f"{rain_total:.0f}mm",
              t("Wet — sustained leaf wetness") if rain_total >= 40 else t("Dry — lower fungal pressure"), rain_tone) +
-        tile("🌡", t("Mean temperature"), f"{temp_mean:.1f}°C",
+        tile(t("Mean temperature"), f"{temp_mean:.1f}°C",
              t("Within blight-favourable window") if 13 <= temp_mean <= 24 else t("Outside main blight window"), temp_tone) +
-        tile("💧", t("Mean humidity"), f"{rh_mean:.0f}%",
+        tile(t("Mean humidity"), f"{rh_mean:.0f}%",
              t("High — favours fungal disease") if rh_mean >= 85 else t("Moderate humidity"), rh_tone))
     strip = "".join(f'<div class="day r{r}" title="Day +{i}: risk {r}/4"></div>' for i, r in enumerate(days))
     axis = "".join(f"<div>+{i}</div>" for i in range(n))
