@@ -154,17 +154,17 @@ if district and season_label:
 
     # ---- "what this means & what to do": one clear suggestion per signal ----
     ins = [
-        ("🌧", t("Rainfall"), rain_tip),
-        ("💰", t("Food prices"), cpi_tip),
-        ("🧪", t("Fertilizer"), fert_tip),
-        ("🌱", t("Soil"), soil_tip),
+        ("var(--ag-slate)", t("Rainfall"), rain_tip),
+        ("var(--ag-terra)", t("Food prices"), cpi_tip),
+        ("var(--ag-sage)", t("Fertilizer"), fert_tip),
+        ("var(--ag-soil)", t("Soil"), soil_tip),
     ]
     ins_html = "".join(
         f"<div style='display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--ag-line-soft)'>"
-        f"<div style='font-size:18px;line-height:1.2'>{ic}</div>"
+        f"<div style='flex-shrink:0;width:9px;height:9px;border-radius:50%;background:{col};margin-top:5px'></div>"
         f"<div><div style='font-weight:600;color:var(--ag-ink);font-size:13.5px'>{lab}</div>"
         f"<div style='color:var(--ag-ink-soft);font-size:13.5px;line-height:1.5;margin-top:2px'>{tip}</div></div></div>"
-        for ic, lab, tip in ins)
+        for col, lab, tip in ins)
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:22px">
       <div class="ag-card-head"><div class="title">{t('WHAT THIS MEANS')} · <strong>{t('WHAT TO DO')}</strong></div>
         <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district} · {season_label}</div></div>

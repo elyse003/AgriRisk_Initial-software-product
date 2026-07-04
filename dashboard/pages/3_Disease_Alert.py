@@ -8,22 +8,38 @@ from _ui import setup, page_header, risk_meter
 from _i18n import t, crop_label
 import streamlit as st
 from config.settings import DISTRICT_COORDS, CROPS, DISEASE_RULES
-from src.models.disease_alert import fetch_forecast, assess_crop
+from src.models.disease_alert import fetch_forecast, assess_crop_full
 
 setup("Disease Alert", "Crop disease warnings from the local weather",
       allowed_roles=("officer", "super_admin"), header=False)
-district = st.selectbox(t("District"), list(DISTRICT_COORDS))
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _forecast(district):
+    """14-day forecast for a district, cached an hour so changing the crop filter
+    doesn't re-hit the weather API."""
+    lat, lon = DISTRICT_COORDS[district]
+    return fetch_forecast(lat, lon)
+
+
+c1, c2 = st.columns(2)
+district = c1.selectbox(t("District"), list(DISTRICT_COORDS))
+_ALL = t("All crops")
+crop_pick = c2.selectbox(t("Crop"), [_ALL] + list(CROPS),
+                         format_func=lambda c: c if c == _ALL else crop_label(c))
+sel_crop = None if crop_pick == _ALL else crop_pick
+scope_label = _ALL if sel_crop is None else crop_label(sel_crop)
 
 page_header(
     t('Disease Alert').upper(),
-    f"<em>{t('Climate-driven')}</em> {t('disease alerts')} · {district}",
+    f"<em>{t('Climate-driven')}</em> {t('disease alerts')} · {district} · {scope_label}",
     t("Crop disease warnings for the next 14 days, based on the local weather forecast."),
     meta_strong=t("14-day horizon"), meta_sub=t("updated hourly"))
 
-if st.button(t("Check Risk"), type="primary"):
-    lat, lon = DISTRICT_COORDS[district]
+# live: recompute whenever the district or crop changes — no button
+if district:
     try:
-        daily = fetch_forecast(lat, lon)
+        daily = _forecast(district)
         live = True
     except Exception:
         daily = {"temperature_2m_min": [16] * 14, "temperature_2m_max": [22] * 14,
@@ -44,10 +60,14 @@ if st.button(t("Check Risk"), type="primary"):
                (1 if 13 <= tm <= 24 else 0) + (1 if (rn or 0) > 1 else 0)
     days = [min(4, day_risk(temps[i], rh[i], rain[i])) for i in range(n)]
 
-    alerts = []
-    for c in CROPS:
-        alerts.extend(assess_crop(c, daily))
-    alerts.sort(key=lambda a: {"High": 0, "Medium": 1, "Low": 2}[a["risk"]])
+    # assess the chosen crop (or all), keeping EVERY disease so we can always give
+    # a recommendation — elevated ones first, low-risk "preventive" ones after
+    scope_crops = [sel_crop] if sel_crop else list(CROPS)
+    full = []
+    for c in scope_crops:
+        full.extend(assess_crop_full(c, daily))
+    full.sort(key=lambda a: {"High": 0, "Medium": 1, "Low": 2}[a["risk"]])
+    n_active = sum(1 for a in full if a["risk"] != "Low")
 
     st.caption(t("Live 14-day weather forecast.") if live else t("Offline mode: showing a sample forecast."))
 
@@ -76,29 +96,37 @@ if st.button(t("Check Risk"), type="primary"):
         <div class="week-strip" style="margin-top:4px">{strip}<div class="axis">{axis}</div></div>
       </div></div>""", unsafe_allow_html=True)
 
-    # ---- active alerts ----
-    if not alerts:
-        st.markdown(f"""<div class="ag-card ag-pagein" style="padding:28px;text-align:center;color:var(--ag-sage)">
-          {t('No elevated disease risk for the forecast window.')}</div>""", unsafe_allow_html=True)
+    # ---- recommendations: one clear "what to do" per disease (always shown) ----
+    risk_col = {"High": "var(--ag-terra)", "Medium": "var(--ag-amber)", "Low": "var(--ag-sage)"}
+    tick = lambda b: "✓" if b else "✗"
+    if n_active == 0:
+        summary = t("No elevated disease risk in the next 14 days — the steps below are preventive.")
     else:
-        rows = ""
-        for a in alerts:
-            why = a["why"]
-            tick = lambda b: "✓" if b else "✗"
-            pct = 80 if a["risk"] == "High" else 55
-            rows += f"""<div class="ag-disease">
-              <div><div class="name">{a['disease']}</div><div class="crop">{crop_label(a['crop'])}</div></div>
-              <div><span class="cond"><span class="lbl">Temp</span> {tick(why.get('temperature'))}</span>
-                <span class="cond"><span class="lbl">RH</span> {tick(why.get('humidity'))}</span>
-                <span class="cond"><span class="lbl">Rain days</span> {why.get('rainy_days', 0)}</span>
-                <div style="margin-top:6px;font-size:12px;color:var(--ag-ink-soft)">{a['action']}</div></div>
-              <div><div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute);margin-bottom:4px">{t('RISK')} · {pct}%</div>
-                {risk_meter(a['risk'])}
-                <div style="font-size:11px;color:var(--ag-mute);margin-top:6px">{t(a['risk'] + ' risk')}</div></div>
-            </div>"""
-        st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
-          <div class="ag-card-head"><div class="title">{t('ACTIVE')} <strong>{t('ALERTS')} · {len(alerts)}</strong></div></div>
-          <div>{rows}</div></div>""", unsafe_allow_html=True)
+        summary = t("{n} disease(s) at elevated risk for {scope}. Act on the highlighted steps.").format(
+            n=n_active, scope=scope_label)
+    rows = ""
+    for a in full:
+        why = a["why"]
+        col = risk_col[a["risk"]]
+        pct = 80 if a["risk"] == "High" else 55 if a["risk"] == "Medium" else 20
+        act_lbl = t("Do now") if a["risk"] != "Low" else t("Preventive care")
+        rows += f"""<div class="ag-disease">
+          <div><div class="name">{a['disease']}</div><div class="crop">{crop_label(a['crop'])}</div></div>
+          <div><span class="cond"><span class="lbl">Temp</span> {tick(why.get('temperature'))}</span>
+            <span class="cond"><span class="lbl">RH</span> {tick(why.get('humidity'))}</span>
+            <span class="cond"><span class="lbl">Rain days</span> {why.get('rainy_days', 0)}</span>
+            <div style="margin-top:8px;padding:8px 11px;border-radius:8px;background:var(--ag-bg-deep);border-left:3px solid {col}">
+              <div style="font-family:var(--f-mono);font-size:9.5px;letter-spacing:.06em;color:var(--ag-mute);text-transform:uppercase">{act_lbl}</div>
+              <div style="font-size:13px;color:var(--ag-ink);margin-top:2px;line-height:1.5">{a['action']}</div></div></div>
+          <div><div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute);margin-bottom:4px">{t('RISK')} · {pct}%</div>
+            {risk_meter(a['risk'])}
+            <div style="font-size:11px;color:var(--ag-mute);margin-top:6px">{t(a['risk'] + ' risk')}</div></div>
+        </div>"""
+    st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
+      <div class="ag-card-head"><div class="title">{t('WHAT TO DO')} · <strong>{scope_label}</strong></div>
+        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{n_active} {t('active')}</div></div>
+      <div class="ag-card-body" style="padding-bottom:6px"><div style="font-size:12.5px;color:var(--ag-ink-soft);margin-bottom:6px">{summary}</div></div>
+      <div>{rows}</div></div>""", unsafe_allow_html=True)
 
     # ---- rule base table ----
     rule_rows = ""
@@ -117,4 +145,4 @@ if st.button(t("Check Risk"), type="primary"):
       <div><span class="label">{t('Note')}:</span> {t('Decision support only. Confirm with local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:
-    st.info(t("Pick a district and click **Check Risk**."))
+    st.info(t("Pick a district and crop to see disease risk."))

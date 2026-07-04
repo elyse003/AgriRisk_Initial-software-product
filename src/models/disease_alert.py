@@ -27,9 +27,11 @@ def fetch_forecast(lat: float, lon: float) -> dict:
     return resp.json()["daily"]
 
 
-def assess_crop(crop: str, daily: dict) -> list[dict]:
-    """Return triggered disease alerts for one crop given a daily forecast."""
-    alerts = []
+def assess_crop_full(crop: str, daily: dict) -> list[dict]:
+    """Assess EVERY disease for one crop (including Low risk), each with its
+    current risk level and the recommended action — so the app can always show a
+    recommendation, not only when a threshold is crossed."""
+    out = []
     temps = [(lo + hi) / 2 for lo, hi in
              zip(daily["temperature_2m_min"], daily["temperature_2m_max"])]
     humidity = daily["relative_humidity_2m_mean"]
@@ -44,16 +46,20 @@ def assess_crop(crop: str, daily: dict) -> list[dict]:
 
         triggers = sum([temp_ok, humid_ok, rain_ok])
         level = "High" if triggers == 3 else "Medium" if triggers == 2 else "Low"
-        if level != "Low":
-            alerts.append({
-                "crop": crop,
-                "disease": rule["name"],
-                "risk": level,
-                "action": rule["action"],
-                "why": {"temperature": temp_ok, "humidity": humid_ok,
-                        "rainy_days": rain_days},
-            })
-    return alerts
+        out.append({
+            "crop": crop,
+            "disease": rule["name"],
+            "risk": level,
+            "action": rule["action"],
+            "why": {"temperature": temp_ok, "humidity": humid_ok,
+                    "rainy_days": rain_days},
+        })
+    return out
+
+
+def assess_crop(crop: str, daily: dict) -> list[dict]:
+    """Return only the triggered (Medium/High) disease alerts for one crop."""
+    return [a for a in assess_crop_full(crop, daily) if a["risk"] != "Low"]
 
 
 def get_all_alerts(lat: float, lon: float, crops: list[str]) -> list[dict]:
