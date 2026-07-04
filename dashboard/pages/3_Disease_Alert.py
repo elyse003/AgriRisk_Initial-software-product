@@ -128,15 +128,15 @@ if district:
       <div class="ag-card-body" style="padding-bottom:6px"><div style="font-size:12.5px;color:var(--ag-ink-soft);margin-bottom:6px">{summary}</div></div>
       <div>{rows}</div></div>""", unsafe_allow_html=True)
 
-    # ---- rule base table ----
+    # ---- rule base table (only the chosen crop, or all if none picked) ----
     rule_rows = ""
-    for crop, rules in DISEASE_RULES.items():
-        for rule in rules:
+    for crop in scope_crops:
+        for rule in DISEASE_RULES.get(crop, []):
             lo, hi = rule["temp_c"]
             rule_rows += (f"<tr><td>{rule['name']}</td><td>{crop_label(crop)}</td>"
                           f"<td class='muted'>{lo}–{hi}°C · RH ≥ {rule['humidity_pct']}% · ≥ {rule['rain_days']} wet days</td></tr>")
     st.markdown(f"""<div class="ag-card ag-pagein">
-      <div class="ag-card-head"><div class="title"><strong>{t('DISEASE GUIDE')}</strong></div></div>
+      <div class="ag-card-head"><div class="title">{t('DISEASE GUIDE')} · <strong>{scope_label}</strong></div></div>
       <table class="ag-data" style="font-size:12px"><thead><tr><th>{t('Disease')}</th><th>{t('Crop')}</th><th>{t('When it strikes')}</th></tr></thead>
       <tbody>{rule_rows}</tbody></table></div>""", unsafe_allow_html=True)
 
