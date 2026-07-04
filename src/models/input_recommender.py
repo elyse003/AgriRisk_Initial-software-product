@@ -63,10 +63,32 @@ CROP_PLAN = {
     "beans":    [("DAP", 100, "at planting (basal)")],
 }
 
+# Agricultural lime for acidic soils. Rwanda's central/highland ferralsols are
+# often acidic (pH < 5.5), which locks up phosphorus and cuts fertilizer response,
+# so the plan varies by district: more acidic soil -> more lime. Travertine lime is
+# subsidised; ~5,000 RWF per 50 kg is a nationwide estimate. Rates are indicative —
+# confirm with a soil test.
+LIME_PRICE_RWF = 5000
+
+
+def _lime_rate_kg_ha(ph) -> int:
+    """Indicative agricultural-lime rate (kg/ha) from topsoil pH; 0 if not acidic."""
+    if ph is None:
+        return 0
+    if ph < 5.0:
+        return 2000
+    if ph < 5.3:
+        return 1500
+    if ph < 5.6:
+        return 1000
+    return 0
+
 
 def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
-                   budget_rwf: float):
-    """Size a fertilizer plan to the farmer's land.
+                   budget_rwf: float, district: str | None = None):
+    """Size a fertilizer plan to the farmer's land — and, when a district is given,
+    add a soil-correction step (lime) sized to that district's soil acidity, so the
+    plan genuinely differs where the soil differs.
 
     Converts land area into the kilograms and 50 kg bags needed using per-hectare
     application rates, then prices them from the catalogue.
@@ -75,6 +97,25 @@ def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
     """
     crop = crop.lower()
     rows = []
+
+    # district-specific soil correction: lime for acidic districts (before planting)
+    if district:
+        from config.district_agro import agro_profile
+        ap = agro_profile(district)
+        lime_rate = _lime_rate_kg_ha(ap.get("ph"))
+        if lime_rate:
+            need_kg = lime_rate * land_ha
+            bags = max(1, math.ceil(need_kg / BAG_KG))
+            rows.append({
+                "fertilizer": "Agricultural lime (50kg bag)",
+                "when": f"soil correction, before planting (pH {ap['ph']:.1f})",
+                "rate_kg_ha": lime_rate,
+                "need_kg": round(need_kg),
+                "bags_50kg": bags,
+                "price_per_bag": LIME_PRICE_RWF,
+                "line_cost": int(bags * LIME_PRICE_RWF),
+            })
+
     for name_key, rate, stage in CROP_PLAN.get(crop, []):
         match = catalogue[catalogue["input_name"].str.contains(name_key, case=False, na=False)]
         if match.empty:

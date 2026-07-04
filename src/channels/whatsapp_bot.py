@@ -290,7 +290,8 @@ def answer(text: str, ctx: dict | None = None) -> str:
             return say("Ubuso bwawe bungana iki? Urugero: 'ifumbire ibigori 0.5 ha'.",
                        "What is your land size? For example: 'fertilizer maize 0.5 ha'.")
         plan, total, ok, remaining = recommend_plan(
-            _catalogue(), crop, float(p["land_ha"]), float(p["budget"]) if p["budget"] else 1e12)
+            _catalogue(), crop, float(p["land_ha"]), float(p["budget"]) if p["budget"] else 1e12,
+            district=district)   # district -> soil-specific lime, matching the dashboard
         if plan.empty:
             return say("Nta gahunda y'ifumbire kuri icyo gihingwa.", "No fertilizer plan for that crop.")
         bw = lambda n: ("umufuka" if n == 1 else "imifuka") if rw else ("bag" if n == 1 else "bags")

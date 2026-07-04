@@ -9,6 +9,7 @@ from _i18n import t, crop_label
 from src.db.connection import fetch_catalogue
 import streamlit as st
 from config.settings import CROPS, DISTRICTS
+from config.district_agro import agro_profile
 from src.models.input_recommender import recommend_plan
 
 setup("Input Recommender", "Fertilizer plan for your land and budget",
@@ -30,11 +31,29 @@ land = c3.number_input(t("Land size (hectares)"), min_value=0.05, max_value=10.0
                        help="1 hectare = 100 ares (1 are = 10m x 10m).")
 budget = c4.slider(t("Budget (RWF)"), 10000, 300000, 80000, 5000)
 
-if st.button(t("Build Fertilizer Plan"), type="primary"):
-    plan, total, ok, remaining = recommend_plan(cat, crop, float(land), float(budget))
+# live: rebuild whenever crop / district / land / budget changes — no button
+if crop and district:
+    plan, total, ok, remaining = recommend_plan(cat, crop, float(land), float(budget), district=district)
     if plan.empty:
         st.warning(t("No fertilizer plan is defined for that crop yet."))
         st.stop()
+
+    # district soil context: what varies here (and what doesn't)
+    ap = agro_profile(district)
+    has_lime = any("lime" in str(r["fertilizer"]).lower() for _, r in plan.iterrows())
+    if has_lime:
+        soil_note = t("{district}'s soil is acidic ({soil}, pH {ph}), so the plan adds lime to "
+                      "correct it — acidic soil locks up phosphorus and wastes fertilizer. Lime is a "
+                      "one-off amendment (good for 2-3 seasons), not an every-season cost like fertilizer.").format(
+            district=district, soil=ap["soil"], ph=f"{ap['ph']:.1f}")
+    else:
+        soil_note = t("{district}'s soil is near-neutral ({soil}, pH {ph}), so no lime is needed. "
+                      "Fertilizer types and Smart Nkunganire prices are set nationally.").format(
+            district=district, soil=ap["soil"], ph=f"{ap['ph']:.1f}")
+    st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:16px;border-left:4px solid var(--ag-soil)">
+      <div style="padding:12px 18px;font-size:12.5px;color:var(--ag-ink-soft);line-height:1.5">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ag-soil);margin-right:8px"></span>{soil_note}</div></div>""",
+                unsafe_allow_html=True)
 
     # ---- ranked recommendation cards (the plan stages) ----
     cards = ""
@@ -94,4 +113,4 @@ if st.button(t("Build Fertilizer Plan"), type="primary"):
       <div><span class="label">{t('Note')}:</span> {t('Confirm with soil testing and local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:
-    st.info(t("Set crop, land size and budget, then click **Build Fertilizer Plan**."))
+    st.info(t("Set crop, district, land size and budget to see the plan."))
