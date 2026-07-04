@@ -135,6 +135,24 @@ def _esoko_farmgate(esoko, crop: str, district: str, variety=None):
     return float(m[m["date"] == latest]["price_rwf"].mean())
 
 
+def _esoko_farmgate_series(esoko, crop: str, district: str, variety=None):
+    """Monthly REAL Esoko farmgate series for one crop/district (variety if given),
+    indexed at month-start; or None. Used to overlay actual recorded farmgate on the
+    estimated history so the real past grows as Esoko accumulates."""
+    if esoko is None or len(esoko) == 0:
+        return None
+    m = esoko[(esoko["crop"] == crop) & (esoko["district"] == district)]
+    if variety and "variety" in m.columns:
+        mv = m[m["variety"] == variety]
+        if not mv.empty:
+            m = mv
+    if m.empty:
+        return None
+    g = m.copy()
+    g["month"] = g["date"].dt.to_period("M").dt.to_timestamp()
+    return g.groupby("month")["price_rwf"].mean().sort_index()
+
+
 def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
     """Robust farmgate/retail ratio per crop (the WFP<->Esoko calibration).
 
@@ -220,31 +238,44 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
     if len(s) == 0:
         return None
 
-    cur = float(s.iloc[-1])
+    s_retail = s                                         # WFP retail drives the model + trend
+    retail_last = float(s_retail.iloc[-1])
     model = (models or {}).get(crop)
-    fc = None
-    if model is not None and len(s) >= MIN_HISTORY:
+    fc_retail = None
+    if model is not None and len(s_retail) >= MIN_HISTORY:
         try:
-            fc = forecast_next(model, s)
+            fc_retail = forecast_next(model, s_retail)
         except Exception:
-            fc = None
+            fc_retail = None
 
-    # Express in FARMGATE: real Esoko where we have it, else estimate from the WFP
-    # retail level via the crop's farmgate/retail ratio. Scale the whole series so
-    # the chart stays continuous; the scale-free trend (% move) is preserved.
-    fg = _esoko_farmgate(esoko, crop, district, variety)
-    if fg is not None and cur:
-        target, level = fg, "farmgate"
-    else:
-        k = (ratios or DEFAULT_FG_RATIO).get(crop, DEFAULT_FG_RATIO.get(crop, 1.0))
-        target, level = (cur * k if cur else cur), "farmgate_est"
-    if cur:
-        scale = target / cur
-        s = s * scale
-        cur = target
-        if fc is not None:
-            fc = float(round(fc * scale))
+    # ---- express the WHOLE history in FARMGATE ----
+    # Estimate every past month as WFP retail x the crop's farmgate/retail ratio,
+    # then OVERLAY the REAL Esoko farmgate wherever we actually recorded it (for
+    # this crop/district/variety). So the past shows real farmgate where we have
+    # it and a labelled estimate elsewhere — and the real portion grows as Esoko
+    # accumulates months.
+    k = (ratios or DEFAULT_FG_RATIO).get(crop, DEFAULT_FG_RATIO.get(crop, 1.0))
+    fg_series = s_retail * k
+    fg_series.index = fg_series.index.to_period("M").to_timestamp()   # month-start keys
+    fg_series = fg_series.groupby(level=0).mean().sort_index()
+
+    real = _esoko_farmgate_series(esoko, crop, district, variety)
+    real_set = set(real.index) if real is not None else set()
+    if real is not None and len(real):
+        for mth, val in real.items():
+            fg_series.loc[mth] = float(val)              # real overrides / extends the month
+        fg_series = fg_series.sort_index()
+
+    s = fg_series
+    cur = float(s.iloc[-1])
+    real_dates = [d for d in s.index if d in real_set]
+    level = "farmgate" if (len(s) and s.index[-1] in real_set) else "farmgate_est"
+
+    fc = None
+    if fc_retail is not None and retail_last:
+        fc = float(round(cur * (fc_retail / retail_last)))   # retail trend on the farmgate level
 
     pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
     return {"series": s, "current": cur, "forecast": fc, "pct": pct,
-            "source": source, "level": level, "last_date": s.index[-1]}
+            "source": source, "level": level, "last_date": s.index[-1],
+            "real_dates": real_dates}

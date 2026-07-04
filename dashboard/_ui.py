@@ -253,9 +253,12 @@ def _nice_bounds(lo, hi, pad=0.06):
     return lo - span * pad, hi + span * pad
 
 
-def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint):
+def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None):
     """Agri-themed price line: ink history + crop-tinted forecast point with an
-    empirical band and a 'now' divider. dates are datetimes, vals/lo/hi floats."""
+    empirical band and a 'now' divider. dates are datetimes, vals/lo/hi floats.
+    real_flags (aligned to vals) marks months backed by REAL Esoko farmgate — those
+    get a solid tinted marker and an 'actual' tag; the rest are labelled 'est'."""
+    real_flags = real_flags or [False] * len(vals)
     import pandas as pd
     W, H = 760, 280
     padL, padR, padT, padB = 56, 20, 22, 34
@@ -292,7 +295,8 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint):
         if fore:
             lab = f"next ~{v:,.0f}"
         else:
-            lab = f"{pd.Timestamp(xs[i]).strftime('%b '+chr(39)+'%y')}  {v:,.0f}"
+            tag = "" if real_flags[i] else "  est"
+            lab = f"{pd.Timestamp(xs[i]).strftime('%b '+chr(39)+'%y')}  {v:,.0f}{tag}"
         tipw = max(52, len(lab) * 5.9 + 16)
         tx = min(max(cx, padL + tipw / 2), W - padR - tipw / 2)   # keep pill on-canvas
         ty = cy - 30 if cy - 30 > padT else cy + 14               # flip below near the top
@@ -310,6 +314,11 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint):
                 f'<rect class="hit" x="{hitx:.1f}" y="{padT}" width="{step:.1f}" height="{ih}" fill="transparent"/>'
                 f'</g>')
 
+    # solid tinted dots on months backed by REAL Esoko farmgate (visible without hover)
+    realmk = "".join(f'<circle cx="{X(i):.1f}" cy="{Y(v):.1f}" r="3.2" fill="{tint}" '
+                     f'stroke="var(--ag-surface)" stroke-width="1.2"/>'
+                     for i, v in enumerate(vals) if real_flags[i])
+
     return f"""<svg viewBox="0 0 {W} {H}" width="100%" height="{H}" style="display:block;font-family:var(--f-mono)">
       <rect x="{X(hist_i):.1f}" y="{padT}" width="{X(n-1)-X(hist_i):.1f}" height="{ih}" fill="var(--ag-bg-deep)" opacity="0.55"/>
       <line x1="{X(hist_i):.1f}" x2="{X(hist_i):.1f}" y1="{padT}" y2="{padT+ih}" stroke="oklch(0.7 0.015 60)" stroke-dasharray="3 3"/>
@@ -318,6 +327,7 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint):
       <path d="{band}" fill="{tint}" opacity="0.16"/>
       <path class="ag-draw" d="{hpath}" fill="none" stroke="var(--ag-ink)" stroke-width="1.7" stroke-linejoin="round"/>
       <path class="ag-fade" d="M {X(hist_i):.1f} {Y(vals[-1]):.1f} L {X(n-1):.1f} {Y(fc_val):.1f}" fill="none" stroke="{tint}" stroke-width="2.2" stroke-dasharray="6 4"/>
+      {realmk}
       <circle cx="{X(n-1):.1f}" cy="{Y(fc_val):.1f}" r="4.5" fill="var(--ag-surface)" stroke="{tint}" stroke-width="2"/>
       {hov}
     </svg>"""
