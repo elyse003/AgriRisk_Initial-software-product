@@ -60,6 +60,23 @@ DISTRICT_AGRO = {
 _FALLBACK = {"zone": "Central Plateau", "soil": "Ferralsol",
              "altitude_m": 1650, "fertility": 3, "ph": 5.4, "drainage": 3}
 
+# Kigali City is mostly urban; farming here is peri-urban (chiefly Gasabo & Kicukiro
+# rural sectors — maize, beans, vegetables). So results still apply, but a city-centre
+# "farmgate" figure reads more as the consumption market — flag that for the officer.
+URBAN_NOTE = {
+    "Nyarugenge": "Nyarugenge is largely urban — local farming is limited to peri-urban "
+                  "sectors, and city prices reflect the consumption market more than a farmgate.",
+    "Gasabo": "Gasabo mixes the city with large rural sectors (maize, beans, vegetables) — "
+              "these results apply to its peri-urban farmland.",
+    "Kicukiro": "Kicukiro is semi-urban with peri-urban farmland — these results apply to "
+                "its rural sectors (e.g. Masaka, Gahanga).",
+}
+
+
+def urban_note(district: str):
+    """A peri-urban/urban caveat for Kigali City districts, or None."""
+    return URBAN_NOTE.get(district)
+
 
 def agro_profile(district: str) -> dict:
     """Full display profile (zone, soil, altitude, fertility, ph, drainage)."""

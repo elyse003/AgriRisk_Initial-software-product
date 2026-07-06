@@ -9,7 +9,7 @@ built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
 from _ui import (setup, load_prices, load_price_forecaster, load_esoko, load_farmgate_ratios,
-                 page_header, price_chart_svg, CROP_TINT)
+                 page_header, urban_notice, price_chart_svg, CROP_TINT)
 from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import CROPS, DISTRICTS
@@ -45,6 +45,7 @@ page_header(
     t("What a farmer is likely to be paid next month — the farmgate price, from "
       "recent market data."),
     meta_strong="RWF/kg", meta_sub=t("farmgate · monthly"))
+urban_notice(district)
 
 # live: recompute + redraw whenever any filter (crop / district / type) changes — no button
 if crop and district:

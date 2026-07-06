@@ -4,7 +4,7 @@ Rendered in the "Officer console" editorial style: a serif headline, the land-si
 plan shown as ranked recommendation cards (with a budget verdict), and the rest of
 the catalogue suitable for the crop as an "other matches" table.
 """
-from _ui import setup, page_header
+from _ui import setup, page_header, urban_notice
 from _i18n import t, crop_label
 from src.db.connection import fetch_catalogue
 import streamlit as st
@@ -30,6 +30,7 @@ c3, c4 = st.columns(2)
 land = c3.number_input(t("Land size (hectares)"), min_value=0.05, max_value=10.0, value=0.5, step=0.05,
                        help="1 hectare = 100 ares (1 are = 10m x 10m).")
 budget = c4.slider(t("Budget (RWF)"), 10000, 300000, 80000, 5000)
+urban_notice(district)
 
 # live: rebuild whenever crop / district / land / budget changes — no button
 if crop and district:

@@ -238,6 +238,19 @@ table.ag-data td.muted{ color:var(--ag-mute); }
 CROP_TINT = {"maize": "#C2891F", "beans": "#9A3B26", "potatoes": "#6F5A34"}
 
 
+def urban_notice(district):
+    """Show a peri-urban/urban caveat for Kigali City districts (no-op elsewhere)."""
+    from config.district_agro import urban_note
+    note = urban_note(district)
+    if not note:
+        return
+    st.markdown(
+        f'<div class="ag-card ag-pagein" style="margin-bottom:16px;border-left:4px solid var(--ag-amber)">'
+        f'<div style="padding:12px 18px;font-size:12.5px;color:var(--ag-ink-soft);line-height:1.5">'
+        f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ag-amber);margin-right:8px"></span>'
+        f'{t("Kigali City")}: {t(note)}</div></div>', unsafe_allow_html=True)
+
+
 def page_header(kicker, title_html, sub, meta_strong="", meta_sub=""):
     """Render the sample's editorial page header (kicker + serif h1 + sub + meta)."""
     meta = (f"<div class='meta'><strong>{meta_strong}</strong>{meta_sub}</div>"

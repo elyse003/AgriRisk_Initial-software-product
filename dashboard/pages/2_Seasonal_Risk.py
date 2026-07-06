@@ -6,7 +6,7 @@ charts (rainfall anomaly + food CPI from real data) and a benchmark table read
 straight from the model's metrics.json.
 """
 from _ui import (setup, load_rainfall, load_cpi, load_fert, load_risk_model, load_metrics,
-                 page_header, gauge_svg, trend_svg, driver_bar)
+                 page_header, urban_notice, gauge_svg, trend_svg, driver_bar)
 from _i18n import t
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import DISTRICTS
@@ -35,6 +35,7 @@ page_header(
     t("How likely staple food prices are to rise sharply this season — from rainfall, "
       "food prices and fertilizer costs."),
     meta_strong=season_label, meta_sub=t("recalculated weekly"))
+urban_notice(district)
 
 # live: recompute + redraw whenever the district or season filter changes — no button
 if district and season_label:

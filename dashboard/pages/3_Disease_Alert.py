@@ -4,7 +4,7 @@ Rendered in the "Officer console" editorial style: a 14-day weather-context stri
 (rainfall / temp / humidity tiles + a daily risk heatmap built from the real
 forecast), disease rows with risk meters, and the FAO rule-base table.
 """
-from _ui import setup, page_header, risk_meter
+from _ui import setup, page_header, urban_notice, risk_meter
 from _i18n import t, crop_label
 import streamlit as st
 from config.settings import DISTRICT_COORDS, CROPS, DISEASE_RULES
@@ -35,6 +35,7 @@ page_header(
     f"<em>{t('Climate-driven')}</em> {t('disease alerts')} · {district} · {scope_label}",
     t("Crop disease warnings for the next 14 days, based on the local weather forecast."),
     meta_strong=t("14-day horizon"), meta_sub=t("updated hourly"))
+urban_notice(district)
 
 # live: recompute whenever the district or crop changes — no button
 if district:
