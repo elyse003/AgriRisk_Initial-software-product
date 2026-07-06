@@ -63,12 +63,19 @@ if crop and district:
     last_date = outlook["last_date"]
     price_kind = t("Farmgate price")
     real_fg = outlook["level"] == "farmgate"
-    badge = "Esoko" if real_fg else t("estimated")
-    if real_fg:
-        src_note = f"Farmgate price from Esoko for {district}; next-month trend from the model."
+    national = outlook["source"] == "national"     # no local history -> national average
+    badge = "Esoko" if real_fg else (t("national avg") if national else t("estimated"))
+    if national and real_fg:
+        src_note = t("No local price history for {district}, so the trend uses Rwanda's national "
+                     "average; the price level is a real Esoko farmgate figure.").format(district=district)
+    elif national:
+        src_note = t("No local price history for {district} — showing Rwanda's national average as a "
+                     "farmgate price; next-month trend from the model.").format(district=district)
+    elif real_fg:
+        src_note = t("Farmgate price from Esoko for {district}; next-month trend from the model.").format(district=district)
     else:
-        src_note = (f"Estimated farmgate for {district} — recent market prices adjusted by the "
-                    f"measured farmgate margin; next-month trend from the model.")
+        src_note = t("Estimated farmgate for {district} — recent market prices adjusted by the "
+                     "measured farmgate margin; next-month trend from the model.").format(district=district)
     log_price(crop, district, str(last_date.date()), cur)
 
     # empirical 80% band from recent monthly log-return volatility (1.28σ)
@@ -92,6 +99,13 @@ if crop and district:
         <div class="value">{fc:,.0f}<span class="unit">RWF/kg</span></div>
         <div class="delta {dcls}"><span>{arrow}</span>{pct:+.1f}% · {trend}</div></div>
     </div>""", unsafe_allow_html=True)
+    if national:
+        st.markdown(
+            f'<div class="ag-pagein" style="font-family:var(--f-mono);font-size:11.5px;color:var(--ag-ink-soft);'
+            f'margin:-8px 0 16px;padding:8px 14px;border-radius:8px;background:var(--ag-bg-deep)">'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ag-slate);margin-right:8px"></span>'
+            f'{t("No local market history for {district} — figures fall back to Rwanda\'s national average.").format(district=district)}'
+            f'</div>', unsafe_allow_html=True)
 
     # ---- chart card ----
     hist = s.tail(24)
