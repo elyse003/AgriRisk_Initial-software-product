@@ -96,10 +96,12 @@ def test_price_handles_district_without_data():
 
 def test_risk_handles_extreme_inputs():
     """Severe drought with high inflation, and the opposite, both return valid labels."""
+    from src.models.risk_classifier import feature_row
     model = pickle.load(open(MODELS_STORE / "risk_classifier.pkl", "rb"))
-    cols = ["rainfall_anomaly", "cpi_change", "fert_change"]
-    for row in [[-3.0, 80.0, 300.0], [2.5, -5.0, -10.0], [0.0, 0.0, 0.0]]:
-        pred = model.predict(pd.DataFrame([row], columns=cols))[0]
+    # feature_row joins the district's soil/terrain profile onto the weather+macro
+    # signals, so the frame matches the deployed model's full feature set.
+    for rain, cpi, fert in [(-3.0, 80.0, 300.0), (2.5, -5.0, -10.0), (0.0, 0.0, 0.0)]:
+        pred = model.predict(feature_row(rain, cpi, fert, "Musanze"))[0]
         assert pred in {"Low", "Medium", "High"}
 
 
