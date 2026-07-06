@@ -1,18 +1,38 @@
 # AgriRisk Rwanda
 
-## Description
+## Overview
 
-AgriRisk Rwanda is a decision-support application for agricultural extension officers and
-smallholder farmers. It brings four tools together for maize, beans, and Irish potatoes
-across all 30 districts of Rwanda:
+AgriRisk Rwanda is a nationwide machine-learning advisory platform for smallholder
+farmers. It follows the whole farming cycle and supports four decisions: crop price
+forecasting, seasonal climate-inflation risk, climate-driven disease alerts, and
+land-size-based fertilizer (input) planning. It covers all 30 districts and Rwanda's
+staple crops — maize, beans, and Irish potatoes — in Kinyarwanda and English.
 
-- **Crop price forecasting** for four weeks ahead, per crop and district.
-- **Seasonal risk** rated low, medium, or high from rainfall, food inflation, and fertilizer cost.
-- **Crop disease alerts** from live weather and FAO disease guidance.
-- **Input recommender** that ranks affordable fertilizer for a chosen crop, district, and budget.
+The platform is built farmer-first. The farmer is the primary user, reached on the
+basic phone they already own, while extension officers and a national administrator
+are supporting roles who use the web dashboard.
 
-The application runs as a Streamlit dashboard with a farmer-facing WhatsApp chat in
-Kinyarwanda and English. It is backed by trained machine learning models and a PostgreSQL database (SQLite for local development).
+### How it is delivered
+
+- **Web dashboard (Streamlit)** — for extension officers and the administrator, to
+  view forecasts, risk, disease alerts, and the farmers they support.
+- **WhatsApp-style chat** — a farmer-facing conversational tool in Kinyarwanda and
+  English that answers short questions (price, risk, disease, fertilizer quantity).
+- **SMS** — short Kinyarwanda alerts for any basic phone, with no internet or data
+  cost. The subscriber registry and alert logic are implemented; connecting the live
+  gateway (Africa's Talking) is a deployment step.
+- **USSD Preview** — a menu-based channel for farmers who cannot read or do not use
+  smartphones. This is planned future work, in line with the project proposal.
+
+### Under the hood
+
+The advice is produced by trained machine-learning models (price forecasting with
+ARIMA, Prophet, and LSTM against a random-forest baseline; seasonal-risk
+classification with random forest and XGBoost) and a rule-based fertilizer planner.
+The system is backed by a database — SQLite for local development and PostgreSQL for
+production — and one keyless live weather API (Open-Meteo) powering the real-time
+disease alerts. The models are trained on public datasets (WFP prices, NISR food
+inflation, World Bank fertilizer costs, CHIRPS rainfall, and MINAGRI input prices).
 
 ## Live demo
 
@@ -118,6 +138,7 @@ Every model is trained on public data. Each source, its key fields, and the modu
 | District rainfall | CHIRPS (HDX) | date, district, rainfall vs normal | Seasonal-risk climate feature |
 | Weather forecast | Open-Meteo (live API) | temperature, humidity, precipitation | Disease alerts |
 | Input prices | MINAGRI / Smart Nkunganire | input, type, crop, subsidised and market price | Input recommender |
+| Live market prices | eSoko Rwanda | date, market, district, farmgate / wholesale / retail price | Current-price reference and validation |
 
 Prices use the retail, RWF series. The processing and feature steps for each source live in `scripts/prepare_data.py`, and the dashboard shows how current the data is.
 
@@ -201,7 +222,7 @@ a hosted Postgres (otherwise the app falls back to an ephemeral SQLite file).
 
 ## Video demo
 
-<add your 5 to 10 minute video link>
+<[DEMO VIDEO](https://youtu.be/5BUKRpP0X9A)>
 
 ## Code files
 
