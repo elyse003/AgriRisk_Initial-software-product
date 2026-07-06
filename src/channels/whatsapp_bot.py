@@ -359,6 +359,20 @@ def converse(text: str, state: dict | None = None):
     state = state or {}
     p = parse_message(text or "")
     rw = p["lang"] == "rw"
+
+    # Does THIS message say anything on-topic — a crop, district, intent keyword,
+    # land size or budget, or a valid answer to a pending menu step? If not, it's
+    # gibberish/off-topic: give the domain decline and CLEAR the sticky state, so a
+    # leftover "price" intent doesn't keep re-asking "Which crop?" for junk input.
+    recognized = bool(p["intent"] or p["crop"] or p["district"] or p["land_ha"] or p["budget"])
+    if not recognized and state.get("variety_asked"):
+        tl = (text or "").strip().lower()
+        if (tl.isdigit() or tl in ("0", "all", "any", "all types", "byose", "zose", "bwose")
+                or _detect_variety(text, state.get("crop") or "")):
+            recognized = True
+    if not recognized:
+        return answer(text), {}
+
     intent = p["intent"] or state.get("intent")
     crop = p["crop"] or state.get("crop")
     district = p["district"] or state.get("district")
