@@ -53,7 +53,7 @@ section[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"]{displ
 .block-container,[data-testid="stMainBlockContainer"]{padding:0 !important;max-width:100% !important;}
 [data-testid="stMarkdownContainer"] a{text-decoration:none !important;color:inherit !important;}
 [data-testid="stMarkdownContainer"] .btn-go{color:#fff !important;}
-[data-testid="stMarkdownContainer"] .band .btn-go{background:#fff !important;color:#C76E1B !important;}
+[data-testid="stMarkdownContainer"] .band .btn-go{background:#fff !important;color:#2D6A4F !important;}
 [data-testid="stMarkdownContainer"] .hero .btn-ghost{color:#fff !important;}
 [data-testid="stMarkdownContainer"] .brand{color:#1B4332 !important;}
 /* Scroll-driven reveal in-app: the landing's IntersectionObserver <script> is
