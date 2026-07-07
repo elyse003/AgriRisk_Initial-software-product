@@ -22,13 +22,16 @@ AMBER = "#D97706"; RED = "#DC2626"; PURPLE = "#7C3AED"; MUT = "#5A7A6A"; BRD = "
 
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap');
 :root{ --forest:#1B4332; --emerald:#2D6A4F; --harvest:#C76E1B; --paper:#F6F2E8; --ink:#1C2A22; --mut:#5E7065; --line:#DED7C4; }
 /* Hide the menu / Deploy / decoration, but keep the toolbar itself so the
    sidebar reopen arrow survives on mobile (where the sidebar can collapse). */
 #MainMenu, footer, [data-testid="stToolbarActions"], [data-testid="stDecoration"] { display:none; }
 .stApp { background: var(--paper); }
-html, body, [class*="css"] { font-family:'Geist',sans-serif; color:var(--ink); }
+html, body, [class*="css"] { font-family:'Poppins',sans-serif; color:var(--ink); }
+/* force Poppins across every Streamlit widget (beats the default Source Sans),
+   but leave the Material icon font alone so icons still render */
+.stApp *:not([data-testid="stIconMaterial"]):not(.material-icons):not(.material-symbols-outlined){ font-family:'Poppins', sans-serif !important; }
 .block-container { padding-top: 2rem; max-width: 1050px; }
 section[data-testid="stSidebar"] { background:#FFFFFF; }
 section[data-testid="stSidebar"] * { color:var(--ink); }
@@ -46,24 +49,24 @@ section[data-testid="stSidebar"] a { border-radius:8px; }
 @media (max-width: 768px) {
   section[data-testid="stSidebar"] { min-width: 0 !important; }
 }
-h1,h2,h3,.ar-head { font-family:'Geist',sans-serif; color:var(--forest); letter-spacing:-.01em; }
+h1,h2,h3,.ar-head { font-family:'Poppins',sans-serif; color:var(--forest); letter-spacing:-.01em; }
 .ar-head { font-size:32px; font-weight:600; }
-.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'Geist',sans-serif; letter-spacing:.02em; }
+.ar-sub { color:var(--mut); font-size:13px; margin-bottom:6px; font-family:'Poppins',sans-serif; letter-spacing:.02em; }
 .ar-grid { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
 .ar-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px 22px;
            box-shadow:0 1px 2px rgba(27,67,50,.04); flex:1; min-width:150px; }
-.ar-num { font-family:'Geist',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.02em; }
+.ar-num { font-family:'Poppins',sans-serif; font-size:30px; font-weight:600; letter-spacing:-.02em; }
 .ar-lbl { color:var(--mut); font-size:13px; margin-top:2px; }
 .ar-alert { background:#FCF3E5; border:1px solid #F0DBBE; border-radius:16px; padding:16px 18px; }
-.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:600; margin-bottom:6px; font-family:'Geist',sans-serif; font-size:18px; }
+.ar-alert b { color:#9A4D10; } .ar-alert .t { color:#9A4D10; font-weight:600; margin-bottom:6px; font-family:'Poppins',sans-serif; font-size:18px; }
 .ar-alert p { color:#B45309; font-size:13.5px; margin:4px 0; }
 .ar-pill { display:inline-block; background:#fff; border:1px solid var(--line); color:var(--emerald);
-           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'Geist',sans-serif; }
+           border-radius:30px; padding:6px 15px; font-size:12.5px; font-weight:500; margin:3px; font-family:'Poppins',sans-serif; }
 .ar-badge { padding:4px 14px; border-radius:20px; font-size:13px; font-weight:700; color:#fff; }
-.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'Geist',sans-serif; }
+.ar-label { font-size:11px; font-weight:700; color:var(--mut); letter-spacing:.12em; text-transform:uppercase; font-family:'Poppins',sans-serif; }
 .stButton>button { font-weight:600; border-radius:9px; background:var(--forest); color:#fff; border:none; }
 .stButton>button:hover { background:#15392a; color:#fff; }
-[data-testid="stMetricValue"] { font-family:'Geist',sans-serif; color:var(--forest); }
+[data-testid="stMetricValue"] { font-family:'Poppins',sans-serif; color:var(--forest); }
 </style>
 """
 
@@ -93,7 +96,7 @@ div[data-testid="stVerticalBlockBorderWrapper"] { background:#16241D !important;
 # ===========================================================================
 EDITORIAL_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap');
 :root{
   --ag-bg: oklch(0.975 0.010 80); --ag-bg-deep: oklch(0.955 0.012 78);
   --ag-surface: oklch(0.992 0.005 80); --ag-surface-2: oklch(0.985 0.008 80);
@@ -106,13 +109,13 @@ EDITORIAL_CSS = """
   --ag-amber: oklch(0.66 0.120 80); --ag-amber-bg: oklch(0.95 0.045 80);
   --ag-slate: oklch(0.52 0.055 235); --ag-slate-bg: oklch(0.94 0.025 235);
   --ag-soil: oklch(0.45 0.055 60);
-  /* One font everywhere (Geist); the AgriRisk wordmark is the same font, italic + bold */
-  --f-serif: "Geist", ui-sans-serif, system-ui, sans-serif;
-  --f-sans:  "Geist", ui-sans-serif, system-ui, sans-serif;
-  --f-mono:  "Geist", ui-sans-serif, system-ui, sans-serif;
-  --f-brand: "Geist", ui-sans-serif, system-ui, sans-serif;
+  /* One font everywhere (Poppins); the AgriRisk wordmark is the same font, italic + bold */
+  --f-serif: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --f-sans:  "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --f-mono:  "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --f-brand: "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
-/* Geist display text needs weight to read as a heading (serif was a single weight) */
+/* Poppins display text needs weight to read as a heading (serif was a single weight) */
 .ag-head h1, .ag-stat .value, .ag-rank .nm, .ag-rank .price, .ag-wtile .val,
 .ag-disease .name, .ag-advice .badge{ font-weight:600; }
 .ag-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
@@ -459,7 +462,7 @@ SIDEBAR_CSS = """
 /* white sidebar with dark text */
 section[data-testid="stSidebar"]{ background:#FFFFFF; border-right:1px solid var(--line); }
 section[data-testid="stSidebar"] *{ color:var(--ink); }
-section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist',sans-serif; font-size:10px;
+section[data-testid="stSidebar"] .nav-sec{ font-family:'Poppins',sans-serif; font-size:10px;
   letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:16px 14px 4px; }
 /* brand at the top of the sidebar (logo.png text is light, so we draw our own) */
 section[data-testid="stSidebar"] .ag-brand-link{ text-decoration:none !important; color:inherit !important; display:block; cursor:pointer; }
@@ -468,9 +471,9 @@ section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; ga
 section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:0 0 26px;
   border-radius:50% 50% 50% 0; background:var(--emerald); transform:rotate(-45deg);
   box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
-section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Geist',sans-serif; font-style:italic;
+section[data-testid="stSidebar"] .ag-brand .nm{ font-family:'Poppins',sans-serif; font-style:italic;
   font-weight:700; font-size:22px; letter-spacing:-.01em; color:var(--forest); line-height:1; }
-section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Geist',sans-serif; font-size:9.5px;
+section[data-testid="stSidebar"] .ag-brand .sub{ font-family:'Poppins',sans-serif; font-size:9.5px;
   letter-spacing:.08em; text-transform:uppercase; color:#6E8377; margin-top:3px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]{ padding:9px 12px; border-radius:9px; margin:1px 6px; }
 section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] p{ font-size:14.5px; font-weight:500; color:#3A4A41; }
@@ -497,10 +500,20 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
   box-shadow:0 8px 22px rgba(0,0,0,.22) !important; }
 .st-key-ag_chatfab button:hover{ background:#15723d !important; }
 .st-key-ag_chatfab button p, .st-key-ag_chatfab button span, .st-key-ag_chatfab button [data-testid="stIconMaterial"]{ color:#fff !important; }
-[data-testid="stPopoverBody"]{ width:344px; max-width:92vw; }
-.ag-chat-head{ font-family:'Geist',sans-serif; font-weight:600; font-size:18px; color:var(--forest);
-  border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
-.ag-chat-head .dot{ width:8px; height:8px; border-radius:50%; background:#1B8A4B; flex:0 0 8px; }
+[data-testid="stPopoverBody"]{ width:352px; max-width:92vw; padding:1rem !important; border-radius:16px; }
+/* Eza-style chat: full-width green header bar bleeding to the popover edges */
+.ag-chat-head{ font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#fff;
+  background:linear-gradient(90deg,#1B8A4B,#5FA83B); margin:-1rem -1rem 12px -1rem; padding:16px 18px;
+  border-radius:16px 16px 0 0; display:flex; align-items:center; gap:9px; }
+.ag-chat-head .dot{ width:9px; height:9px; border-radius:50%; background:#fff; flex:0 0 9px; }
+/* green "Send" button, rounded input */
+[data-testid="stPopoverBody"] .stFormSubmitButton button{ background:#2D6A4F !important; color:#fff !important;
+  border:none !important; border-radius:9px !important; font-weight:600 !important; }
+[data-testid="stPopoverBody"] .stFormSubmitButton button:hover{ background:#245a42 !important; }
+[data-testid="stPopoverBody"] .stTextInput input{ border-radius:9px !important; }
+/* green chat avatar (replaces the default orange) */
+[data-testid="stPopoverBody"] [data-testid="stChatMessageAvatarAssistant"]{ background:#2D6A4F !important; color:#fff !important; }
+[data-testid="stPopoverBody"] [data-testid="stChatMessageAvatarUser"]{ background:var(--emerald) !important; color:#fff !important; }
 </style>
 """
 
@@ -553,10 +566,10 @@ def _chat_body():
         with box.chat_message("user" if role == "user" else "assistant"):
             st.write(txt)
     with st.form("ag_chat_form", clear_on_submit=True, border=False):
-        c1, c2 = st.columns([5, 1], vertical_alignment="bottom")
+        c1, c2 = st.columns([4, 1.4], vertical_alignment="bottom")
         q = c1.text_input("msg", label_visibility="collapsed",
-                          placeholder=t("Ask price, risk, disease, inputs…"))
-        send = c2.form_submit_button("➤", use_container_width=True)
+                          placeholder=t("Ask about crops…"))
+        send = c2.form_submit_button(t("Send"), use_container_width=True, type="primary")
     if send and (q or "").strip():
         reply, st.session_state.chat_ctx = converse(q, st.session_state.chat_ctx)
         st.session_state.chat.append(("user", q))
@@ -650,11 +663,11 @@ def footer():
 .ar-foot a:hover {{ color:var(--forest) !important; }}
 .ar-foot-grid {{ display:flex; flex-wrap:wrap; gap:28px 48px; justify-content:space-between; }}
 .ar-foot-brand {{ max-width:24em; }}
-.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Geist',sans-serif;
+.ar-foot .fb {{ display:flex; align-items:center; gap:9px; font-family:'Poppins',sans-serif;
                 font-style:italic; font-weight:700; letter-spacing:-.01em; font-size:19px; color:var(--forest); }}
 .ar-foot .fb .seed {{ width:18px; height:18px; border-radius:50% 50% 50% 0; background:var(--emerald);
                       transform:rotate(-45deg); }}
-.ar-foot .fcol h5 {{ font-family:'Geist',sans-serif; font-size:11px; letter-spacing:.12em;
+.ar-foot .fcol h5 {{ font-family:'Poppins',sans-serif; font-size:11px; letter-spacing:.12em;
                      text-transform:uppercase; color:var(--harvest); margin-bottom:10px; font-weight:700; }}
 .ar-foot .fcol a, .ar-foot .fcol span {{ display:block; margin:6px 0; }}
 .ar-foot-bottom {{ margin-top:26px; padding-top:16px; border-top:1px solid var(--line); display:flex;
