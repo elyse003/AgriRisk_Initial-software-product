@@ -635,6 +635,13 @@ def setup(title, subtitle, allowed_roles=None, header=True):
                     unsafe_allow_html=True)
         require_login()   # renders sign in / sign up, then st.stop()
 
+    # Resolve the language from the selector BEFORE rendering the sidebar, so the
+    # whole page (sidebar nav + content) switches together. Otherwise the nav, which
+    # renders before the language radio, would lag one rerun behind on a switch.
+    st.session_state.setdefault("lang", "en")
+    if st.session_state.get("_lang_radio") in LANGUAGES:
+        st.session_state["lang"] = LANGUAGES[st.session_state["_lang_radio"]]
+
     # signed in -> full sidebar: brand + custom icon nav, then a bottom group
     # (language + account + logout) that the CSS pins to the foot of the sidebar.
     render_sidebar_nav(user)
