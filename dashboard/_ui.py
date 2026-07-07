@@ -459,15 +459,18 @@ SIDEBAR_CSS = """
 <style>
 /* hide Streamlit's auto page list; we render our own icon nav */
 [data-testid="stSidebarNav"]{ display:none; }
+/* pull the nav up and pack items closer together (like the reference sidebar) */
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"]{ padding-top:0.7rem !important; }
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"]{ gap:0.18rem !important; }
 /* white sidebar with dark text */
 section[data-testid="stSidebar"]{ background:#FFFFFF; border-right:1px solid var(--line); }
 section[data-testid="stSidebar"] *{ color:var(--ink); }
 section[data-testid="stSidebar"] .nav-sec{ font-family:'Poppins',sans-serif; font-size:10px;
-  letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:16px 14px 4px; }
+  letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:10px 14px 3px; }
 /* brand at the top of the sidebar (logo.png text is light, so we draw our own) */
 section[data-testid="stSidebar"] .ag-brand-link{ text-decoration:none !important; color:inherit !important; display:block; cursor:pointer; }
 section[data-testid="stSidebar"] .ag-brand-link:hover{ opacity:.78; transition:opacity .12s ease; }
-section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; gap:11px; padding:2px 8px 14px; }
+section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; gap:11px; padding:0 8px 8px; }
 section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:0 0 26px;
   border-radius:50% 50% 50% 0; background:var(--emerald); transform:rotate(-45deg);
   box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
