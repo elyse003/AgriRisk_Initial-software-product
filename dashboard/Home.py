@@ -56,7 +56,16 @@ section[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"]{displ
 [data-testid="stMarkdownContainer"] .band .btn-go{background:#fff !important;color:#C76E1B !important;}
 [data-testid="stMarkdownContainer"] .hero .btn-ghost{color:#fff !important;}
 [data-testid="stMarkdownContainer"] .brand{color:#1B4332 !important;}
-.reveal{opacity:1 !important;transform:none !important;}
+/* Scroll-driven reveal in-app: the landing's IntersectionObserver <script> is
+   stripped by Streamlit, so drive the .reveal pop-in with pure CSS (no JS).
+   Supported in Chromium/Edge; browsers without it just show the content. */
+@keyframes agReveal{from{opacity:0;transform:translateY(30px) scale(.985)}to{opacity:1;transform:none}}
+@supports (animation-timeline:view()){
+  .reveal{animation:agReveal linear both;animation-timeline:view();animation-range:entry 5% cover 34%;}
+}
+@supports not (animation-timeline:view()){
+  .reveal{opacity:1 !important;transform:none !important;}
+}
 """
 style = style.replace("<style>", "<style>\n" + FONT + OVERRIDE)
 st.markdown(style + body, unsafe_allow_html=True)
