@@ -462,6 +462,8 @@ section[data-testid="stSidebar"] *{ color:var(--ink); }
 section[data-testid="stSidebar"] .nav-sec{ font-family:'Geist',sans-serif; font-size:10px;
   letter-spacing:.14em; text-transform:uppercase; color:#6E8377; margin:16px 14px 4px; }
 /* brand at the top of the sidebar (logo.png text is light, so we draw our own) */
+section[data-testid="stSidebar"] .ag-brand-link{ text-decoration:none !important; color:inherit !important; display:block; cursor:pointer; }
+section[data-testid="stSidebar"] .ag-brand-link:hover{ opacity:.78; transition:opacity .12s ease; }
 section[data-testid="stSidebar"] .ag-brand{ display:flex; align-items:center; gap:11px; padding:2px 8px 14px; }
 section[data-testid="stSidebar"] .ag-brand .seed{ width:26px; height:26px; flex:0 0 26px;
   border-radius:50% 50% 50% 0; background:var(--emerald); transform:rotate(-45deg);
@@ -506,8 +508,12 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
 def render_sidebar_nav(user):
     """Custom icon navigation in the sidebar (replaces Streamlit's auto page list)."""
     sb = st.sidebar
-    sb.markdown("<div class='ag-brand'><span class='seed'></span>"
-                "<div><div class='nm'>AgriRisk</div><div class='sub'>Rwanda · 30 districts</div></div></div>",
+    from _auth import auth_qs
+    qs = auth_qs()   # carry the login token so returning to the dashboard keeps the session
+    # the AgriRisk wordmark links to the landing page from any tool page
+    sb.markdown(f"<a href='/{qs}' target='_self' class='ag-brand-link'>"
+                "<div class='ag-brand'><span class='seed'></span>"
+                "<div><div class='nm'>AgriRisk</div><div class='sub'>Rwanda · 30 districts</div></div></div></a>",
                 unsafe_allow_html=True)
     role = (user or {}).get("role")
 

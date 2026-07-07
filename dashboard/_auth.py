@@ -79,12 +79,15 @@ def current_user():
 
 
 def auth_token() -> str:
-    """The current user's token (for embedding in reload-style links), or ''."""
-    if not st.session_state.get("auth_user"):
+    """The current user's token (for embedding in reload-style links), or ''.
+    Calls current_user() first so a token in the URL (e.g. on the landing page,
+    reached via the logo) restores the session before we hand it back out."""
+    user = current_user()
+    if not user:
         return ""
     tok = st.session_state.get("auth_token")
     if not tok:
-        tok = _make_token(st.session_state["auth_user"])
+        tok = _make_token(user)
         st.session_state["auth_token"] = tok
     return tok
 
