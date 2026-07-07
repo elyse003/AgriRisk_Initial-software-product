@@ -155,7 +155,7 @@ if crop and district:
     # ---- two-col: advice + forecast table / RQ note ----
     tone = "hold" if up else "sell" if down else "flat"
     badge_bg = "var(--ag-sage-bg)" if up else "var(--ag-terra-bg)" if down else "var(--ag-bg-deep)"
-    badge_word = t("Hold") if up else t("Sell") if down else ", "
+    badge_word = t("Hold") if up else t("Sell") if down else t("Steady")
     advice = (t("{crop} trending up in {district}. Advise holding stock 2 to 3 weeks.") if up
               else t("{crop} trending down in {district}. Advise selling soon.") if down
               else t("{crop} stable in {district}. No urgent action.")).format(crop=cl, district=district)

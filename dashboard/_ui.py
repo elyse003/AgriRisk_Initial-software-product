@@ -164,8 +164,9 @@ EDITORIAL_CSS = """
   line-height:1.55; color:var(--ag-ink-soft); }
 .ag-note strong{ color:var(--ag-ink); font-weight:600; } .ag-note em{ font-style:italic; color:var(--ag-terra); }
 .ag-advice{ display:flex; gap:14px; align-items:flex-start; }
-.ag-advice .badge{ width:56px; height:56px; border-radius:50%; display:grid; place-items:center;
-  font-family:var(--f-serif); font-size:21px; flex-shrink:0; }
+.ag-advice .badge{ display:inline-flex; align-items:center; justify-content:center;
+  padding:8px 16px; border-radius:999px; font-family:var(--f-serif); font-size:16px;
+  font-weight:600; white-space:nowrap; flex-shrink:0; }
 table.ag-data{ width:100%; border-collapse:separate; border-spacing:0; font-size:13px; }
 table.ag-data th{ text-align:left; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
   color:var(--ag-mute); font-weight:500; padding:10px 14px; border-bottom:1px solid var(--ag-line);
