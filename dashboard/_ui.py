@@ -251,6 +251,27 @@ def urban_notice(district):
         f'{t("Kigali City")}: {t(note)}</div></div>', unsafe_allow_html=True)
 
 
+def insight_panel(items, lead="What this means", strong="What to do", meta="", intro=""):
+    """A consistent plain-language 'what this means · what to do' card, shared by
+    all four modules. `items` is a list of (dot_color, label, text). Built as one
+    joined string (no own-line conditionals) so empty inserts can't break the HTML."""
+    rows = "".join(
+        f'<div style="display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--ag-line-soft)">'
+        f'<div style="flex-shrink:0;width:9px;height:9px;border-radius:50%;background:{c};margin-top:5px"></div>'
+        f'<div><div style="font-weight:600;color:var(--ag-ink);font-size:13.5px">{lab}</div>'
+        f'<div style="color:var(--ag-ink-soft);font-size:13.5px;line-height:1.5;margin-top:2px">{txt}</div></div></div>'
+        for c, lab, txt in items if txt)
+    meta_html = (f'<div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{meta}</div>'
+                 if meta else "")
+    intro_html = (f'<div style="font-size:12.5px;color:var(--ag-ink-soft);padding:8px 0 0">{intro}</div>'
+                  if intro else "")
+    st.markdown(
+        f'<div class="ag-card ag-pagein" style="margin-bottom:22px">'
+        f'<div class="ag-card-head"><div class="title">{lead} · <strong>{strong}</strong></div>{meta_html}</div>'
+        f'<div class="ag-card-body" style="padding-top:2px">{intro_html}{rows}</div></div>',
+        unsafe_allow_html=True)
+
+
 def page_header(kicker, title_html, sub, meta_strong="", meta_sub=""):
     """Render the sample's editorial page header (kicker + serif h1 + sub + meta)."""
     meta = (f"<div class='meta'><strong>{meta_strong}</strong>{meta_sub}</div>"

@@ -6,7 +6,7 @@ charts (rainfall anomaly + food CPI from real data) and a benchmark table read
 straight from the model's metrics.json.
 """
 from _ui import (setup, load_rainfall, load_cpi, load_fert, load_risk_model, load_metrics,
-                 page_header, urban_notice, gauge_svg, trend_svg, driver_bar)
+                 page_header, urban_notice, insight_panel, gauge_svg, trend_svg, driver_bar)
 from _i18n import t
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import DISTRICTS
@@ -154,22 +154,12 @@ if district and season_label:
     </div>""", unsafe_allow_html=True)
 
     # ---- "what this means & what to do": one clear suggestion per signal ----
-    ins = [
+    insight_panel([
         ("var(--ag-slate)", t("Rainfall"), rain_tip),
         ("var(--ag-terra)", t("Food prices"), cpi_tip),
         ("var(--ag-sage)", t("Fertilizer"), fert_tip),
         ("var(--ag-soil)", t("Soil"), soil_tip),
-    ]
-    ins_html = "".join(
-        f"<div style='display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--ag-line-soft)'>"
-        f"<div style='flex-shrink:0;width:9px;height:9px;border-radius:50%;background:{col};margin-top:5px'></div>"
-        f"<div><div style='font-weight:600;color:var(--ag-ink);font-size:13.5px'>{lab}</div>"
-        f"<div style='color:var(--ag-ink-soft);font-size:13.5px;line-height:1.5;margin-top:2px'>{tip}</div></div></div>"
-        for col, lab, tip in ins)
-    st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:22px">
-      <div class="ag-card-head"><div class="title">{t('WHAT THIS MEANS')} · <strong>{t('WHAT TO DO')}</strong></div>
-        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district} · {season_label}</div></div>
-      <div class="ag-card-body" style="padding-top:2px">{ins_html}</div></div>""", unsafe_allow_html=True)
+    ], lead=t("What this means"), strong=t("What to do"), meta=f"{district} · {season_label}")
 
     # ---- district soil & terrain profile (now part of the model) ----
     ph_note = t("acidic — lime helps") if ap["ph"] < 5.3 else (t("slightly acidic") if ap["ph"] < 6.0 else t("near neutral"))

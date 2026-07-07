@@ -9,7 +9,7 @@ built by scripts/train_models.py on real WFP data) instead of training on the
 fly. WFP prices are monthly, so the horizon is the next month (~4 weeks).
 """
 from _ui import (setup, load_prices, load_price_forecaster, load_esoko, load_farmgate_ratios,
-                 page_header, urban_notice, price_chart_svg, CROP_TINT)
+                 page_header, urban_notice, insight_panel, price_chart_svg, CROP_TINT)
 from _i18n import t, crop_label
 import numpy as np, pandas as pd, streamlit as st
 from config.settings import CROPS, DISTRICTS
@@ -78,13 +78,11 @@ if crop and district:
                      "measured farmgate margin; next-month trend from the model.").format(district=district)
     log_price(crop, district, str(last_date.date()), cur)
 
-    # empirical 80% band from recent monthly log-return volatility (1.28σ). Because
-    # the series is retail scaled by a constant ratio, that sigma is RETAIL
-    # volatility — inflate it so the range reflects farmgate's wider swings (see
+    # empirical 80% band (1.28σ). sigma comes from price_outlook (the SMOOTH retail
+    # returns, not the farmgate overlay), inflated for farmgate's wider swings (see
     # FARMGATE_VOL_UPLIFT; an assumption until Esoko history lets us measure it).
     from src.models.price_forecasting import FARMGATE_VOL_UPLIFT
-    rets = np.log(s).diff().dropna().tail(12)
-    sigma = (float(rets.std()) if len(rets) > 2 else 0.05) * FARMGATE_VOL_UPLIFT
+    sigma = outlook.get("sigma", 0.05) * FARMGATE_VOL_UPLIFT
     lo, hi = fc * np.exp(-1.28 * sigma), fc * np.exp(1.28 * sigma)
     band_pct = (hi - lo) / 2 / fc * 100
 
@@ -135,6 +133,24 @@ if crop and district:
         f'<div class="ag-card-body"><div class="ag-legend">{legend}</div>{svg}'
         f'<div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{note}</div>'
         f'</div></div>', unsafe_allow_html=True)
+
+    # ---- plain-language "what this means & what to do" (farmer-facing) ----
+    src_word = (t("national average — no local data") if national
+                else t("from Esoko farmgate") if real_fg else t("estimated farmgate"))
+    price_msg = t("You'd be paid about {p} RWF/kg now ({src}).").format(p=f"{cur:,.0f}", src=src_word)
+    if up:
+        trend_msg = t("Prices look to be rising (~{pct}). If you can store well, holding 2-3 weeks may pay more.").format(pct=f"{pct:+.1f}%")
+    elif down:
+        trend_msg = t("Prices look to be falling (~{pct}). Selling sooner is likely better than waiting.").format(pct=f"{pct:+.1f}%")
+    else:
+        trend_msg = t("Prices look steady (~{pct}). No urgent timing pressure.").format(pct=f"{pct:+.1f}%")
+    range_msg = t("Likely between {lo} and {hi} RWF/kg next month — farmgate can swing wider, so treat it as a guide.").format(
+        lo=f"{lo:,.0f}", hi=f"{hi:,.0f}")
+    insight_panel([
+        ("var(--ag-ink)", t("Price now"), price_msg),
+        (color, t("Next month"), trend_msg),
+        ("var(--ag-mute)", t("How sure"), range_msg),
+    ], lead=t("What this means"), strong=t("What to do"), meta=f"{cl} · {district}")
 
     # ---- two-col: advice + forecast table / RQ note ----
     tone = "hold" if up else "sell" if down else "flat"

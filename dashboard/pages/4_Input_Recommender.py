@@ -4,7 +4,7 @@ Rendered in the "Officer console" editorial style: a serif headline, the land-si
 plan shown as ranked recommendation cards (with a budget verdict), and the rest of
 the catalogue suitable for the crop as an "other matches" table.
 """
-from _ui import setup, page_header, urban_notice
+from _ui import setup, page_header, urban_notice, insight_panel
 from _i18n import t, crop_label
 from src.db.connection import fetch_catalogue
 import streamlit as st
@@ -90,6 +90,22 @@ if crop and district:
         <span style="font-family:var(--f-serif);font-size:30px;color:{note_col}">{total:,}<span style="font-size:13px;color:var(--ag-mute);font-family:var(--f-mono)"> RWF</span></span>
         <span style="font-size:13.5px;color:var(--ag-ink-soft);line-height:1.5">{msg}</span></div></div>""",
                 unsafe_allow_html=True)
+
+    # ---- plain-language "what this means & what to do" ----
+    buy_parts = [f"{int(r['bags_50kg'])} × {str(r['fertilizer']).replace(' (50kg bag)', '')}" for _, r in plan.iterrows()]
+    buy_msg = t("For {land:g} ha, buy: {items}.").format(land=land, items=", ".join(buy_parts))
+    when_parts = [f"{str(r['fertilizer']).replace(' (50kg bag)', '')} — {r['when']}" for _, r in plan.iterrows()]
+    when_msg = "; ".join(when_parts) + "."
+    soil_do = (t("Apply lime before planting to fix the acidity, then the fertilizers.")
+               if has_lime else t("Soil pH is fine — no lime needed; just the fertilizers."))
+    budget_do = (t("Fits your budget with {r:,} RWF to spare.").format(r=remaining) if ok
+                 else t("Over budget by {x:,} RWF — buy in stages or start with a smaller area (lime is a one-off).").format(x=-remaining))
+    insight_panel([
+        ("var(--ag-sage)", t("Buy"), buy_msg),
+        ("var(--ag-slate)", t("When to apply"), when_msg),
+        ("var(--ag-soil)", t("Soil"), soil_do),
+        (note_col, t("Budget"), budget_do),
+    ], lead=t("What this means"), strong=t("What to do"), meta=f"{crop_label(crop)} · {district} · {land:g} ha")
 
     # ---- other matches: catalogue inputs suitable for this crop ----
     suit = cat[cat["crop_suitability"].str.contains(crop, case=False, na=False)].copy()

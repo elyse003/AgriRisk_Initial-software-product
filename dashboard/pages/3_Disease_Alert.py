@@ -4,7 +4,7 @@ Rendered in the "Officer console" editorial style: a 14-day weather-context stri
 (rainfall / temp / humidity tiles + a daily risk heatmap built from the real
 forecast), disease rows with risk meters, and the FAO rule-base table.
 """
-from _ui import setup, page_header, urban_notice, risk_meter
+from _ui import setup, page_header, urban_notice, insight_panel, risk_meter
 from _i18n import t, crop_label
 import streamlit as st
 from config.settings import DISTRICT_COORDS, CROPS, DISEASE_RULES
@@ -97,6 +97,19 @@ if district:
         <div class="kicker">{t('DAILY DISEASE RISK INDEX')}</div>
         <div class="week-strip" style="margin-top:4px">{strip}<div class="axis">{axis}</div></div>
       </div></div>""", unsafe_allow_html=True)
+
+    # ---- plain-language reading of the weather (what drives disease) ----
+    rain_i = (t("Wet 14 days ({mm}mm) — leaves stay wet, which lets fungal spores spread.").format(mm=f"{rain_total:.0f}")
+              if rain_total >= 40 else t("Fairly dry ({mm}mm) — lower fungal pressure.").format(mm=f"{rain_total:.0f}"))
+    temp_i = (t("{c}°C on average — inside the range blights favour.").format(c=f"{temp_mean:.1f}")
+              if 13 <= temp_mean <= 24 else t("{c}°C on average — outside the main blight window.").format(c=f"{temp_mean:.1f}"))
+    rh_i = (t("{h}% humidity — high, which favours fungal disease.").format(h=f"{rh_mean:.0f}")
+            if rh_mean >= 85 else t("{h}% humidity — moderate.").format(h=f"{rh_mean:.0f}"))
+    insight_panel([
+        ("var(--ag-slate)", t("Rain & leaf wetness"), rain_i),
+        ("var(--ag-amber)", t("Temperature"), temp_i),
+        ("var(--ag-terra)", t("Humidity"), rh_i),
+    ], lead=t("What this means"), strong=t("Right now"), meta=f"{district} · {t('next 14 days')}")
 
     # ---- recommendations: one clear "what to do" per disease (always shown) ----
     risk_col = {"High": "var(--ag-terra)", "Medium": "var(--ag-amber)", "Low": "var(--ag-sage)"}

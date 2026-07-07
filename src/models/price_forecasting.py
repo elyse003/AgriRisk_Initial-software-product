@@ -295,6 +295,13 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
         fc = float(round(cur * (fc_retail / retail_last)))   # retail trend on the farmgate level
 
     pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
+    # Monthly log-return volatility for the forecast band. Use the crop's NATIONAL
+    # (pooled) series — the model's dynamics are pooled, and a single thin/erratic
+    # district series (e.g. a Kigali market) would otherwise give a spuriously huge
+    # band. Capped so data noise can't produce an absurd range.
+    rr = np.log(national).diff().dropna().tail(12)
+    sigma = float(rr.std()) if len(rr) > 2 else 0.05
+    sigma = min(sigma, 0.15)
     return {"series": s, "current": cur, "forecast": fc, "pct": pct,
             "source": source, "level": level, "last_date": s.index[-1],
-            "real_dates": real_dates}
+            "real_dates": real_dates, "sigma": sigma}
