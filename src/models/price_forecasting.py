@@ -35,6 +35,25 @@ FEATURES = ([f"ret{l}" for l in RET_LAGS]
 # farmer tool). Overridden by the live measured ratios when available.
 DEFAULT_FG_RATIO = {"maize": 0.82, "beans": 0.86, "potatoes": 1.0}
 
+# Forecast-band honesty: because we scale WFP retail by a constant ratio, the
+# forecast's volatility is RETAIL volatility — but farmgate prices swing wider
+# (farmers are price-takers; harvest gluts hit farmgate harder). Until we have
+# enough Esoko farmgate history to measure it directly (>= MIN_HISTORY months, see
+# ESOKO_DIRECT_MIN), inflate the retail-derived sigma by this documented factor
+# (~1.3-1.5x for staples in the literature). This is an ASSUMPTION, not a
+# measurement — replace it with the measured farmgate sigma once history allows.
+FARMGATE_VOL_UPLIFT = 1.4
+
+# Data-gated roadmap for the WFP+Esoko hybrid (upgrades switch on as Esoko grows):
+#   >= ESOKO_SEASONAL_MIN months  -> replace the flat farmgate/retail ratio with a
+#                                    per-month (seasonal) margin from the overlap.
+#   >= ESOKO_DIRECT_MIN months    -> train directly on farmgate (train_models.py
+#                                    --include-esoko) and measure the band sigma
+#                                    from real farmgate returns (drop the uplift).
+# Fitting these before the thresholds would model noise, so they stay gated.
+ESOKO_SEASONAL_MIN = 6
+ESOKO_DIRECT_MIN = MIN_HISTORY   # 14
+
 
 def mape(y_true, y_pred) -> float:
     """Mean Absolute Percentage Error (%), the proposal's primary metric."""

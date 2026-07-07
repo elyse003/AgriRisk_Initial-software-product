@@ -78,9 +78,13 @@ if crop and district:
                      "measured farmgate margin; next-month trend from the model.").format(district=district)
     log_price(crop, district, str(last_date.date()), cur)
 
-    # empirical 80% band from recent monthly log-return volatility (1.28σ)
+    # empirical 80% band from recent monthly log-return volatility (1.28σ). Because
+    # the series is retail scaled by a constant ratio, that sigma is RETAIL
+    # volatility — inflate it so the range reflects farmgate's wider swings (see
+    # FARMGATE_VOL_UPLIFT; an assumption until Esoko history lets us measure it).
+    from src.models.price_forecasting import FARMGATE_VOL_UPLIFT
     rets = np.log(s).diff().dropna().tail(12)
-    sigma = float(rets.std()) if len(rets) > 2 else 0.05
+    sigma = (float(rets.std()) if len(rets) > 2 else 0.05) * FARMGATE_VOL_UPLIFT
     lo, hi = fc * np.exp(-1.28 * sigma), fc * np.exp(1.28 * sigma)
     band_pct = (hi - lo) / 2 / fc * 100
 
@@ -154,7 +158,9 @@ if crop and district:
             <tr><td>{t('Next-month forecast')}</td><td class="num" style="color:{tint}">{fc:,.0f}</td></tr>
             <tr><td class="muted">{t('Likely low')}</td><td class="num muted">{lo:,.0f}</td></tr>
             <tr><td class="muted">{t('Likely high')}</td><td class="num muted">{hi:,.0f}</td></tr>
-          </tbody></table></div>
+          </tbody></table>
+          <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);padding:10px 14px 2px;line-height:1.5">
+            {t("Indicative range — farmgate prices can swing wider than market prices, so treat the low/high as a guide.")}</div></div>
       </div></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
