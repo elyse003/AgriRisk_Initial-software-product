@@ -36,12 +36,12 @@ FEATURES = ([f"ret{l}" for l in RET_LAGS]
 DEFAULT_FG_RATIO = {"maize": 0.82, "beans": 0.86, "potatoes": 1.0}
 
 # Forecast-band honesty: because we scale WFP retail by a constant ratio, the
-# forecast's volatility is RETAIL volatility — but farmgate prices swing wider
+# forecast's volatility is RETAIL volatility, but farmgate prices swing wider
 # (farmers are price-takers; harvest gluts hit farmgate harder). Until we have
 # enough Esoko farmgate history to measure it directly (>= MIN_HISTORY months, see
 # ESOKO_DIRECT_MIN), inflate the retail-derived sigma by this documented factor
 # (~1.3-1.5x for staples in the literature). This is an ASSUMPTION, not a
-# measurement — replace it with the measured farmgate sigma once history allows.
+# measurement, replace it with the measured farmgate sigma once history allows.
 FARMGATE_VOL_UPLIFT = 1.4
 
 # Data-gated roadmap for the WFP+Esoko hybrid (upgrades switch on as Esoko grows):
@@ -178,7 +178,7 @@ def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
     For each Esoko farmgate observation, divide by the matching WFP RETAIL price
     (the district's own month if present, else the crop's national median for
     that month, else the latest national), and take the median per crop. Returns
-    {crop: {"ratio": k, "n": obs, "months": esoko_months}} — e.g. ratio 0.85 means
+    {crop: {"ratio": k, "n": obs, "months": esoko_months}}, e.g. ratio 0.85 means
     "farmgate is about 85% of retail".
     """
     out = {}
@@ -208,7 +208,7 @@ def farmgate_retail_ratio(prices: pd.DataFrame, esoko) -> dict:
 
 
 def crop_ratios(prices, esoko) -> dict:
-    """{crop: farmgate/retail ratio} — measured from the overlap where possible,
+    """{crop: farmgate/retail ratio}, measured from the overlap where possible,
     else the baked-in default. Used to express non-Esoko districts in farmgate."""
     r = dict(DEFAULT_FG_RATIO)
     for c, info in farmgate_retail_ratio(prices, esoko).items():
@@ -231,7 +231,7 @@ def esoko_as_prices(esoko) -> pd.DataFrame | None:
 
 def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
                   esoko=None, ratios=None, variety=None, stale_days: int = 540) -> dict | None:
-    """Next-month FARMGATE outlook for one crop/district — the single source of
+    """Next-month FARMGATE outlook for one crop/district, the single source of
     truth shared by the dashboard, chat and USSD.
 
     This is a farmer tool, so EVERYTHING is expressed in farmgate terms: the real
@@ -271,7 +271,7 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
     # Estimate every past month as WFP retail x the crop's farmgate/retail ratio,
     # then OVERLAY the REAL Esoko farmgate wherever we actually recorded it (for
     # this crop/district/variety). So the past shows real farmgate where we have
-    # it and a labelled estimate elsewhere — and the real portion grows as Esoko
+    # it and a labelled estimate elsewhere, and the real portion grows as Esoko
     # accumulates months.
     k = (ratios or DEFAULT_FG_RATIO).get(crop, DEFAULT_FG_RATIO.get(crop, 1.0))
     fg_series = s_retail * k
@@ -296,7 +296,7 @@ def price_outlook(prices: pd.DataFrame, models, crop: str, district: str,
 
     pct = ((fc - cur) / cur * 100) if (fc is not None and cur) else None
     # Monthly log-return volatility for the forecast band. Use the crop's NATIONAL
-    # (pooled) series — the model's dynamics are pooled, and a single thin/erratic
+    # (pooled) series, the model's dynamics are pooled, and a single thin/erratic
     # district series (e.g. a Kigali market) would otherwise give a spuriously huge
     # band. Capped so data noise can't produce an absurd range.
     rr = np.log(national).diff().dropna().tail(12)

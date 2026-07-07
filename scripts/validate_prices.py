@@ -2,7 +2,7 @@
 sound).
 
 The model forecasts a scale-free next-month RETURN, so we can learn the DYNAMICS
-from WFP's long retail history and set the LEVEL from Esoko farmgate — provided
+from WFP's long retail history and set the LEVEL from Esoko farmgate, provided
 farmgate and retail move together. This script quantifies that:
 
   * coverage          how many crop/districts each source covers
@@ -59,7 +59,7 @@ def main():
     print("\n=== TREND TRANSFER: retail vs farmgate return correlation ===")
     months = esoko["date"].dt.to_period("M").nunique()
     if months < 3:
-        print(f"  Only {months} Esoko month(s) — need >= 3 to correlate month-over-month")
+        print(f"  Only {months} Esoko month(s), need >= 3 to correlate month-over-month")
         print("  returns. Keep accumulating Esoko exports (this is the check that")
         print("  justifies applying WFP's trend to the farmgate level).")
     else:

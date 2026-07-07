@@ -1,7 +1,7 @@
 """USSD Preview: a feature-phone *384#-style simulator for the AgriRisk menu.
 
 Demonstrates how a farmer reaches AgriRisk on ANY phone, with no internet, via a
-numbered menu — without needing a live USSD code (which requires an operator
+numbered menu, without needing a live USSD code (which requires an operator
 agreement). Powered by src.channels.ussd_menu, which reuses the same advisory
 logic as the chat/WhatsApp/SMS bot.
 """
@@ -18,7 +18,7 @@ setup("USSD Preview", "Feature-phone menu demo",
 page_header(
     "USSD PREVIEW",
     f"Feature-phone <em>{t('menu')}</em> demo",
-    t("How a farmer reaches AgriRisk on any phone — no internet, no app — through a "
+    t("How a farmer reaches AgriRisk on any phone, no internet, no app, through a "
       "*384#-style menu. This is a working simulator; going live needs a short code from "
       "an operator, but the menu itself is ready."),
     meta_strong="*384#", meta_sub=t("simulator"))

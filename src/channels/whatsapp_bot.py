@@ -196,15 +196,15 @@ def answer(text: str, ctx: dict | None = None) -> str:
     # rather than falling through to the generic "off-topic" decline.
     if intent is None and (crop or district):
         subj = crop.title() if crop else district
-        return say(f"{subj}: urashaka iki — igiciro, ibyago (risk), indwara, cyangwa ifumbire?",
-                   f"{subj}: what would you like — price, seasonal risk, disease, or inputs?")
+        return say(f"{subj}: urashaka iki, igiciro, ibyago (risk), indwara, cyangwa ifumbire?",
+                   f"{subj}: what would you like, price, seasonal risk, disease, or inputs?")
 
     if intent in (None, "help"):
         return say("Ndi umufasha w'ubuhinzi gusa. Nshobora kugufasha ku: igiciro, ibyago "
-                   "(risk), indwara, cyangwa ifumbire — ku bigori, ibishyimbo n'ibirayi. "
+                   "(risk), indwara, cyangwa ifumbire, ku bigori, ibishyimbo n'ibirayi. "
                    "Urugero: 'ibigori igiciro Bugesera' cyangwa 'indwara ibirayi Musanze'.",
                    "I'm a farming assistant only. I can help with crop price, seasonal risk, "
-                   "disease alerts, or input plans — for maize, beans and potatoes. "
+                   "disease alerts, or input plans, for maize, beans and potatoes. "
                    "For example: 'maize price Bugesera' or 'disease potato Musanze'.")
 
     if intent == "price":
@@ -278,7 +278,7 @@ def answer(text: str, ctx: dict | None = None) -> str:
         if not alerts:
             return say(f"{district}: nta byago byinshi by'indwara mu minsi 14 iri imbere.",
                        f"{district}: no elevated disease risk in the next 14 days.")
-        parts = "; ".join(f"{a['disease']} ({a['crop']}) — {a['risk']}" for a in alerts[:3])
+        parts = "; ".join(f"{a['disease']} ({a['crop']}), {a['risk']}" for a in alerts[:3])
         tip = alerts[0]["action"]
         return say(f"{district}: {parts}. {tip}", f"{district}: {parts}. {tip}")
 
@@ -309,7 +309,7 @@ def answer(text: str, ctx: dict | None = None) -> str:
 
 
 def _slots_complete(m: dict) -> bool:
-    """True when the merged slots are enough to fully answer — so the chat can
+    """True when the merged slots are enough to fully answer, so the chat can
     stop carrying context. Mirrors the 'ask for the missing piece' checks above."""
     intent = m.get("intent")
     if intent == "price":
@@ -360,7 +360,7 @@ def converse(text: str, state: dict | None = None):
     p = parse_message(text or "")
     rw = p["lang"] == "rw"
 
-    # Does THIS message say anything on-topic — a crop, district, intent keyword,
+    # Does THIS message say anything on-topic, a crop, district, intent keyword,
     # land size or budget, or a valid answer to a pending menu step? If not, it's
     # gibberish/off-topic: give the domain decline and CLEAR the sticky state, so a
     # leftover "price" intent doesn't keep re-asking "Which crop?" for junk input.

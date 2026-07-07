@@ -4,7 +4,7 @@ Sends one SMS through the configured Communications-Platform-as-a-Service. The
 default provider is Africa's Talking (best Rwanda coverage, MTN/Airtel); Twilio
 is also supported. It uses plain HTTP (`requests`) so there's no SDK dependency.
 
-SAFE BY DEFAULT: with no API key set, or SMS_DRY_RUN=1, it does NOT send — it
+SAFE BY DEFAULT: with no API key set, or SMS_DRY_RUN=1, it does NOT send, it
 just returns/logs the message it *would* send. So the whole alert pipeline runs
 and demos with zero cost or telecom onboarding; set the credentials to go live.
 
@@ -67,7 +67,7 @@ def _send_twilio(to: str, message: str) -> dict:
 
 def send_sms(to: str, message: str, dry_run: bool | None = None, retries: int = 3) -> dict:
     """Send one SMS (or simulate it). Returns a small result dict; never raises
-    on a provider error — it reports it, so a bad number can't stop a batch.
+    on a provider error, it reports it, so a bad number can't stop a batch.
     Retries a few times so a transient network/TLS blip doesn't fail the send."""
     if dry_run is None:
         dry_run = not is_live()

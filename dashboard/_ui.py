@@ -293,7 +293,7 @@ def _nice_bounds(lo, hi, pad=0.06):
 def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None):
     """Agri-themed price line: ink history + crop-tinted forecast point with an
     empirical band and a 'now' divider. dates are datetimes, vals/lo/hi floats.
-    real_flags (aligned to vals) marks months backed by REAL Esoko farmgate — those
+    real_flags (aligned to vals) marks months backed by REAL Esoko farmgate, those
     get a solid tinted marker and an 'actual' tag; the rest are labelled 'est'."""
     real_flags = real_flags or [False] * len(vals)
     import pandas as pd
@@ -322,7 +322,7 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None)
         xt += f'<text x="{X(i):.1f}" y="{H-padB+16}" font-size="9.5" fill="{col}" text-anchor="middle">{lab}</text>'
 
     # interactive hover layer: as the cursor scrubs across, each month reveals a
-    # crosshair, a dot and a value pill. Pure CSS (:hover) — no JS in st.markdown.
+    # crosshair, a dot and a value pill. Pure CSS (:hover), no JS in st.markdown.
     step = iw / (n - 1)
     ally = list(vals) + [fc_val]
     hov = ""
@@ -369,7 +369,7 @@ def price_chart_svg(dates, vals, fc_date, fc_val, lo, hi, tint, real_flags=None)
       {hov}
     </svg>"""
     # a whitespace-only line (e.g. when realmk is empty) reads as a blank line and
-    # ends Streamlit's HTML block, dumping the rest as raw text — so drop them.
+    # ends Streamlit's HTML block, dumping the rest as raw text, so drop them.
     return "".join(ln for ln in svg.splitlines() if ln.strip())
 
 
@@ -560,7 +560,7 @@ def _chat_body():
     st.markdown(f"<div class='ag-chat-head'><span class='dot'></span>{t('AgriRisk Assistant')}</div>",
                 unsafe_allow_html=True)
     if "chat" not in st.session_state:
-        st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs — "
+        st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs, "
                                                  "for example: 'maize price Musanze'."))]
     st.session_state.setdefault("chat_ctx", {})
     box = st.container(height=460)   # taller so the panel opens higher (Eza-style)
@@ -582,7 +582,7 @@ def _chat_body():
 def floating_chat():
     """Round floating chat button (bottom-right) opening a small assistant popover.
 
-    Wrapped so a chat/import hiccup can never blank out the host page — the rest
+    Wrapped so a chat/import hiccup can never blank out the host page, the rest
     of the page (e.g. the USSD Preview) still renders."""
     try:
         with st.container(key="ag_chatfab"):

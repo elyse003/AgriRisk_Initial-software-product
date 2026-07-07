@@ -31,7 +31,7 @@ OUTCOME_HORIZON = 6   # months ahead used to measure realized price stress
 
 
 def feature_row(rainfall_anomaly, cpi_change, fert_change, district):
-    """One-row feature frame (in FEATURES order) for a live prediction — joins the
+    """One-row feature frame (in FEATURES order) for a live prediction, joins the
     district's static agro profile onto the dynamic signals. Shared by the
     dashboard and the chatbot so every channel scores identically."""
     vals = {"rainfall_anomaly": rainfall_anomaly, "cpi_change": cpi_change,

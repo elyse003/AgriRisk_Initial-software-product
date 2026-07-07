@@ -29,7 +29,7 @@ district = c2.selectbox(t("District"), DISTRICTS)
 cl = crop_label(crop)
 tint = CROP_TINT.get(crop, "#6F5A34")
 
-# beans & potatoes have varieties/grades in the Esoko data — let the user pick one
+# beans & potatoes have varieties/grades in the Esoko data, let the user pick one
 variety = None
 if crop in ("beans", "potatoes") and "variety" in esoko.columns:
     vlist = sorted(v for v in esoko[esoko["crop"] == crop]["variety"].dropna().unique()
@@ -42,12 +42,12 @@ if crop in ("beans", "potatoes") and "variety" in esoko.columns:
 page_header(
     t('Price Forecast').upper(),
     f"{cl}{f' · {variety}' if variety else ''} <em>{t('farmgate price')}</em> · {district}",
-    t("What a farmer is likely to be paid next month — the farmgate price, from "
+    t("What a farmer is likely to be paid next month, the farmgate price, from "
       "recent market data."),
     meta_strong="RWF/kg", meta_sub=t("farmgate · monthly"))
 urban_notice(district)
 
-# live: recompute + redraw whenever any filter (crop / district / type) changes — no button
+# live: recompute + redraw whenever any filter (crop / district / type) changes, no button
 if crop and district:
     # one shared outlook so the dashboard, chat and USSD always agree (all farmgate)
     outlook = price_outlook(prices, models, crop, district, esoko=esoko, ratios=ratios, variety=variety)
@@ -69,12 +69,12 @@ if crop and district:
         src_note = t("No local price history for {district}, so the trend uses Rwanda's national "
                      "average; the price level is a real Esoko farmgate figure.").format(district=district)
     elif national:
-        src_note = t("No local price history for {district} — showing Rwanda's national average as a "
+        src_note = t("No local price history for {district}, showing Rwanda's national average as a "
                      "farmgate price; next-month trend from the model.").format(district=district)
     elif real_fg:
         src_note = t("Farmgate price from Esoko for {district}; next-month trend from the model.").format(district=district)
     else:
-        src_note = t("Estimated farmgate for {district} — recent market prices adjusted by the "
+        src_note = t("Estimated farmgate for {district}, recent market prices adjusted by the "
                      "measured farmgate margin; next-month trend from the model.").format(district=district)
     log_price(crop, district, str(last_date.date()), cur)
 
@@ -106,7 +106,7 @@ if crop and district:
             f'<div class="ag-pagein" style="font-family:var(--f-mono);font-size:11.5px;color:var(--ag-ink-soft);'
             f'margin:-8px 0 16px;padding:8px 14px;border-radius:8px;background:var(--ag-bg-deep)">'
             f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ag-slate);margin-right:8px"></span>'
-            f'{t("No local market history for {district} — figures fall back to Rwanda\'s national average.").format(district=district)}'
+            f'{t("No local market history for {district}, figures fall back to Rwanda\'s national average.").format(district=district)}'
             f'</div>', unsafe_allow_html=True)
 
     # ---- chart card ----
@@ -135,7 +135,7 @@ if crop and district:
         f'</div></div>', unsafe_allow_html=True)
 
     # ---- plain-language "what this means & what to do" (farmer-facing) ----
-    src_word = (t("national average — no local data") if national
+    src_word = (t("national average, no local data") if national
                 else t("from Esoko farmgate") if real_fg else t("estimated farmgate"))
     price_msg = t("You'd be paid about {p} RWF/kg now ({src}).").format(p=f"{cur:,.0f}", src=src_word)
     if up:
@@ -144,7 +144,7 @@ if crop and district:
         trend_msg = t("Prices look to be falling (~{pct}). Selling sooner is likely better than waiting.").format(pct=f"{pct:+.1f}%")
     else:
         trend_msg = t("Prices look steady (~{pct}). No urgent timing pressure.").format(pct=f"{pct:+.1f}%")
-    range_msg = t("Likely between {lo} and {hi} RWF/kg next month — farmgate can swing wider, so treat it as a guide.").format(
+    range_msg = t("Likely between {lo} and {hi} RWF/kg next month, farmgate can swing wider, so treat it as a guide.").format(
         lo=f"{lo:,.0f}", hi=f"{hi:,.0f}")
     insight_panel([
         ("var(--ag-ink)", t("Price now"), price_msg),
@@ -155,7 +155,7 @@ if crop and district:
     # ---- two-col: advice + forecast table / RQ note ----
     tone = "hold" if up else "sell" if down else "flat"
     badge_bg = "var(--ag-sage-bg)" if up else "var(--ag-terra-bg)" if down else "var(--ag-bg-deep)"
-    badge_word = t("Hold") if up else t("Sell") if down else "—"
+    badge_word = t("Hold") if up else t("Sell") if down else ", "
     advice = (t("{crop} trending up in {district}. Advise holding stock 2 to 3 weeks.") if up
               else t("{crop} trending down in {district}. Advise selling soon.") if down
               else t("{crop} stable in {district}. No urgent action.")).format(crop=cl, district=district)
@@ -176,7 +176,7 @@ if crop and district:
             <tr><td class="muted">{t('Likely high')}</td><td class="num muted">{hi:,.0f}</td></tr>
           </tbody></table>
           <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);padding:10px 14px 2px;line-height:1.5">
-            {t("Indicative range — farmgate prices can swing wider than market prices, so treat the low/high as a guide.")}</div></div>
+            {t("Indicative range, farmgate prices can swing wider than market prices, so treat the low/high as a guide.")}</div></div>
       </div></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">

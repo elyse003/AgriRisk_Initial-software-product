@@ -23,7 +23,7 @@ OFFICERS = ("officer", "super_admin")
 # Session persistence across full page reloads.
 # Login lives in st.session_state, which a full browser reload wipes. Some
 # in-app links (the dashboard tool cards, the footer) are plain <a href> anchors
-# that DO reload — which used to drop the user back to the sign-in screen. To
+# that DO reload, which used to drop the user back to the sign-in screen. To
 # avoid that, we mint a short signed token on login and carry it in those links
 # (auth_qs()); current_user() restores the session from it after a reload.
 # ---------------------------------------------------------------------------

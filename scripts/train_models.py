@@ -44,7 +44,7 @@ def train_price(include_esoko=False):
             if ea is not None:
                 prices = pd.concat([prices, ea], ignore_index=True)
             note = ("" if months >= MIN_HISTORY else
-                    f" — too shallow to add usable series yet (need >= {MIN_HISTORY} months); "
+                    f", too shallow to add usable series yet (need >= {MIN_HISTORY} months); "
                     "will help automatically as it grows")
             print(f"  +Esoko farmgate pooled: {len(ea) if ea is not None else 0} rows, "
                   f"{months} month(s){note}")

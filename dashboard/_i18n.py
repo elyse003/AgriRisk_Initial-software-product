@@ -206,7 +206,7 @@ RW = {
         "Imbonerahamwe yuzuye ni iy'abajyanama b'ubuhinzi. Ushobora kuganira "
         "n'umufasha kuri WhatsApp ku nama z'igiciro, ibyago, indwara n'ifumbire.",
 
-    # ---- editorial result pages (redesign) — working draft, review with a native speaker ----
+    # ---- editorial result pages (redesign), working draft, review with a native speaker ----
     "price": "igiciro",
     "Last actual": "Iheruka nyayo",
     "Model MAPE (held-out)": "MAPE y'icyitegererezo",
@@ -284,8 +284,8 @@ RW = {
     "AgriRisk Assistant": "Umufasha wa AgriRisk",
     "Console": "Ibikoresho",
     "Preferences": "Ibyo uhitamo",
-    "Hello! Ask me about price, risk, disease or inputs — for example: 'maize price Musanze'.":
-        "Muraho! Mbaza ku giciro, ibyago, indwara cyangwa ifumbire — urugero: 'ibigori igiciro Musanze'.",
+    "Hello! Ask me about price, risk, disease or inputs, for example: 'maize price Musanze'.":
+        "Muraho! Mbaza ku giciro, ibyago, indwara cyangwa ifumbire, urugero: 'ibigori igiciro Musanze'.",
     "Ask price, risk, disease, inputs…": "Baza igiciro, ibyago, indwara, ifumbire…",
     # ---- simplified result-page labels ----
     "Current price": "Igiciro cy'ubu",

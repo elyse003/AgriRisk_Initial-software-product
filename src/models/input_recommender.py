@@ -1,7 +1,7 @@
 """Module 4: inflation-adjusted input recommender.
 
 Weighted ranking over the MINAGRI input catalogue, filtered by crop, district,
-and budget. Returns at most MAX_RECOMMENDATIONS (3) items — per Lobell et al.
+and budget. Returns at most MAX_RECOMMENDATIONS (3) items, per Lobell et al.
 (2020), capping at three prevents decision paralysis. This module is complete;
 it just needs the catalogue loaded.
 """
@@ -66,7 +66,7 @@ CROP_PLAN = {
 # Agricultural lime for acidic soils. Rwanda's central/highland ferralsols are
 # often acidic (pH < 5.5), which locks up phosphorus and cuts fertilizer response,
 # so the plan varies by district: more acidic soil -> more lime. Travertine lime is
-# subsidised; ~5,000 RWF per 50 kg is a nationwide estimate. Rates are indicative —
+# subsidised; ~5,000 RWF per 50 kg is a nationwide estimate. Rates are indicative, 
 # confirm with a soil test.
 LIME_PRICE_RWF = 5000
 
@@ -86,7 +86,7 @@ def _lime_rate_kg_ha(ph) -> int:
 
 def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
                    budget_rwf: float, district: str | None = None):
-    """Size a fertilizer plan to the farmer's land — and, when a district is given,
+    """Size a fertilizer plan to the farmer's land, and, when a district is given,
     add a soil-correction step (lime) sized to that district's soil acidity, so the
     plan genuinely differs where the soil differs.
 

@@ -29,7 +29,7 @@ def fetch_forecast(lat: float, lon: float) -> dict:
 
 def assess_crop_full(crop: str, daily: dict) -> list[dict]:
     """Assess EVERY disease for one crop (including Low risk), each with its
-    current risk level and the recommended action — so the app can always show a
+    current risk level and the recommended action, so the app can always show a
     recommendation, not only when a threshold is crossed."""
     out = []
     temps = [(lo + hi) / 2 for lo, hi in

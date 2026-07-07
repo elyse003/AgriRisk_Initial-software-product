@@ -32,12 +32,12 @@ scode = SEASON_CODE[season_label]
 page_header(
     t('Seasonal Risk').upper(),
     f"<em>{t('Seasonal')}</em> {t('planting risk')} · {district}",
-    t("How likely staple food prices are to rise sharply this season — from rainfall, "
+    t("How likely staple food prices are to rise sharply this season, from rainfall, "
       "food prices and fertilizer costs."),
     meta_strong=season_label, meta_sub=t("recalculated weekly"))
 urban_notice(district)
 
-# live: recompute + redraw whenever the district or season filter changes — no button
+# live: recompute + redraw whenever the district or season filter changes, no button
 if district and season_label:
     r = rain[(rain.district == district) & (rain.season == scode)]
     rain_a = float(r.rainfall_anomaly.iloc[-1]) if len(r) else float(rain.rainfall_anomaly.mean())
@@ -77,45 +77,45 @@ if district and season_label:
 
     # risk index (0-100): what the digits mean
     if s100 <= 35:
-        idx_read = t("mostly stable — normal planting and input spending is reasonable")
+        idx_read = t("mostly stable, normal planting and input spending is reasonable")
     elif s100 <= 45:
-        idx_read = t("low to moderate — largely stable, but keep an eye on markets")
+        idx_read = t("low to moderate, largely stable, but keep an eye on markets")
     elif s100 <= 60:
-        idx_read = t("moderate — mixed signals; plan carefully and keep a reserve")
+        idx_read = t("moderate, mixed signals; plan carefully and keep a reserve")
     elif s100 <= 75:
-        idx_read = t("elevated — a price spike is more likely; store and spend cautiously")
+        idx_read = t("elevated, a price spike is more likely; store and spend cautiously")
     else:
-        idx_read = t("high — sharp price rises are likely; prioritise storage and hardy varieties")
+        idx_read = t("high, sharp price rises are likely; prioritise storage and hardy varieties")
 
     # rainfall anomaly (z-score): 0 = this district's normal, each 1.0 = one std dev
     if rain_a >= 1.0:
-        rain_note, rain_tip = t("much wetter than normal"), t("Great soil moisture and low drought risk — but scout for fungal disease in humid spells.")
+        rain_note, rain_tip = t("much wetter than normal"), t("Great soil moisture and low drought risk, but scout for fungal disease in humid spells.")
     elif rain_a >= 0.3:
         rain_note, rain_tip = t("a bit wetter than normal"), t("Good moisture for planting; drought risk is low.")
     elif rain_a > -0.3:
         rain_note, rain_tip = t("about normal rainfall"), t("Typical planting conditions for this season.")
     elif rain_a > -1.0:
-        rain_note, rain_tip = t("drier than normal"), t("Some drought risk — favour drought-tolerant, short-cycle varieties and save water.")
+        rain_note, rain_tip = t("drier than normal"), t("Some drought risk, favour drought-tolerant, short-cycle varieties and save water.")
     else:
-        rain_note, rain_tip = t("much drier than normal"), t("High drought risk — delay planting or choose drought-tolerant seed; irrigate if you can.")
+        rain_note, rain_tip = t("much drier than normal"), t("High drought risk, delay planting or choose drought-tolerant seed; irrigate if you can.")
     rain_note = f"{rain_a:+.2f} SD · {rain_note}"
 
     # food price pressure (CPI year-on-year %)
     if cpi_c >= 15:
-        cpi_note, cpi_tip = t("food prices rising fast"), t("Strong upward pressure — a good time to sell stored grain, but expect higher costs too.")
+        cpi_note, cpi_tip = t("food prices rising fast"), t("Strong upward pressure, a good time to sell stored grain, but expect higher costs too.")
     elif cpi_c >= 5:
         cpi_note, cpi_tip = t("food prices rising"), t("Moderate upward pressure on staple prices; hold some stock if you can store it well.")
     elif cpi_c >= 0:
         cpi_note, cpi_tip = t("food prices roughly stable"), t("Little inflation pressure this season.")
     else:
-        cpi_note, cpi_tip = t("food prices falling"), t("Weaker selling prices — sell only what you must; store the rest if you can.")
+        cpi_note, cpi_tip = t("food prices falling"), t("Weaker selling prices, sell only what you must; store the rest if you can.")
     cpi_note = f"{cpi_c:+.1f}% {t('vs a year ago')} · {cpi_note}"
 
     # fertilizer cost (year-on-year %)
     if fert_c >= 20:
         fert_note, fert_tip = t("fertilizer much dearer"), t("Budget inputs carefully; stretch with compost and manure.")
     elif fert_c >= 5:
-        fert_note, fert_tip = t("fertilizer getting dearer"), t("Input costs are rising — plan and buy early.")
+        fert_note, fert_tip = t("fertilizer getting dearer"), t("Input costs are rising, plan and buy early.")
     elif fert_c > -5:
         fert_note, fert_tip = t("fertilizer costs stable"), t("Normal input budgeting is fine.")
     else:
@@ -124,11 +124,11 @@ if district and season_label:
 
     # soil & terrain suggestion
     if ap["ph"] < 5.3:
-        soil_tip = t("Acidic {soil} (pH {ph}) — apply lime to lift yield, and add organic matter.").format(soil=ap["soil"], ph=f"{ap['ph']:.1f}")
+        soil_tip = t("Acidic {soil} (pH {ph}), apply lime to lift yield, and add organic matter.").format(soil=ap["soil"], ph=f"{ap['ph']:.1f}")
     elif ap["fertility"] <= 2:
-        soil_tip = t("Lower-fertility {soil} — build it up with compost/manure and a balanced fertilizer.").format(soil=ap["soil"])
+        soil_tip = t("Lower-fertility {soil}, build it up with compost/manure and a balanced fertilizer.").format(soil=ap["soil"])
     else:
-        soil_tip = t("{soil} at {alt} m — reasonable for the district's staples.").format(soil=ap["soil"], alt=f"{ap['altitude_m']:,}")
+        soil_tip = t("{soil} at {alt} m, reasonable for the district's staples.").format(soil=ap["soil"], alt=f"{ap['altitude_m']:,}")
     soil_note = f"{ap['soil']} · {ap['altitude_m']:,} m"
 
     drivers = [
@@ -162,7 +162,7 @@ if district and season_label:
     ], lead=t("What this means"), strong=t("What to do"), meta=f"{district} · {season_label}")
 
     # ---- district soil & terrain profile (now part of the model) ----
-    ph_note = t("acidic — lime helps") if ap["ph"] < 5.3 else (t("slightly acidic") if ap["ph"] < 6.0 else t("near neutral"))
+    ph_note = t("acidic, lime helps") if ap["ph"] < 5.3 else (t("slightly acidic") if ap["ph"] < 6.0 else t("near neutral"))
     fert_lbl = {1: t("very low"), 2: t("low"), 3: t("moderate"), 4: t("good"), 5: t("rich")}[ap["fertility"]]
     drain_lbl = {1: t("poor"), 2: t("poor"), 3: t("moderate"), 4: t("free-draining"), 5: t("free-draining")}[ap["drainage"]]
     cells = [

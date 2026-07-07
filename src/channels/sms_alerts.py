@@ -1,8 +1,8 @@
 """Automated weekly farmer SMS alerts over a CPaaS (default Africa's Talking).
 
 Composes a short, bilingual price + seasonal-risk alert for each subscriber from
-their district and crops — reusing the SAME model-backed advice as the chat /
-USSD / WhatsApp bot (src.channels.whatsapp_bot.answer) — and sends it through the
+their district and crops, reusing the SAME model-backed advice as the chat /
+USSD / WhatsApp bot (src.channels.whatsapp_bot.answer), and sends it through the
 gateway-agnostic sender (src.channels.sms_gateway). Runs in dry-run with no
 credentials, so it's fully testable/demoable; set the CPaaS keys to go live.
 

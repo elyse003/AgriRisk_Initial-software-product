@@ -23,7 +23,7 @@ ALL_TOOLS = [
 if user["role"] == "farmer":
     st.info(f"{t('Welcome')}, {user['name']}. " + t(
         "The full dashboard is for extension officers. Tap the chat button (bottom-right), "
-        "or open USSD Preview to try the *384# menu — both answer price, risk, disease and "
+        "or open USSD Preview to try the *384# menu, both answer price, risk, disease and "
         "input questions."))
     TOOLS = []
 else:

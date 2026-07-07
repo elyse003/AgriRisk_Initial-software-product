@@ -4,7 +4,7 @@ Talking Simulator (sandbox) before going live to real phones.
     python scripts/test_sms.py +250790857019
     python scripts/test_sms.py +250790857019 "Custom message"
 
-With no custom message it sends a representative weekly alert — the exact thing a
+With no custom message it sends a representative weekly alert, the exact thing a
 subscriber receives. It auto-loads a repo-root .env, so put your sandbox keys there:
 
     AT_USERNAME=sandbox
@@ -12,7 +12,7 @@ subscriber receives. It auto-loads a repo-root .env, so put your sandbox keys th
 
 SAFE BY DEFAULT: with no credentials it runs in dry-run (prints only, nothing sent).
 In SANDBOX mode the SMS appears in the AT SIMULATOR (Launch Simulator on the
-dashboard and connect this number) — NOT on a real handset. Real delivery needs a
+dashboard and connect this number), NOT on a real handset. Real delivery needs a
 LIVE (production) app.
 """
 import os
@@ -46,8 +46,8 @@ def _mode():
     if not is_live():
         return "dry-run (printed only, nothing sent, no charge)"
     if os.getenv("AT_USERNAME", "").lower() == "sandbox":
-        return "SANDBOX (free — appears in the AT simulator, not a real phone)"
-    return "LIVE (real SMS to a real phone — you will be charged)"
+        return "SANDBOX (free, appears in the AT simulator, not a real phone)"
+    return "LIVE (real SMS to a real phone, you will be charged)"
 
 
 if __name__ == "__main__":
@@ -75,15 +75,15 @@ if __name__ == "__main__":
     elif status == "error":
         err = str(result.get("error", ""))
         if "WRONG_VERSION_NUMBER" in err or "SSLError" in err or "SSL" in err.upper():
-            print("\nThe sandbox host failed TLS on THIS network (WRONG_VERSION_NUMBER) — "
+            print("\nThe sandbox host failed TLS on THIS network (WRONG_VERSION_NUMBER), "
                   "the request never left your machine, so nothing reaches the simulator. "
                   "Try a different network/hotspot (mobile data), or go live.")
         elif "401" in err or "403" in err or "Unauthorized" in err:
             print("\nAuth rejected. Check that AT_USERNAME is exactly 'sandbox' and the key "
                   "is the SANDBOX API key (not the production one).")
         else:
-            print("\nSend failed — see the error above.")
+            print("\nSend failed, see the error above.")
     elif status == "sent" and sandbox:
         print(f"\nSent to the SANDBOX. Now open the AT Simulator "
               "(developers.africastalking.com -> your sandbox app -> Launch Simulator), "
-              f"connect {phone}, and the SMS shows up there — it will NOT arrive on a real phone.")
+              f"connect {phone}, and the SMS shows up there, it will NOT arrive on a real phone.")

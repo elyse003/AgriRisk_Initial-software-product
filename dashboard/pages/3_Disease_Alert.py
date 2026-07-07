@@ -37,7 +37,7 @@ page_header(
     meta_strong=t("14-day horizon"), meta_sub=t("updated hourly"))
 urban_notice(district)
 
-# live: recompute whenever the district or crop changes — no button
+# live: recompute whenever the district or crop changes, no button
 if district:
     try:
         daily = _forecast(district)
@@ -62,7 +62,7 @@ if district:
     days = [min(4, day_risk(temps[i], rh[i], rain[i])) for i in range(n)]
 
     # assess the chosen crop (or all), keeping EVERY disease so we can always give
-    # a recommendation — elevated ones first, low-risk "preventive" ones after
+    # a recommendation, elevated ones first, low-risk "preventive" ones after
     scope_crops = [sel_crop] if sel_crop else list(CROPS)
     full = []
     for c in scope_crops:
@@ -82,11 +82,11 @@ if district:
     temp_tone = "var(--ag-terra)" if 13 <= temp_mean <= 24 else "var(--ag-amber)"
     tiles = (
         tile(t("14-day rainfall"), f"{rain_total:.0f}mm",
-             t("Wet — sustained leaf wetness") if rain_total >= 40 else t("Dry — lower fungal pressure"), rain_tone) +
+             t("Wet, sustained leaf wetness") if rain_total >= 40 else t("Dry, lower fungal pressure"), rain_tone) +
         tile(t("Mean temperature"), f"{temp_mean:.1f}°C",
              t("Within blight-favourable window") if 13 <= temp_mean <= 24 else t("Outside main blight window"), temp_tone) +
         tile(t("Mean humidity"), f"{rh_mean:.0f}%",
-             t("High — favours fungal disease") if rh_mean >= 85 else t("Moderate humidity"), rh_tone))
+             t("High, favours fungal disease") if rh_mean >= 85 else t("Moderate humidity"), rh_tone))
     strip = "".join(f'<div class="day r{r}" title="Day +{i}: risk {r}/4"></div>' for i, r in enumerate(days))
     axis = "".join(f"<div>+{i}</div>" for i in range(n))
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
@@ -99,12 +99,12 @@ if district:
       </div></div>""", unsafe_allow_html=True)
 
     # ---- plain-language reading of the weather (what drives disease) ----
-    rain_i = (t("Wet 14 days ({mm}mm) — leaves stay wet, which lets fungal spores spread.").format(mm=f"{rain_total:.0f}")
-              if rain_total >= 40 else t("Fairly dry ({mm}mm) — lower fungal pressure.").format(mm=f"{rain_total:.0f}"))
-    temp_i = (t("{c}°C on average — inside the range blights favour.").format(c=f"{temp_mean:.1f}")
-              if 13 <= temp_mean <= 24 else t("{c}°C on average — outside the main blight window.").format(c=f"{temp_mean:.1f}"))
-    rh_i = (t("{h}% humidity — high, which favours fungal disease.").format(h=f"{rh_mean:.0f}")
-            if rh_mean >= 85 else t("{h}% humidity — moderate.").format(h=f"{rh_mean:.0f}"))
+    rain_i = (t("Wet 14 days ({mm}mm), leaves stay wet, which lets fungal spores spread.").format(mm=f"{rain_total:.0f}")
+              if rain_total >= 40 else t("Fairly dry ({mm}mm), lower fungal pressure.").format(mm=f"{rain_total:.0f}"))
+    temp_i = (t("{c}°C on average, inside the range blights favour.").format(c=f"{temp_mean:.1f}")
+              if 13 <= temp_mean <= 24 else t("{c}°C on average, outside the main blight window.").format(c=f"{temp_mean:.1f}"))
+    rh_i = (t("{h}% humidity, high, which favours fungal disease.").format(h=f"{rh_mean:.0f}")
+            if rh_mean >= 85 else t("{h}% humidity, moderate.").format(h=f"{rh_mean:.0f}"))
     insight_panel([
         ("var(--ag-slate)", t("Rain & leaf wetness"), rain_i),
         ("var(--ag-amber)", t("Temperature"), temp_i),
@@ -115,7 +115,7 @@ if district:
     risk_col = {"High": "var(--ag-terra)", "Medium": "var(--ag-amber)", "Low": "var(--ag-sage)"}
     tick = lambda b: "✓" if b else "✗"
     if n_active == 0:
-        summary = t("No elevated disease risk in the next 14 days — the steps below are preventive.")
+        summary = t("No elevated disease risk in the next 14 days, the steps below are preventive.")
     else:
         summary = t("{n} disease(s) at elevated risk for {scope}. Act on the highlighted steps.").format(
             n=n_active, scope=scope_label)

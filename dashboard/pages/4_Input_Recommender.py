@@ -19,7 +19,7 @@ cat = fetch_catalogue()
 page_header(
     t('Input Recommender').upper(),
     f"<em>{t('Affordable inputs')}</em> · {t('your land and budget')}",
-    t("The fertilizer your land needs, priced against your budget — just the few "
+    t("The fertilizer your land needs, priced against your budget, just the few "
       "inputs that matter most."),
     meta_strong=f"{len(cat)} {t('items')}", meta_sub="MINAGRI · Smart Nkunganire")
 
@@ -32,7 +32,7 @@ land = c3.number_input(t("Land size (hectares)"), min_value=0.05, max_value=10.0
 budget = c4.slider(t("Budget (RWF)"), 10000, 300000, 80000, 5000)
 urban_notice(district)
 
-# live: rebuild whenever crop / district / land / budget changes — no button
+# live: rebuild whenever crop / district / land / budget changes, no button
 if crop and district:
     plan, total, ok, remaining = recommend_plan(cat, crop, float(land), float(budget), district=district)
     if plan.empty:
@@ -44,7 +44,7 @@ if crop and district:
     has_lime = any("lime" in str(r["fertilizer"]).lower() for _, r in plan.iterrows())
     if has_lime:
         soil_note = t("{district}'s soil is acidic ({soil}, pH {ph}), so the plan adds lime to "
-                      "correct it — acidic soil locks up phosphorus and wastes fertilizer. Lime is a "
+                      "correct it, acidic soil locks up phosphorus and wastes fertilizer. Lime is a "
                       "one-off amendment (good for 2-3 seasons), not an every-season cost like fertilizer.").format(
             district=district, soil=ap["soil"], ph=f"{ap['ph']:.1f}")
     else:
@@ -94,12 +94,12 @@ if crop and district:
     # ---- plain-language "what this means & what to do" ----
     buy_parts = [f"{int(r['bags_50kg'])} × {str(r['fertilizer']).replace(' (50kg bag)', '')}" for _, r in plan.iterrows()]
     buy_msg = t("For {land:g} ha, buy: {items}.").format(land=land, items=", ".join(buy_parts))
-    when_parts = [f"{str(r['fertilizer']).replace(' (50kg bag)', '')} — {r['when']}" for _, r in plan.iterrows()]
+    when_parts = [f"{str(r['fertilizer']).replace(' (50kg bag)', '')}, {r['when']}" for _, r in plan.iterrows()]
     when_msg = "; ".join(when_parts) + "."
     soil_do = (t("Apply lime before planting to fix the acidity, then the fertilizers.")
-               if has_lime else t("Soil pH is fine — no lime needed; just the fertilizers."))
+               if has_lime else t("Soil pH is fine, no lime needed; just the fertilizers."))
     budget_do = (t("Fits your budget with {r:,} RWF to spare.").format(r=remaining) if ok
-                 else t("Over budget by {x:,} RWF — buy in stages or start with a smaller area (lime is a one-off).").format(x=-remaining))
+                 else t("Over budget by {x:,} RWF, buy in stages or start with a smaller area (lime is a one-off).").format(x=-remaining))
     insight_panel([
         ("var(--ag-sage)", t("Buy"), buy_msg),
         ("var(--ag-slate)", t("When to apply"), when_msg),
