@@ -500,7 +500,7 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
   box-shadow:0 8px 22px rgba(0,0,0,.22) !important; }
 .st-key-ag_chatfab button:hover{ background:#15723d !important; }
 .st-key-ag_chatfab button p, .st-key-ag_chatfab button span, .st-key-ag_chatfab button [data-testid="stIconMaterial"]{ color:#fff !important; }
-[data-testid="stPopoverBody"]{ width:352px; max-width:92vw; padding:1rem !important; border-radius:16px; }
+[data-testid="stPopoverBody"]{ width:352px; max-width:92vw; padding:1rem !important; border-radius:16px; max-height:84vh; }
 /* Eza-style chat: full-width green header bar bleeding to the popover edges */
 .ag-chat-head{ font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; color:#fff;
   background:linear-gradient(90deg,#1B8A4B,#5FA83B); margin:-1rem -1rem 12px -1rem; padding:16px 18px;
@@ -561,7 +561,7 @@ def _chat_body():
         st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs — "
                                                  "for example: 'maize price Musanze'."))]
     st.session_state.setdefault("chat_ctx", {})
-    box = st.container(height=300)
+    box = st.container(height=460)   # taller so the panel opens higher (Eza-style)
     for role, txt in st.session_state.chat:
         with box.chat_message("user" if role == "user" else "assistant"):
             st.write(txt)
