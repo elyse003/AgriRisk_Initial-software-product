@@ -44,10 +44,11 @@ for _f in ("background.jpg", "maize.jpg", "beans.jpg", "potatoes.jpg"):
 
 # fonts (the <link> in <head> is dropped) + overrides so Streamlit's chrome,
 # background and link styling don't fight the landing design.
-FONT = ("@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&"
-        "family=Geist+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');")
+FONT = "@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600;1,700&display=swap');"
 OVERRIDE = """
 .stApp{background:#F6F2E8 !important;}
+/* force the landing typeface (Poppins) over Streamlit's default Source Sans */
+[data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] *{font-family:'Poppins',sans-serif !important;}
 header[data-testid="stHeader"],[data-testid="stToolbar"],#MainMenu{display:none !important;}
 section[data-testid="stSidebar"],[data-testid="stSidebarCollapsedControl"]{display:none !important;}
 .block-container,[data-testid="stMainBlockContainer"]{padding:0 !important;max-width:100% !important;}
