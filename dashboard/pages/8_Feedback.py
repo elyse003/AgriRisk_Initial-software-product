@@ -62,7 +62,7 @@ if submitted:
     else:
         role = "extension_officer" if role_label == t("Extension officer") else "farmer"
         ok = submit_tam_feedback(code, role, module, pu, peou, sat, conf,
-                                 comments or None, user_id=user.get("user_id"))
+                                 comments or None)
         if ok:
             st.success(t("Thank you! Your response was recorded anonymously."))
             insight_panel([

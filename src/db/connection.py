@@ -360,17 +360,20 @@ def submit_feedback(user_id, module_name, satisfaction_rating):
 
 def submit_tam_feedback(participant_code, participant_role, module_name,
                         perceived_usefulness, perceived_ease_of_use,
-                        satisfaction_rating, confidence, comments=None, user_id=None):
+                        satisfaction_rating, confidence, comments=None):
     """Store one anonymised TAM questionnaire response (RQ4 pilot instrument).
 
-    No names or phone numbers are stored, only the participant code (EO-01/FM-01),
-    matching the consent + anonymisation protocol in the proposal's ethics section.
+    Deliberately takes no user_id: the row must not be linkable to the signed-in
+    account, or the response would be pseudonymous rather than anonymous and the
+    consent statement shown on the form would not hold. The only identifier kept
+    is the participant code (EO-01/FM-01), whose mapping to a real person lives
+    offline with the researcher. Matches the proposal's ethics section.
     """
     _ensure()
     try:
         with engine().begin() as conn:
             conn.execute(insert(feedback).values(
-                user_id=user_id, module_name=module_name,
+                module_name=module_name,
                 participant_code=(participant_code or "").strip().upper(),
                 participant_role=participant_role,
                 perceived_usefulness=int(perceived_usefulness),
