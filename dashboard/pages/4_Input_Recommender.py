@@ -21,7 +21,7 @@ page_header(
     f"<em>{t('Affordable inputs')}</em> · {t('your land and budget')}",
     t("The fertilizer your land needs, priced against your budget, just the few "
       "inputs that matter most."),
-    meta_strong=f"{len(cat)} {t('items')}", meta_sub="MINAGRI · Smart Nkunganire")
+    meta_strong=f"{len(cat)} {t('items')}", meta_sub=t("subsidised prices"))
 
 c1, c2 = st.columns(2)
 crop = c1.selectbox(t("Crop"), CROPS, format_func=crop_label)
@@ -49,7 +49,7 @@ if crop and district:
             district=district, soil=ap["soil"], ph=f"{ap['ph']:.1f}")
     else:
         soil_note = t("{district}'s soil is near-neutral ({soil}, pH {ph}), so no lime is needed. "
-                      "Fertilizer types and Smart Nkunganire prices are set nationally.").format(
+                      "Fertilizer types and subsidised prices are set nationally.").format(
             district=district, soil=ap["soil"], ph=f"{ap['ph']:.1f}")
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:16px;border-left:4px solid var(--ag-soil)">
       <div style="padding:12px 18px;font-size:12.5px;color:var(--ag-ink-soft);line-height:1.5">
@@ -83,7 +83,7 @@ if crop and district:
     msg = (t("Total for {land:g} ha: {total:,} RWF, within budget, {remaining:,} RWF to spare.")
            .format(land=land, total=total, remaining=remaining) if ok else
            t("Total for {land:g} ha: {total:,} RWF, over budget by {extra:,} RWF. Use the subsidised "
-             "Smart Nkunganire price, buy in stages, or start with a smaller area.")
+             "price, buy in stages, or start with a smaller area.")
            .format(land=land, total=total, extra=-remaining))
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:22px;border-left:4px solid {note_col}">
       <div style="padding:16px 20px;display:flex;align-items:baseline;gap:14px">
@@ -125,7 +125,6 @@ if crop and district:
           <tbody>{body}</tbody></table></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Prices')}:</span> MINAGRI · Smart Nkunganire</div>
       <div><span class="label">{t('Sized to')}:</span> {land:g} ha</div>
       <div><span class="label">{t('Note')}:</span> {t('Confirm with soil testing and local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)

@@ -89,10 +89,6 @@
   .ch h4{font-family:var(--disp);font-weight:700;font-size:19px;color:var(--forest);margin:8px 0 6px}
   .ch p{font-size:14px;color:var(--mut)}
 
-  /* sources */
-  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
-  .pill{font-family:var(--mono);font-size:12.5px;color:var(--emerald);background:#fff;border:1px solid var(--line);border-radius:30px;padding:8px 16px}
-
   /* faq */
   details{border-bottom:1px solid var(--line);padding:18px 0}
   summary{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--forest);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px}
@@ -129,7 +125,7 @@
   footer{border-top:1px solid var(--line);background:var(--forest);color:#CFE3D6;padding:52px 0 26px}
   footer a{color:#CFE3D6}
   footer a:hover{color:#fff}
-  .foot-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:28px}
+  .foot-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr;gap:28px}
   @media(max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
   @media(max-width:480px){.foot-grid{grid-template-columns:1fr}}
   .foot-brand .b{display:flex;align-items:center;gap:10px;font-family:var(--brand);font-style:italic;font-weight:700;letter-spacing:-.01em;font-size:23px;color:#fff}
@@ -339,15 +335,6 @@
     <div class="ch reveal"><div class="tag">Conversational</div><h4>WhatsApp</h4><p>A farmer asks a plain question and gets a short, useful answer, prices, risk, or what to do about a disease warning.</p></div>
     <div class="ch reveal"><div class="tag">For officers</div><h4>Dashboard</h4><p>Extension officers and administrators see their district's forecasts, risk, and the farmers they support, all in one place.</p></div>
   </div>
-  <div class="sec-eyebrow reveal" style="margin-top:46px">Grounded in public data</div>
-  <div class="pills">
-    <span class="pill">WFP market prices</span>
-    <span class="pill">World Bank CPI</span>
-    <span class="pill">World Bank fertilizer index</span>
-    <span class="pill">CHIRPS rainfall</span>
-    <span class="pill">Open-Meteo weather</span>
-    <span class="pill">MINAGRI / Smart Nkunganire</span>
-  </div>
 </section>
 
 <section id="faq" class="wrap">
@@ -356,7 +343,6 @@
   <div style="margin-top:30px">
     <details><summary>Do farmers need a smartphone?</summary><p>No. The core advice goes out by SMS, which works on any basic phone with no internet. WhatsApp is there for farmers who use it, and the dashboard is for extension officers.</p></details>
     <details><summary>Which crops and areas are covered?</summary><p>Maize, beans, and Irish potatoes across all 30 districts of Rwanda, the country's main food crops and the full national footprint.</p></details>
-    <details><summary>Where does the data come from?</summary><p>Public sources: WFP for market prices, the World Bank for inflation and fertilizer costs, CHIRPS for rainfall, Open-Meteo for live weather, and MINAGRI for subsidised input prices.</p></details>
     <details><summary>How current is it?</summary><p>Weather and disease alerts are live. Prices, inflation, fertilizer, and rainfall are published monthly, so the platform refreshes on that cycle and shows how recent its data is.</p></details>
   </div>
 </section>
@@ -410,8 +396,6 @@
         <a href="#season">Seasonal risk</a><a href="#season">Input plan</a><a href="#season">Disease alerts</a><a href="#season">Price forecast</a></div>
       <div class="foot-col"><h5>Explore</h5>
         <a href="#crops">Crops</a><a href="#numbers">Why it helps</a><a href="#reach">Reaching farmers</a><a href="#faq">FAQ</a></div>
-      <div class="foot-col"><h5>Data</h5>
-        <span>WFP market prices</span><span>World Bank CPI</span><span>CHIRPS rainfall</span><span>Open-Meteo · MINAGRI</span></div>
     </div>
     <div class="foot-bottom">
       <span>© 2026 AgriRisk Rwanda · BSc Software Engineering capstone</span>

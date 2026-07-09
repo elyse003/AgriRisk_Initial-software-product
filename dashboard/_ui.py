@@ -750,12 +750,6 @@ def footer():
       <a href="/Disease_Alert{qs}" target="_self">{t("Disease Alert")}</a>
       <a href="/Input_Recommender{qs}" target="_self">{t("Input Recommender")}</a>
     </div>
-    <div class="fcol"><h5>{t("Data")}</h5>
-      <span>WFP market prices</span>
-      <span>World Bank CPI &amp; fertilizer</span>
-      <span>CHIRPS rainfall</span>
-      <span>Open-Meteo &middot; MINAGRI</span>
-    </div>
     <div class="fcol"><h5>{t("Project")}</h5>
       <a href="/" target="_self">{t("Home")}</a>
       <a href="/Dashboard{qs}" target="_self">{t("Dashboard")}</a>

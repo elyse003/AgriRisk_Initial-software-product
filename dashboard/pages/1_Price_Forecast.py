@@ -180,7 +180,6 @@ if crop and district:
       </div></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Source')}:</span> {t('WFP market prices')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Next-month estimate. Confirm with local market conditions.')}</div>
     </div>""", unsafe_allow_html=True)
 else:

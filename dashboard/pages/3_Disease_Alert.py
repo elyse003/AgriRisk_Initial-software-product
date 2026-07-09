@@ -91,7 +91,7 @@ if district:
     axis = "".join(f"<div>+{i}</div>" for i in range(n))
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
       <div class="ag-card-head"><div class="title">14-DAY <strong>{t('WEATHER CONTEXT')}</strong></div>
-        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">Open-Meteo · {district}</div></div>
+        <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district}</div></div>
       <div class="ag-card-body">
         <div class="ag-grid" style="--cols:1fr 1fr 1fr;gap:24px;margin-bottom:18px">{tiles}</div>
         <div class="kicker">{t('DAILY DISEASE RISK INDEX')}</div>
@@ -156,7 +156,6 @@ if district:
       <tbody>{rule_rows}</tbody></table></div>""", unsafe_allow_html=True)
 
     st.markdown(f"""<div class="ag-foot">
-      <div><span class="label">{t('Weather')}:</span> {t('Open-Meteo 14-day forecast')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Decision support only. Confirm with local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
 else:

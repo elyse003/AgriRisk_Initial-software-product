@@ -146,9 +146,10 @@ RW = {
     "Total for {land:g} ha: {total:,} RWF, within budget, {remaining:,} RWF to spare.":
         "Igiteranyo kuri {land:g} ha: {total:,} RWF, biri mu ngengo y'imari, {remaining:,} RWF birasagutse.",
     "Total for {land:g} ha: {total:,} RWF, over budget by {extra:,} RWF. Use the subsidised "
-    "Smart Nkunganire price, buy in stages, or start with a smaller area.":
+    "price, buy in stages, or start with a smaller area.":
         "Igiteranyo kuri {land:g} ha: {total:,} RWF, birenze ingengo y'imari ku {extra:,} RWF. "
-        "Koresha igiciro gifashijwe cya Smart Nkunganire, gura mu byiciro, cyangwa utangire ku buso buto.",
+        "Koresha igiciro gifashijwe, gura mu byiciro, cyangwa utangire ku buso buto.",
+    "subsidised prices": "ibiciro bifashijwe",
     "Rates follow MINAGRI/RAB recommendations and should be confirmed with soil testing and "
     "local extension advice. Prices are subsidised (Smart Nkunganire System).":
         "Ingano ikurikiza inama za MINAGRI/RAB kandi igomba kwemezwa hakozwe isuzuma ry'ubutaka "
@@ -461,7 +462,7 @@ RW = {
     '{c}°C on average, inside the range blights favour.': '{c}°C impuzandengo, biri mu rwego rworohereza indwara.',
     '{c}°C on average, outside the main blight window.': "{c}°C impuzandengo, hanze y'igihe cy'ingenzi cy'indwara.",
     "{district}'s soil is acidic ({soil}, pH {ph}), so the plan adds lime to correct it, acidic soil locks up phosphorus and wastes fertilizer. Lime is a one-off amendment (good for 2-3 seasons), not an every-season cost like fertilizer.": "Ubutaka bwa {district} burimo aside ({soil}, pH {ph}), bityo gahunda yongeraho shokora kugira ngo ibikemure, ubutaka burimo aside bufunga fosifore kandi bugapfusha ifumbire ubusa. Shokora ishyirwaho rimwe (imara ibihembwe 2-3), si ikiguzi cya buri gihembwe nk'ifumbire.",
-    "{district}'s soil is near-neutral ({soil}, pH {ph}), so no lime is needed. Fertilizer types and Smart Nkunganire prices are set nationally.": "Ubutaka bwa {district} buri hafi kuringana ({soil}, pH {ph}), bityo nta shokora ikenewe. Ubwoko bw'ifumbire n'ibiciro bya Smart Nkunganire bishyirwaho ku rwego rw'igihugu.",
+    "{district}'s soil is near-neutral ({soil}, pH {ph}), so no lime is needed. Fertilizer types and subsidised prices are set nationally.": "Ubutaka bwa {district} buri hafi kuringana ({soil}, pH {ph}), bityo nta shokora ikenewe. Ubwoko bw'ifumbire n'ibiciro bifashijwe bishyirwaho ku rwego rw'igihugu.",
     '{h}% humidity, high, which favours fungal disease.': "Ubuhehere {h}%, buri hejuru, buworohereza indwara z'uduhumyo.",
     '{h}% humidity, moderate.': 'Ubuhehere {h}%, buringaniye.',
     '{n} disease(s) at elevated risk for {scope}. Act on the highlighted steps.': 'Indwara {n} zifite ibyago byinshi kuri {scope}. Kora ku ntambwe zagaragajwe.',
