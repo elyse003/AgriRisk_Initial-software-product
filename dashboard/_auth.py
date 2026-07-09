@@ -167,11 +167,79 @@ def logout():
         pass
 
 
+# ---------------------------------------------------------------------------
+# Sign-in screen: a single centred card. The Google button is a real st.button
+# (so it can call st.login) restyled via its .st-key-* container, because a
+# Streamlit button cannot hold inline SVG. The G is a base64 data URI, so the
+# logo needs no network request and no static asset.
+# ---------------------------------------------------------------------------
+_G_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHBhdGggZmlsbD0iI0VBNDMzNSIgZD0iTTI0IDkuNWMzLjU0IDAgNi43MSAxLjIyIDkuMjEgMy42bDYuODUtNi44NUMzNS45IDIuMzggMzAuNDcgMCAyNCAwIDE0LjYyIDAgNi41MSA1LjM4IDIuNTYgMTMuMjJsNy45OCA2LjE5QzEyLjQzIDEzLjcyIDE3Ljc0IDkuNSAyNCA5LjV6Ii8+PHBhdGggZmlsbD0iIzQyODVGNCIgZD0iTTQ2Ljk4IDI0LjU1YzAtMS41Ny0uMTUtMy4wOS0uMzgtNC41NUgyNHY5LjAyaDEyLjk0Yy0uNTggMi45Ni0yLjI2IDUuNDgtNC43OCA3LjE4bDcuNzMgNmM0LjUxLTQuMTggNy4wOS0xMC4zNiA3LjA5LTE3LjY1eiIvPjxwYXRoIGZpbGw9IiNGQkJDMDUiIGQ9Ik0xMC41MyAyOC41OWMtLjQ4LTEuNDUtLjc2LTIuOTktLjc2LTQuNTlzLjI3LTMuMTQuNzYtNC41OWwtNy45OC02LjE5Qy45MiAxNi40NiAwIDIwLjEyIDAgMjRjMCAzLjg4LjkyIDcuNTQgMi41NiAxMC43OGw3Ljk3LTYuMTl6Ii8+PHBhdGggZmlsbD0iIzM0QTg1MyIgZD0iTTI0IDQ4YzYuNDggMCAxMS45My0yLjEzIDE1Ljg5LTUuODFsLTcuNzMtNmMtMi4xNSAxLjQ1LTQuOTIgMi4zLTguMTYgMi4zLTYuMjYgMC0xMS41Ny00LjIyLTEzLjQ3LTkuOTFsLTcuOTggNi4xOUM2LjUxIDQyLjYyIDE0LjYyIDQ4IDI0IDQ4eiIvPjwvc3ZnPg=="
+
+LOGIN_CSS = """
+<style>
+.st-key-ag_login{ max-width:430px; margin:26px auto 0; background:#fff;
+  border:1px solid var(--line); border-radius:16px; padding:0 26px 22px;
+  box-shadow:0 12px 34px rgba(27,67,50,.07); }
+.ag-login-brand{ display:flex; align-items:center; justify-content:center; gap:10px;
+  padding:22px 0 18px; margin:0 -26px 20px; border-bottom:1px solid var(--line); }
+.ag-login-brand .seed{ width:22px; height:22px; border-radius:50% 50% 50% 0;
+  background:var(--emerald); transform:rotate(-45deg); box-shadow:inset -3px -3px 0 rgba(0,0,0,.08); }
+.ag-login-brand .nm{ font-style:italic; font-weight:700; font-size:23px; color:var(--forest);
+  letter-spacing:-.01em; }
+/* uppercase field labels, like the reference */
+.st-key-ag_login [data-testid="stWidgetLabel"] p{ font-size:11px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--mut); }
+.st-key-ag_login [data-testid="stForm"]{ border:none; padding:0; }
+/* the inputs sit on a white card, so they need their own fill and border */
+.st-key-ag_login .stTextInput div[data-baseweb="input"]{
+  background:#FBF9F3 !important; border:1px solid var(--line) !important; border-radius:8px; }
+/* the password field nests a second baseweb box for the reveal icon: no border on it */
+.st-key-ag_login .stTextInput div[data-baseweb="base-input"]{
+  background:transparent !important; border:none !important; }
+.st-key-ag_login .stTextInput input{ background:transparent !important; }
+.st-key-ag_login .stTextInput div[data-baseweb="input"]:focus-within{ border-color:var(--emerald) !important; }
+/* primary: full-width AgriRisk green (Streamlit sizes buttons to their label) */
+.st-key-ag_login [data-testid="stFormSubmitButton"]{ width:100%; }
+.st-key-ag_login [data-testid="stFormSubmitButton"] button{ width:100% !important;
+  background:var(--forest) !important; color:#fff !important; border:none !important;
+  border-radius:8px; padding:11px 0; font-weight:700 !important; letter-spacing:.07em;
+  text-transform:uppercase; font-size:13px; margin-top:4px; }
+.st-key-ag_login [data-testid="stFormSubmitButton"] button:hover{ background:#15392a !important; }
+/* the OR rule */
+.ag-or{ display:flex; align-items:center; gap:14px; margin:18px 0 14px;
+  color:var(--mut); font-size:11px; letter-spacing:.12em; }
+.ag-or:before,.ag-or:after{ content:""; flex:1; height:1px; background:var(--line); }
+/* Google: white, bordered, four-colour G before the label */
+div[class*="st-key-google_login"] button{ background:#fff !important; color:var(--ink) !important;
+  border:1px solid var(--line) !important; border-radius:8px; font-weight:600 !important; }
+div[class*="st-key-google_login"] button:hover{ border-color:var(--emerald) !important;
+  background:#fff !important; }
+div[class*="st-key-google_login"] button p{ display:inline-flex; align-items:center; }
+div[class*="st-key-google_login"] button p:before{ content:""; width:18px; height:18px;
+  margin-right:10px; flex:0 0 18px;
+  background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PHBhdGggZmlsbD0iI0VBNDMzNSIgZD0iTTI0IDkuNWMzLjU0IDAgNi43MSAxLjIyIDkuMjEgMy42bDYuODUtNi44NUMzNS45IDIuMzggMzAuNDcgMCAyNCAwIDE0LjYyIDAgNi41MSA1LjM4IDIuNTYgMTMuMjJsNy45OCA2LjE5QzEyLjQzIDEzLjcyIDE3Ljc0IDkuNSAyNCA5LjV6Ii8+PHBhdGggZmlsbD0iIzQyODVGNCIgZD0iTTQ2Ljk4IDI0LjU1YzAtMS41Ny0uMTUtMy4wOS0uMzgtNC41NUgyNHY5LjAyaDEyLjk0Yy0uNTggMi45Ni0yLjI2IDUuNDgtNC43OCA3LjE4bDcuNzMgNmM0LjUxLTQuMTggNy4wOS0xMC4zNiA3LjA5LTE3LjY1eiIvPjxwYXRoIGZpbGw9IiNGQkJDMDUiIGQ9Ik0xMC41MyAyOC41OWMtLjQ4LTEuNDUtLjc2LTIuOTktLjc2LTQuNTlzLjI3LTMuMTQuNzYtNC41OWwtNy45OC02LjE5Qy45MiAxNi40NiAwIDIwLjEyIDAgMjRjMCAzLjg4LjkyIDcuNTQgMi41NiAxMC43OGw3Ljk3LTYuMTl6Ii8+PHBhdGggZmlsbD0iIzM0QTg1MyIgZD0iTTI0IDQ4YzYuNDggMCAxMS45My0yLjEzIDE1Ljg5LTUuODFsLTcuNzMtNmMtMi4xNSAxLjQ1LTQuOTIgMi4zLTguMTYgMi4zLTYuMjYgMC0xMS41Ny00LjIyLTEzLjQ3LTkuOTFsLTcuOTggNi4xOUM2LjUxIDQyLjYyIDE0LjYyIDQ4IDI0IDQ4eiIvPjwvc3ZnPg==") center/contain no-repeat; }
+/* secondary row: forgot password / sign up */
+div[class*="st-key-ag_alt"] button{ background:#fff !important; color:var(--mut) !important;
+  border:1px solid var(--line) !important; border-radius:8px; font-weight:600 !important;
+  font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; }
+div[class*="st-key-ag_alt"] button:hover{ color:var(--forest) !important;
+  border-color:var(--emerald) !important; background:#fff !important; }
+/* "FORGOT PASSWORD?" wrapped onto two lines in its half-width column */
+div[class*="st-key-ag_alt"] button p{ white-space:nowrap; font-size:10.5px; letter-spacing:.04em; }
+</style>
+"""
+
+
+def _brand():
+    st.markdown("<div class='ag-login-brand'><span class='seed'></span>"
+                "<span class='nm'>AgriRisk</span></div>", unsafe_allow_html=True)
+
+
 def _login_form():
-    with st.form("login"):
+    with st.form("login", border=False):
         username = st.text_input(t("Username"))
         password = st.text_input(t("Password"), type="password")
-        submitted = st.form_submit_button(t("Sign in"), type="primary")
+        submitted = st.form_submit_button(t("Log in"), type="primary", use_container_width=True)
     if submitted:
         user = authenticate((username or "").strip(), password or "")
         if user:
@@ -179,31 +247,33 @@ def _login_form():
             st.rerun()
         else:
             st.error(t("Wrong username or password."))
+
     _google_button("signin")
+
+    c1, c2 = st.columns(2)
+    if c1.button(t("Forgot password?"), key="ag_alt_forgot", use_container_width=True):
+        st.info(t("Ask an administrator to reset it for you in User Management."))
+    if c2.button(t("Sign up"), key="ag_alt_signup", use_container_width=True):
+        st.session_state["auth_view"] = "signup"
+        st.rerun()
 
 
 def _google_button(key):
     """"Continue with Google", shown only when OIDC is configured.
 
-    `key` must differ per call site: the button renders on both the sign-in and
-    the sign-up tab, and Streamlit rejects two widgets sharing an id.
+    `key` must differ per call site: the button renders on the sign-in and the
+    sign-up view, and Streamlit rejects two widgets sharing an id.
     """
     if not google_enabled():
         return
-    st.markdown(
-        "<div style='display:flex;align-items:center;gap:12px;margin:14px 0 10px;"
-        "color:#5E7065;font-size:12px'>"
-        "<div style='flex:1;height:1px;background:#DED7C4'></div>"
-        f"{t('or')}"
-        "<div style='flex:1;height:1px;background:#DED7C4'></div></div>",
-        unsafe_allow_html=True)
-    if st.button(t("Continue with Google"), use_container_width=True,
-                 icon=":material/account_circle:", key=f"google_login_{key}"):
+    st.markdown(f"<div class='ag-or'>{t('OR')}</div>", unsafe_allow_html=True)
+    if st.button(t("Log in with Google"), use_container_width=True,
+                 key=f"google_login_{key}"):
         st.login("google")
 
 
 def _signup_form():
-    with st.form("signup"):
+    with st.form("signup", border=False):
         name = st.text_input(t("Full name"))
         username = st.text_input(t("Username"))
         c1, c2 = st.columns(2)
@@ -211,46 +281,47 @@ def _signup_form():
         pw2 = c2.text_input(t("Confirm password"), type="password")
         district = st.selectbox(t("District"), ["Nationwide"] + DISTRICTS)
         phone = st.text_input(t("Phone (optional)"))
-        submitted = st.form_submit_button(t("Create account"), type="primary")
+        submitted = st.form_submit_button(t("Create account"), type="primary", use_container_width=True)
     # New accounts are farmers; an administrator promotes trusted users to officer.
-    role = "farmer"
     st.caption(t("New accounts are farmers. An administrator can upgrade you to "
                  "extension officer."))
     if submitted:
         name, username = (name or "").strip(), (username or "").strip()
         if not (name and username and pw):
             st.error(t("Please fill in name, username and password."))
-            return
-        if pw != pw2:
+        elif pw != pw2:
             st.error(t("Passwords do not match."))
-            return
-        if len(pw) < 6:
+        elif len(pw) < 6:
             st.error(t("Password must be at least 6 characters."))
-            return
-        ok = add_user(name, role, district=district, phone=(phone.strip() or None),
-                      language=st.session_state.get("lang", "en"),
-                      username=username, password=pw)
-        if not ok:
-            st.error(t("That username or phone is already taken."))
-            return
-        _start_session(authenticate(username, pw))
-        st.rerun()
+        else:
+            ok = add_user(name, "farmer", district=district, phone=(phone.strip() or None),
+                          language=st.session_state.get("lang", "en"),
+                          username=username, password=pw)
+            if not ok:
+                st.error(t("That username or phone is already taken."))
+            else:
+                _start_session(authenticate(username, pw))
+                st.rerun()
+
     _google_button("signup")
+
+    if st.button(t("Back to sign in"), key="ag_alt_back", use_container_width=True):
+        st.session_state["auth_view"] = "signin"
+        st.rerun()
 
 
 def require_login():
-    """Return the logged-in user, or render the sign-in / sign-up screen and stop."""
+    """Return the logged-in user, or render the sign-in card and stop."""
     user = current_user()
     if user:
         return user
-    st.markdown(f"<div class='ar-head'>{t('Sign in')}</div>"
-                f"<div class='ar-sub'>{t('For extension officers and administrators')}</div>",
-                unsafe_allow_html=True)
-    tab_in, tab_up = st.tabs([t("Sign in"), t("Create account")])
-    with tab_in:
-        _login_form()
-    with tab_up:
-        _signup_form()
+    st.markdown(LOGIN_CSS, unsafe_allow_html=True)
+    with st.container(key="ag_login"):
+        _brand()
+        if st.session_state.get("auth_view") == "signup":
+            _signup_form()
+        else:
+            _login_form()
     st.stop()
 
 

@@ -474,6 +474,15 @@ RW = {
     'Mixed signals. Monitor markets and weather; plan inputs carefully and keep a reserve.': "Ibimenyetso bivanze. Kurikirana isoko n'iteganyagihe; tegura ifumbire witonze kandi ubike ingoboka.",
     'Conditions look stable. Normal planting and input investment is reasonable.': "Imiterere isa n'ihagaze. Guhinga no gushora mu ifumbire bisanzwe birashoboka.",
 
+    # --- Login card ---
+    'Log in': 'Injira',
+    'Log in with Google': 'Injira ukoresheje Google',
+    'OR': 'CYANGWA',
+    'Forgot password?': 'Wibagiwe ijambobanga?',
+    'Sign up': 'Iyandikishe',
+    'Back to sign in': 'Subira ku kwinjira',
+    'Ask an administrator to reset it for you in User Management.': 'Saba umuyobozi akugurire ijambobanga rishya muri User Management.',
+
     # --- Google sign-in ---
     "or": "cyangwa",
     "Continue with Google": "Komeza ukoresheje Google",
