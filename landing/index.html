@@ -146,7 +146,15 @@
   .brand{font-weight:400 !important}
   h1{font-size:clamp(40px,5.6vw,66px);line-height:1.05}
   h1 .em{font-style:italic}
-  .sec-h{font-size:clamp(30px,3.6vw,40px);line-height:1.14;max-width:20em;margin-left:auto;margin-right:auto}
+  .sec-h{font-size:clamp(30px,3.6vw,40px);line-height:1.14;max-width:20em;margin-left:auto;margin-right:auto;
+         text-wrap:balance}
+  /* .one-line headlines fit the 1200px content column on one line (widest is
+     1048px). Two are too long and stay wrapped, balanced onto even lines:
+     "Each module answers..." (1404px) and "The advice reaches..." (1277px). */
+  @media(min-width:1240px){
+    .sec-h{max-width:none}
+    .sec-h.one-line,.band h2{white-space:nowrap}
+  }
   .mod h3{font-size:24px}
   .band h2{font-size:clamp(30px,4vw,44px)}
 
@@ -297,7 +305,7 @@
 </section>
 
 <section id="crops" class="wrap">
-  <h2 class="sec-h reveal">Built around Rwanda's three main food crops.</h2>
+  <h2 class="sec-h one-line reveal">Built around Rwanda's three main food crops.</h2>
   <p class="sec-sub">Every forecast, risk score, disease alert and input plan is tuned to maize, beans and Irish potatoes, the crops most Rwandan households grow and eat.</p>
   <div class="crops">
     <div class="crop reveal"><img src="../assets/maize.jpg" alt="Maize" loading="lazy">
@@ -313,7 +321,7 @@
 </section>
 
 <section id="numbers" class="wrap">
-  <h2 class="sec-h reveal">Clear advice you can act on, grounded in real data.</h2>
+  <h2 class="sec-h one-line reveal">Clear advice you can act on, grounded in real data.</h2>
   <div class="stats reveal" style="margin-top:34px">
     <div class="stat"><div class="v">30</div><div class="l">districts covered</div></div>
     <div class="stat"><div class="v">3</div><div class="l">staple crops</div></div>
@@ -333,7 +341,7 @@
 </section>
 
 <section id="faq" class="wrap">
-  <h2 class="sec-h reveal">How it works in practice.</h2>
+  <h2 class="sec-h one-line reveal">How it works in practice.</h2>
   <div style="margin-top:30px">
     <details><summary>Do farmers need a smartphone?</summary><p>No. The core advice goes out by SMS, which works on any basic phone with no internet. WhatsApp is there for farmers who use it, and the dashboard is for extension officers.</p></details>
     <details><summary>Which crops and areas are covered?</summary><p>Maize, beans, and Irish potatoes across all 30 districts of Rwanda, the country's main food crops and the full national footprint.</p></details>
@@ -350,7 +358,7 @@
 </section>
 
 <section id="contact" class="wrap">
-  <h2 class="sec-h reveal">Questions, feedback, or a pilot in your district?</h2>
+  <h2 class="sec-h one-line reveal">Questions, feedback, or a pilot in your district?</h2>
   <p class="sec-sub">We're a student team building AgriRisk for Rwanda's farmers and extension officers. Send a message and we'll get back to you.</p>
   <div class="contact-grid">
     <div class="cinfo reveal">
