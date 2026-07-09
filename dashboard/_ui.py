@@ -27,6 +27,11 @@ CSS = """
 /* Hide the menu / Deploy / decoration, but keep the toolbar itself so the
    sidebar reopen arrow survives on mobile (where the sidebar can collapse). */
 #MainMenu, footer, [data-testid="stToolbarActions"], [data-testid="stDecoration"] { display:none; }
+/* hide Streamlit's chrome: the "running" status indicator, the Deploy button and
+   the hosted-with-Streamlit badge. The toolbar itself stays so the mobile sidebar
+   reopen arrow survives. */
+[data-testid="stStatusWidget"], [data-testid="stAppDeployButton"],
+[data-testid="stAppViewBadge"], [class*="viewerBadge"] { display:none !important; }
 .stApp { background: var(--paper); }
 html, body, [class*="css"] { font-family:'Poppins',sans-serif; color:var(--ink); }
 /* force Poppins across every Streamlit widget (beats the default Source Sans),
