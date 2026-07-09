@@ -1,0 +1,67 @@
+{
+  "test_rows": 286,
+  "majority_baseline": 0.3357,
+  "results": [
+    {
+      "features": "rainfall_anomaly",
+      "n_features": 1,
+      "accuracy": 0.3182,
+      "macro_f1": 0.3162
+    },
+    {
+      "features": "cpi_change",
+      "n_features": 1,
+      "accuracy": 0.6958,
+      "macro_f1": 0.698
+    },
+    {
+      "features": "fert_change",
+      "n_features": 1,
+      "accuracy": 0.6993,
+      "macro_f1": 0.7001
+    },
+    {
+      "features": "rainfall_anomaly + cpi_change",
+      "n_features": 2,
+      "accuracy": 0.5699,
+      "macro_f1": 0.5745
+    },
+    {
+      "features": "rainfall_anomaly + fert_change",
+      "n_features": 2,
+      "accuracy": 0.5699,
+      "macro_f1": 0.571
+    },
+    {
+      "features": "cpi_change + fert_change",
+      "n_features": 2,
+      "accuracy": 0.6958,
+      "macro_f1": 0.698
+    },
+    {
+      "features": "rainfall_anomaly + cpi_change + fert_change",
+      "n_features": 3,
+      "accuracy": 0.6049,
+      "macro_f1": 0.608
+    }
+  ],
+  "mcnemar": {
+    "rainfall_anomaly + cpi_change  vs  rainfall_anomaly": {
+      "only_combined_correct": 102,
+      "only_isolated_correct": 30,
+      "accuracy_delta": 0.2517,
+      "p_value": 0.0,
+      "significant_at_0.05": true,
+      "verdict": "combined BETTER"
+    },
+    "rainfall_anomaly + cpi_change  vs  cpi_change": {
+      "only_combined_correct": 19,
+      "only_isolated_correct": 55,
+      "accuracy_delta": -0.1259,
+      "p_value": 0.0,
+      "significant_at_0.05": true,
+      "verdict": "combined WORSE"
+    }
+  },
+  "seed": 42
+}

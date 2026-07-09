@@ -548,6 +548,7 @@ def render_sidebar_nav(user):
         sb.page_link("pages/0_Dashboard.py", label=t("Home"), icon=":material/home:")
         sb.page_link("pages/5_USSD_Preview.py", label=t("USSD Preview"), icon=":material/dialpad:")
         sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
+        sb.page_link("pages/8_Feedback.py", label=t("Feedback"), icon=":material/rate_review:")
         return
 
     sb.markdown(f"<div class='nav-sec'>{t('Console')}</div>", unsafe_allow_html=True)
@@ -557,6 +558,7 @@ def render_sidebar_nav(user):
     sb.page_link("pages/5_USSD_Preview.py", label=t("USSD Preview"), icon=":material/dialpad:")
     sb.markdown(f"<div class='nav-sec'>{t('Account')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
+    sb.page_link("pages/8_Feedback.py", label=t("Feedback"), icon=":material/rate_review:")
     if role == "super_admin":
         sb.page_link("pages/7_User_Management.py", label=t("User Management"), icon=":material/group:")
 

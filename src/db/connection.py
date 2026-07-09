@@ -17,8 +17,9 @@ import os
 from pathlib import Path
 
 import pandas as pd
-from sqlalchemy import (Column, DateTime, Float, Integer, MetaData, String, Table,
-                        UniqueConstraint, create_engine, delete, func, insert, select, update)
+from sqlalchemy import (Column, DateTime, Float, Integer, MetaData, String, Table, Text,
+                        UniqueConstraint, create_engine, delete, func, insert, select, update,
+                        inspect, text)
 from sqlalchemy.exc import IntegrityError
 
 
@@ -133,7 +134,22 @@ feedback = Table(
     Column("module_name", String(40)),
     Column("satisfaction_rating", Integer),
     Column("submitted_at", DateTime, server_default=func.now()),
+    # --- TAM pilot instrument (RQ4): anonymised participant code + constructs ---
+    Column("participant_code", String(16)),      # EO-01..EO-20 / FM-01..FM-20
+    Column("participant_role", String(20)),      # extension_officer | farmer
+    Column("perceived_usefulness", Integer),     # 1-5 Likert
+    Column("perceived_ease_of_use", Integer),    # 1-5 Likert
+    Column("confidence", Integer),               # 1-5 Likert (advisory confidence)
+    Column("comments", Text),
 )
+
+# Columns added after the first release; SQLAlchemy's create_all() will not add
+# them to an existing table, so patch them in additively (SQLite + Postgres).
+_FEEDBACK_ADDED = {
+    "participant_code": "VARCHAR(16)", "participant_role": "VARCHAR(20)",
+    "perceived_usefulness": "INTEGER", "perceived_ease_of_use": "INTEGER",
+    "confidence": "INTEGER", "comments": "TEXT",
+}
 subscribers = Table(
     "subscribers", metadata,
     Column("subscriber_id", Integer, primary_key=True, autoincrement=True),
@@ -200,12 +216,27 @@ def _seed():
 _initialised = False
 
 
+def _migrate_feedback():
+    """Additively add the TAM columns to an existing feedback table (no data loss)."""
+    try:
+        existing = {c["name"] for c in inspect(engine()).get_columns("feedback")}
+        missing = {k: v for k, v in _FEEDBACK_ADDED.items() if k not in existing}
+        if not missing:
+            return
+        with engine().begin() as conn:
+            for col, sqltype in missing.items():
+                conn.execute(text(f"ALTER TABLE feedback ADD COLUMN {col} {sqltype}"))
+    except Exception:
+        pass          # never block the app on a migration
+
+
 def _ensure():
     global _initialised
     if _initialised:
         return
     try:
         init_db()
+        _migrate_feedback()
     except Exception:
         pass
     _initialised = True
@@ -325,6 +356,41 @@ def submit_feedback(user_id, module_name, satisfaction_rating):
         return True
     except Exception:
         return False
+
+
+def submit_tam_feedback(participant_code, participant_role, module_name,
+                        perceived_usefulness, perceived_ease_of_use,
+                        satisfaction_rating, confidence, comments=None, user_id=None):
+    """Store one anonymised TAM questionnaire response (RQ4 pilot instrument).
+
+    No names or phone numbers are stored, only the participant code (EO-01/FM-01),
+    matching the consent + anonymisation protocol in the proposal's ethics section.
+    """
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            conn.execute(insert(feedback).values(
+                user_id=user_id, module_name=module_name,
+                participant_code=(participant_code or "").strip().upper(),
+                participant_role=participant_role,
+                perceived_usefulness=int(perceived_usefulness),
+                perceived_ease_of_use=int(perceived_ease_of_use),
+                satisfaction_rating=int(satisfaction_rating),
+                confidence=int(confidence),
+                comments=(comments or None)))
+        return True
+    except Exception:
+        return False
+
+
+def fetch_feedback():
+    """All TAM responses as a DataFrame (for scripts/export_feedback.py)."""
+    _ensure()
+    try:
+        with engine().connect() as conn:
+            return pd.read_sql(select(feedback), conn)
+    except Exception:
+        return pd.DataFrame()
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,27 @@
+# Research / evaluation dependencies (NOT needed to run the app).
+#
+# The deployed Streamlit app and the webhook keep lean requirements so they build
+# on Streamlit Cloud / Render. These heavier packages are only used by the
+# comparison notebook and the research scripts that answer the proposal's
+# research questions:
+#
+#   scripts/rq1_ablation.py           Prophet with vs without CPI/fertilizer regressors (RQ1)
+#   scripts/rq2_ablation.py           feature-subset ablation + McNemar (RQ2)
+#   scripts/rq3_disease_validation.py FAO rules replayed on historical weather (RQ3)
+#   scripts/shap_risk.py              SHAP explainability for the risk classifier
+#   scripts/train_models.py           optional MLflow experiment tracking
+#   notebooks/AgriRisk_Rwanda_Models.ipynb   ARIMA / Prophet / LSTM / RF / XGBoost study
+#
+# Install with:  pip install -r requirements-research.txt
+
+prophet>=1.1          # price forecasting (proposal's primary model) + add_regressor
+statsmodels>=0.14     # ARIMA baseline
+xgboost>=2.0          # risk classifier compared against Random Forest
+shap>=0.44            # explainability (mean |SHAP| per feature)
+mlflow>=2.9           # experiment tracking / reproducibility
+scipy>=1.11           # Wilcoxon signed-rank, McNemar (binomtest)
+matplotlib>=3.7       # SHAP summary plot, notebook figures
+seaborn>=0.13         # notebook figures
+
+# LSTM comparison in the notebook only (heavy; skip unless re-running that cell)
+# tensorflow>=2.15

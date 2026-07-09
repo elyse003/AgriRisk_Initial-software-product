@@ -1,0 +1,49 @@
+{
+  "model": "GradientBoostingClassifier",
+  "n_explained": 200,
+  "importance": [
+    {
+      "feature": "cpi_change",
+      "mean_abs_shap": 0.13408,
+      "share_pct": 36.7,
+      "impurity_share_pct": 36.6
+    },
+    {
+      "feature": "fert_change",
+      "mean_abs_shap": 0.13321,
+      "share_pct": 36.5,
+      "impurity_share_pct": 39.7
+    },
+    {
+      "feature": "rainfall_anomaly",
+      "mean_abs_shap": 0.04718,
+      "share_pct": 12.9,
+      "impurity_share_pct": 16.7
+    },
+    {
+      "feature": "soil_ph",
+      "mean_abs_shap": 0.0287,
+      "share_pct": 7.9,
+      "impurity_share_pct": 3.2
+    },
+    {
+      "feature": "altitude_m",
+      "mean_abs_shap": 0.0181,
+      "share_pct": 5.0,
+      "impurity_share_pct": 2.9
+    },
+    {
+      "feature": "soil_fertility",
+      "mean_abs_shap": 0.00273,
+      "share_pct": 0.7,
+      "impurity_share_pct": 0.3
+    },
+    {
+      "feature": "drainage",
+      "mean_abs_shap": 0.00112,
+      "share_pct": 0.3,
+      "impurity_share_pct": 0.5
+    }
+  ],
+  "agro_share_pct": 13.9
+}

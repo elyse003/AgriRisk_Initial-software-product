@@ -84,6 +84,47 @@ def train_risk():
     return rf_m, gb_m, len(df), majority
 
 
+def _log_to_mlflow(metrics: dict, include_esoko: bool):
+    """Log this training run to MLflow for reproducibility (proposal: experiment
+    tracking). A no-op when MLflow isn't installed, so the deployed app - whose
+    requirements deliberately stay lean - never breaks on this import."""
+    try:
+        import mlflow
+    except ImportError:
+        print("  (mlflow not installed; skipping experiment tracking)")
+        return
+    try:
+        root = Path(__file__).resolve().parent.parent
+        # MLflow 3.x deprecated the ./mlruns file store; use a local SQLite backend.
+        mlflow.set_tracking_uri(f"sqlite:///{(root / 'mlflow.db').as_posix()}")
+        mlflow.set_experiment("agririsk-models")
+        with mlflow.start_run(run_name="train_models"):
+            mlflow.log_params({
+                "price_model": "GradientBoostingRegressor(log-returns, pooled)",
+                "risk_model": "GradientBoosting vs RandomForest",
+                "risk_features": ",".join(rc.FEATURES),
+                "risk_label": "tercile of realized 6-month-ahead price change",
+                "include_esoko": include_esoko,
+                "min_history_months": MIN_HISTORY,
+            })
+            flat = {f"price_mape_{k}": v for k, v in metrics["price_mape_by_crop"].items()}
+            flat["price_mape_avg"] = metrics["price_mape_avg"]
+            flat["risk_rf_accuracy"] = metrics["risk_random_forest"]["accuracy"]
+            flat["risk_rf_macro_f1"] = metrics["risk_random_forest"]["macro_f1"]
+            flat["risk_gb_accuracy"] = metrics["risk_gradient_boosting"]["accuracy"]
+            flat["risk_gb_macro_f1"] = metrics["risk_gradient_boosting"]["macro_f1"]
+            flat["risk_majority_baseline"] = metrics["risk_majority_baseline"]
+            flat["n_risk_rows"] = metrics["n_risk_rows"]
+            mlflow.log_metrics({k: float(v) for k, v in flat.items() if v is not None})
+            for art in ("metrics.json", "price_forecaster.pkl", "risk_classifier.pkl"):
+                p = MODELS_STORE / art
+                if p.exists():
+                    mlflow.log_artifact(str(p))
+        print("  logged run to MLflow (./mlruns) - view with: mlflow ui")
+    except Exception as e:                      # tracking must never fail training
+        print(f"  (mlflow logging skipped: {type(e).__name__}: {e})")
+
+
 def main(include_esoko=False):
     print("Training production models on real data ...")
     mape = train_price(include_esoko=include_esoko)
@@ -98,6 +139,7 @@ def main(include_esoko=False):
     }
     json.dump(metrics, open(MODELS_STORE / "metrics.json", "w"), indent=2)
     print("Saved models_store/price_forecaster.pkl, risk_classifier.pkl, metrics.json")
+    _log_to_mlflow(metrics, include_esoko)
     print(json.dumps(metrics, indent=2))
 
 

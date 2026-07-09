@@ -1,0 +1,77 @@
+{
+  "test_months": 12,
+  "per_series": [
+    {
+      "crop": "maize",
+      "district": "Musanze",
+      "test_months": 12,
+      "mape_price_only": 14.14,
+      "mape_with_regressors": 9.43,
+      "mape_regressors_lastknown": 11.49
+    },
+    {
+      "crop": "maize",
+      "district": "Bugesera",
+      "test_months": 12,
+      "mape_price_only": 26.48,
+      "mape_with_regressors": 17.11,
+      "mape_regressors_lastknown": 18.45
+    },
+    {
+      "crop": "beans",
+      "district": "Musanze",
+      "test_months": 12,
+      "mape_price_only": 8.06,
+      "mape_with_regressors": 8.38,
+      "mape_regressors_lastknown": 9.84
+    },
+    {
+      "crop": "beans",
+      "district": "Bugesera",
+      "test_months": 12,
+      "mape_price_only": 21.18,
+      "mape_with_regressors": 21.68,
+      "mape_regressors_lastknown": 21.88
+    },
+    {
+      "crop": "potatoes",
+      "district": "Musanze",
+      "test_months": 12,
+      "mape_price_only": 8.68,
+      "mape_with_regressors": 9.66,
+      "mape_regressors_lastknown": 13.87
+    },
+    {
+      "crop": "potatoes",
+      "district": "Bugesera",
+      "test_months": 12,
+      "mape_price_only": 8.79,
+      "mape_with_regressors": 10.65,
+      "mape_regressors_lastknown": 15.1
+    }
+  ],
+  "pooled_mean_ape": {
+    "price_only": 14.55,
+    "with_regressors_actual": 12.82,
+    "with_regressors_lastknown": 15.1
+  },
+  "tests": [
+    {
+      "comparison": "price-only vs with-regressors (actual future values)",
+      "mean_ape_price_only": 14.55,
+      "mean_ape_other": 12.82,
+      "p_value": 0.19681,
+      "significant_at_0.05": false,
+      "verdict": "no significant difference"
+    },
+    {
+      "comparison": "price-only vs with-regressors (last-known, deployable)",
+      "mean_ape_price_only": 14.55,
+      "mean_ape_other": 15.1,
+      "p_value": 0.47952,
+      "significant_at_0.05": false,
+      "verdict": "no significant difference"
+    }
+  ],
+  "caveat": "The 'actual future values' arm feeds Prophet true future CPI/fertilizer, which a live system would not know; it is an optimistic upper bound. The 'last-known' arm is what is actually deployable."
+}
