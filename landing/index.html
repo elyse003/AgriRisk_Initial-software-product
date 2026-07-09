@@ -66,7 +66,7 @@
   /* the contact subtitle fits the content column on one line (1009px of 1160px
      at the 1240px breakpoint); the other two need 1194px and 1857px, so they
      keep their 46em measure and wrap onto balanced lines. */
-  @media(min-width:1240px){ .sec-sub.one-line{max-width:none;white-space:nowrap} }
+  @media(min-width:1240px){ .sec-sub.one-line,.lead.one-line{max-width:none;white-space:nowrap} }
 
   /* module cards */
   .mods{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:38px}
@@ -271,7 +271,7 @@
   <div class="wrap hero-inner">
     <div class="eyebrow">Nationwide agricultural intelligence · Rwanda</div>
     <h1>Advice for every<br>stage of the <span class="em">season.</span></h1>
-    <p class="lead">A free advisory service for Rwanda's farmers and extension officers. It follows the whole season, from deciding what to plant to selling at the right price, across all 30 districts and the country's staple crops.</p>
+    <p class="lead one-line">A free advisory service for Rwanda's farmers and extension officers, from what to plant to selling at the right price.</p>
     <div class="cta-row">
       <a class="btn btn-go" href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard">Open the dashboard</a>
       <a class="btn btn-ghost" href="#season">See how it works</a>
@@ -327,7 +327,7 @@
 
 <section id="crops" class="wrap">
   <h2 class="sec-h one-line reveal">Built around Rwanda's three main food crops.</h2>
-  <p class="sec-sub">Every forecast, risk score, disease alert and input plan is tuned to maize, beans and Irish potatoes, the crops most Rwandan households grow and eat.</p>
+  <p class="sec-sub one-line">Every forecast, risk score, disease alert and input plan is tuned to maize, beans and Irish potatoes.</p>
   <div class="crops">
     <div class="crop reveal"><img src="../assets/maize.jpg" alt="Maize" loading="lazy">
       <div class="cap"><div class="en">Maize</div><div class="rw">Ibigori</div>
@@ -349,7 +349,7 @@
     <div class="stat"><div class="v">2</div><div class="l">languages (rw &amp; en)</div></div>
     <div class="stat"><div class="v">4</div><div class="l">tools for the season</div></div>
   </div>
-  <p class="sec-sub" style="margin-top:20px">Every forecast, risk rating and alert is built from years of real Rwandan market, weather and price information, so the advice is grounded in what actually happens on the ground, not guesswork. Free to use, in Kinyarwanda and English.</p>
+  <p class="sec-sub one-line" style="margin-top:20px">Built from years of real Rwandan market, weather and price data, not guesswork. Free in Kinyarwanda and English.</p>
 </section>
 
 <section id="reach" class="wrap">
