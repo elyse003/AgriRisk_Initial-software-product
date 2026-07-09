@@ -125,11 +125,31 @@ The **instrument is built and working**; the pilot itself has not yet been run.
 * Stores them **anonymously** in the `feedback` table — only the participant code
   (`EO-01`…`EO-20`, `FM-01`…`FM-20`), never a name or phone number, matching the
   proposal's consent and anonymisation protocol.
+* **Anonymity is enforced, not just asserted.** An earlier version also wrote the
+  signed-in account's `user_id` onto each response, which made it *pseudonymous*:
+  every answer was linkable back to a named user. The proposal requires that "no
+  names, phone numbers, or identifying information are recorded alongside
+  evaluation responses", so `submit_tam_feedback()` now takes no `user_id` at all.
+  Verified by inserting a row and reading it back: `user_id IS NULL`.
+* The code-to-identity mapping must be kept **offline**, in a password-protected
+  file, and deleted within 30 days of study completion, per the proposal's ethics
+  section. It is that sheet, not the database, that could re-identify a participant.
 * `scripts/export_feedback.py` reports n, mean ± sd per construct, a breakdown by
   role and module, tracks progress toward the 20 + 20 target, checks the
   **mean satisfaction ≥ 4.0 / 5** success criterion, and exports a CSV.
 
-**Status.** Ready to collect. The pilot with 40 participants across Musanze and
+#### Known gaps in the instrument (not yet closed)
+
+| Proposal | Implementation | Impact |
+| --- | --- | --- |
+| **12-item** TAM questionnaire adapted from Davis (1989) and Venkatesh & Davis (2000): perceived ease of use (**4 items**), perceived usefulness (**4 items**), satisfaction (**4 items**) | **1 item per construct** (4 Likert items total, incl. confidence) | A single-item construct cannot be tested for internal consistency, so **no Cronbach's α can be reported**. Davis's validated wording is not reproduced. |
+| Extension officers additionally complete a **pre-post confidence assessment** | **One post-hoc confidence item** | RQ4 asks whether platform access *produces a measurable improvement* in confidence. A post-only item cannot measure a change. |
+
+Closing both is a form change plus one extra column (`phase`: pre / post); the
+storage, export and analysis paths already handle multiple rows per participant.
+
+**Status.** Instrument works and is anonymous, but it is a **short-form** TAM, not
+the 12-item one specified. The pilot with 40 participants across Musanze and
 Bugesera remains to be conducted.
 
 ---
@@ -177,6 +197,8 @@ proposed inputs, turns out to contribute nothing.
 | 6 | Hosting on **Railway.app** | **Streamlit Cloud** (app) + **Render** (webhook) | Free tiers, same outcome: a public URL. `Dockerfile` + `docker-compose.yml` are in the repo for one-command local deployment as promised. |
 | 7 | Validate disease vs **RAB outbreak records** | **Climatological consistency check** on 5 yrs of ERA5 weather | RAB outbreak records are not publicly available. See RQ3. |
 | 8 | Explainability via **SHAP** | Dashboard shows impurity importances; **SHAP now computed** in `scripts/shap_risk.py` | SHAP added. It also *corrects* the picture (below). |
+| 9 | §3.3 documents the **five public data sources** | The **UI no longer names the providers** (WFP, World Bank, CHIRPS, Open-Meteo, MINAGRI / Smart Nkunganire) | Removed from the landing page and every dashboard page at the product owner's request. The proposal requires the sources be *documented and openly licensed*, not displayed in-product. They remain in §3.3 of the proposal, in this document, and in the README. The Price Forecast page still distinguishes a **measured** farmgate figure from an **estimated** one, since that is data quality, not attribution. |
+| 10 | **§3.5 ERD:** "FEEDBACK stores user satisfaction ratings with **user_id as a foreign key referencing USERS**" — vs **§ethics:** "no names, phone numbers, or **identifying information are recorded alongside evaluation responses**" | TAM rows store **no `user_id`** | **The proposal contradicts itself.** The ERD makes every response linkable to a named account; the ethics protocol forbids exactly that. The ethics commitment is the one made to participants under informed consent, so it wins. The legacy `submit_feedback()` (a per-module star rating, not a TAM response) still carries `user_id`, which is what the ERD was describing. |
 
 ### SHAP vs impurity importance (risk classifier)
 
