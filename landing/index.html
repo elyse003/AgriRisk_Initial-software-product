@@ -61,7 +61,12 @@
   /* section frame, centered headers (like the reference site) */
   section{padding:96px 0;border-top:1px solid var(--line)}
   .sec-h{font-family:var(--disp);font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.01em;color:var(--forest);max-width:none;margin:0 auto;text-align:center}
-  .sec-sub{color:var(--mut);margin:20px auto 0;max-width:46em;font-size:17px;line-height:1.6;text-align:center}
+  .sec-sub{color:var(--mut);margin:20px auto 0;max-width:46em;font-size:17px;line-height:1.6;text-align:center;
+           text-wrap:balance}
+  /* the contact subtitle fits the content column on one line (1009px of 1160px
+     at the 1240px breakpoint); the other two need 1194px and 1857px, so they
+     keep their 46em measure and wrap onto balanced lines. */
+  @media(min-width:1240px){ .sec-sub.one-line{max-width:none;white-space:nowrap} }
 
   /* module cards */
   .mods{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:38px}
@@ -375,7 +380,7 @@
 
 <section id="contact" class="wrap">
   <h2 class="sec-h one-line reveal">Questions, feedback, or a pilot in your district?</h2>
-  <p class="sec-sub">We're a student team building AgriRisk for Rwanda's farmers and extension officers. Send a message and we'll get back to you.</p>
+  <p class="sec-sub one-line">We're a student team building AgriRisk for Rwanda's farmers and extension officers. Send a message and we'll get back to you.</p>
   <div class="contact-grid">
     <div class="cinfo reveal">
       <div class="row"><div class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
