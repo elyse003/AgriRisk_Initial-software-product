@@ -1,9 +1,15 @@
 [theme]
 primaryColor = "#2D6A4F"
-backgroundColor = "#E8F5EC"
+backgroundColor = "#F6F2E8"
 secondaryBackgroundColor = "#FFFFFF"
 textColor = "#1B4332"
 font = "sans serif"
 
 [server]
 headless = true
+
+[client]
+# Streamlit's own page list rendered in the sidebar before our CSS could hide it,
+# so it flashed on screen for a moment on every page load. Every page draws its
+# own navigation (dashboard/_ui.py: render_sidebar_nav), so turn it off at source.
+showSidebarNavigation = false
