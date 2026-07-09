@@ -137,10 +137,18 @@ feedback = Table(
     # --- TAM pilot instrument (RQ4): anonymised participant code + constructs ---
     Column("participant_code", String(16)),      # EO-01..EO-20 / FM-01..FM-20
     Column("participant_role", String(20)),      # extension_officer | farmer
+    Column("phase", String(8)),                  # pre | post (officers do both)
+    # construct means, kept for the summary and for pre-2026 rows
     Column("perceived_usefulness", Integer),     # 1-5 Likert
     Column("perceived_ease_of_use", Integer),    # 1-5 Likert
     Column("confidence", Integer),               # 1-5 Likert (advisory confidence)
     Column("comments", Text),
+    # the 12 raw items (Davis 1989; Venkatesh & Davis 2000), 4 per construct.
+    # Stored individually because Cronbach's alpha needs per-item variance: it
+    # cannot be recovered from the construct mean alone.
+    Column("pu1", Integer), Column("pu2", Integer), Column("pu3", Integer), Column("pu4", Integer),
+    Column("peou1", Integer), Column("peou2", Integer), Column("peou3", Integer), Column("peou4", Integer),
+    Column("sat1", Integer), Column("sat2", Integer), Column("sat3", Integer), Column("sat4", Integer),
 )
 
 # Columns added after the first release; SQLAlchemy's create_all() will not add
@@ -149,6 +157,8 @@ _FEEDBACK_ADDED = {
     "participant_code": "VARCHAR(16)", "participant_role": "VARCHAR(20)",
     "perceived_usefulness": "INTEGER", "perceived_ease_of_use": "INTEGER",
     "confidence": "INTEGER", "comments": "TEXT",
+    "phase": "VARCHAR(8)",
+    "pu1": "INTEGER", "pu2": "INTEGER", "pu3": "INTEGER", "pu4": "INTEGER", "peou1": "INTEGER", "peou2": "INTEGER", "peou3": "INTEGER", "peou4": "INTEGER", "sat1": "INTEGER", "sat2": "INTEGER", "sat3": "INTEGER", "sat4": "INTEGER",
 }
 subscribers = Table(
     "subscribers", metadata,
@@ -358,10 +368,21 @@ def submit_feedback(user_id, module_name, satisfaction_rating):
         return False
 
 
-def submit_tam_feedback(participant_code, participant_role, module_name,
-                        perceived_usefulness, perceived_ease_of_use,
-                        satisfaction_rating, confidence, comments=None):
-    """Store one anonymised TAM questionnaire response (RQ4 pilot instrument).
+def submit_tam_feedback(participant_code, participant_role, phase,
+                        pu_items=None, peou_items=None, sat_items=None,
+                        confidence=None, module_name=None, comments=None):
+    """Store one anonymised TAM response (RQ4 pilot instrument).
+
+    The proposal specifies a 12-item questionnaire adapted from Davis (1989) and
+    Venkatesh & Davis (2000): 4 items each for perceived usefulness, perceived
+    ease of use and satisfaction, on a 5-point Likert scale. The raw items are
+    stored individually so Cronbach's alpha can be computed per construct; the
+    construct means are stored alongside for the headline summary.
+
+    Extension officers answer twice: phase="pre" is a confidence baseline taken
+    before they use the platform (no TAM items), phase="post" is the full
+    questionnaire afterwards. Pairing the two by participant_code is what lets
+    RQ4 report a *change* in confidence rather than a single post-hoc rating.
 
     Deliberately takes no user_id: the row must not be linkable to the signed-in
     account, or the response would be pseudonymous rather than anonymous and the
@@ -370,17 +391,34 @@ def submit_tam_feedback(participant_code, participant_role, module_name,
     offline with the researcher. Matches the proposal's ethics section.
     """
     _ensure()
+
+    def _mean(items):
+        vals = [int(v) for v in (items or []) if v is not None]
+        return round(sum(vals) / len(vals)) if vals else None
+
+    pu_items = list(pu_items or [])
+    peou_items = list(peou_items or [])
+    sat_items = list(sat_items or [])
+
+    values = {
+        "module_name": module_name,
+        "participant_code": (participant_code or "").strip().upper(),
+        "participant_role": participant_role,
+        "phase": phase,
+        "confidence": int(confidence) if confidence is not None else None,
+        "comments": (comments or None),
+        # construct means (satisfaction reuses the original column name)
+        "perceived_usefulness": _mean(pu_items),
+        "perceived_ease_of_use": _mean(peou_items),
+        "satisfaction_rating": _mean(sat_items),
+    }
+    for prefix, items in (("pu", pu_items), ("peou", peou_items), ("sat", sat_items)):
+        for i, v in enumerate(items[:4], start=1):
+            values[f"{prefix}{i}"] = int(v)
+
     try:
         with engine().begin() as conn:
-            conn.execute(insert(feedback).values(
-                module_name=module_name,
-                participant_code=(participant_code or "").strip().upper(),
-                participant_role=participant_role,
-                perceived_usefulness=int(perceived_usefulness),
-                perceived_ease_of_use=int(perceived_ease_of_use),
-                satisfaction_rating=int(satisfaction_rating),
-                confidence=int(confidence),
-                comments=(comments or None)))
+            conn.execute(insert(feedback).values(**values))
         return True
     except Exception:
         return False

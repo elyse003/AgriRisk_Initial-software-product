@@ -138,19 +138,38 @@ The **instrument is built and working**; the pilot itself has not yet been run.
   role and module, tracks progress toward the 20 + 20 target, checks the
   **mean satisfaction ≥ 4.0 / 5** success criterion, and exports a CSV.
 
-#### Known gaps in the instrument (not yet closed)
+#### The 12-item instrument (closed)
 
-| Proposal | Implementation | Impact |
+The questionnaire now matches the proposal exactly:
+
+| Construct | Items | Stored as |
 | --- | --- | --- |
-| **12-item** TAM questionnaire adapted from Davis (1989) and Venkatesh & Davis (2000): perceived ease of use (**4 items**), perceived usefulness (**4 items**), satisfaction (**4 items**) | **1 item per construct** (4 Likert items total, incl. confidence) | A single-item construct cannot be tested for internal consistency, so **no Cronbach's α can be reported**. Davis's validated wording is not reproduced. |
-| Extension officers additionally complete a **pre-post confidence assessment** | **One post-hoc confidence item** | RQ4 asks whether platform access *produces a measurable improvement* in confidence. A post-only item cannot measure a change. |
+| Perceived usefulness | 4 | `pu1`…`pu4` |
+| Perceived ease of use | 4 | `peou1`…`peou4` |
+| Satisfaction | 4 | `sat1`…`sat4` |
+| Confidence (officers, **pre and post**) | 1, asked twice | `confidence` + `phase` |
 
-Closing both is a form change plus one extra column (`phase`: pre / post); the
-storage, export and analysis paths already handle multiple rows per participant.
+* Items are stored **individually**, not as construct means, because Cronbach's
+  alpha needs per-item variance: it cannot be recovered from the mean alone.
+  `scripts/export_feedback.py` reports alpha per construct with an
+  interpretation (poor / questionable / acceptable / good / excellent).
+* Extension officers answer a **confidence baseline before** using the platform
+  (`phase="pre"`, that one item only) and the **full questionnaire after**
+  (`phase="post"`). `export_feedback.py` pairs the two by participant code and
+  runs a **Wilcoxon signed-rank test**, which is what lets RQ4 report a
+  *measurable improvement* rather than a single post-hoc rating. Farmers answer
+  once.
+* The construct means are still written to the original columns, so rows
+  collected before this change (which have `phase = NULL`) are treated as
+  `post` and still count toward the summary.
 
-**Status.** Instrument works and is anonymous, but it is a **short-form** TAM, not
-the 12-item one specified. The pilot with 40 participants across Musanze and
-Bugesera remains to be conducted.
+Verified end-to-end in a browser: the baseline form renders 1 slider, the full
+form renders 13 (12 items + confidence), both rows store `user_id IS NULL`, and
+a synthetic 8-officer / 6-farmer pilot produces alpha per construct and a
+significant pre/post confidence change.
+
+**Status.** The instrument is complete, anonymous, and matches the proposal. The
+pilot with 40 participants across Musanze and Bugesera remains to be conducted.
 
 ---
 

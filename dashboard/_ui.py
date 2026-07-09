@@ -563,8 +563,9 @@ section[data-testid="stSidebar"] .stButton>button:hover{ background:#15392a; }
   border:none !important; border-radius:9px !important; font-weight:600 !important; }
 [data-testid="stPopoverBody"] .stFormSubmitButton button:hover{ background:#245a42 !important; }
 [data-testid="stPopoverBody"] .stTextInput input{ border-radius:9px !important; }
-/* hide Streamlit's "Press Enter to submit form" hint in the chat */
-[data-testid="stPopoverBody"] [data-testid="InputInstructions"]{ display:none !important; }
+/* hide Streamlit's "Press Enter to submit form" hint everywhere, not just the
+   chat: it also showed under the Feedback form's participant-code field */
+[data-testid="InputInstructions"]{ display:none !important; }
 /* green chat avatar (replaces the default orange) */
 [data-testid="stPopoverBody"] [data-testid="stChatMessageAvatarAssistant"]{ background:#2D6A4F !important; color:#fff !important; }
 [data-testid="stPopoverBody"] [data-testid="stChatMessageAvatarUser"]{ background:var(--emerald) !important; color:#fff !important; }
