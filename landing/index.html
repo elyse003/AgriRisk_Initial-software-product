@@ -45,7 +45,9 @@
   .hero-inner{position:relative;z-index:2;width:100%;padding:96px 40px 92px;text-align:center}
   .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A7DCBC;margin-bottom:20px}
   h1{font-family:var(--disp);font-size:clamp(44px,6vw,74px);line-height:1.04;letter-spacing:-.01em;color:#fff}
-  .hero h1 .em{color:#9FE0BC}
+  /* the hero headline is one voice: same weight, same upright Poppins, all white.
+     Scoped to .hero h1 so it also outranks `h1 .em{font-style:italic}` below. */
+  .hero h1 .em{color:#fff;font-style:normal}
   .lead{font-size:17.5px;color:rgba(255,255,255,.88);margin:22px auto 30px;max-width:36em}
   .cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.72)}
