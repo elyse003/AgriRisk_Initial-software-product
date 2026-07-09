@@ -95,8 +95,13 @@ users = Table(
     Column("phone", String(20), unique=True),
     Column("language", String(5), default="rw"),
     Column("username", String(40), unique=True),
-    Column("password_hash", String(200)),
+    Column("password_hash", String(200)),   # NULL for Google accounts (no password login)
+    Column("email", String(200), unique=True),
 )
+
+# users gained `email` when Google sign-in was added; same additive strategy as
+# the feedback table below (create_all() will not alter an existing table).
+_USERS_ADDED = {"email": "VARCHAR(200)"}
 price_records = Table(
     "price_records", metadata,
     Column("record_id", Integer, primary_key=True, autoincrement=True),
@@ -240,6 +245,20 @@ def _migrate_feedback():
         pass          # never block the app on a migration
 
 
+def _migrate_users():
+    """Additively add the Google sign-in column to an existing users table."""
+    try:
+        existing = {c["name"] for c in inspect(engine()).get_columns("users")}
+        missing = {k: v for k, v in _USERS_ADDED.items() if k not in existing}
+        if not missing:
+            return
+        with engine().begin() as conn:
+            for col, sqltype in missing.items():
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} {sqltype}"))
+    except Exception:
+        pass          # never block the app on a migration
+
+
 def _ensure():
     global _initialised
     if _initialised:
@@ -247,6 +266,7 @@ def _ensure():
     try:
         init_db()
         _migrate_feedback()
+        _migrate_users()
     except Exception:
         pass
     _initialised = True
@@ -439,6 +459,43 @@ def fetch_feedback():
 # the super admin. The web platform looks a person up on sign-in; the chatbot
 # looks them up by phone number when they send a message.
 # ---------------------------------------------------------------------------
+def get_user_by_email(email):
+    """The user registered against this Google address, or None."""
+    _ensure()
+    try:
+        with engine().connect() as conn:
+            row = conn.execute(select(users).where(
+                users.c.email == (email or "").strip().lower())).mappings().first()
+        if not row:
+            return None
+        user = dict(row)
+        user.pop("password_hash", None)
+        return user
+    except Exception:
+        return None
+
+
+def add_oauth_user(name, email, role="farmer", district="Nationwide", language="en"):
+    """Create an account for a verified Google identity.
+
+    No password_hash is stored, so the account cannot be used with the password
+    form: verify_password() rejects an empty stored hash. The username is the
+    email, which is what the signed session token is keyed on.
+    """
+    _ensure()
+    email = (email or "").strip().lower()
+    if not email:
+        return None
+    try:
+        with engine().begin() as conn:
+            conn.execute(insert(users).values(
+                name=name or email.split("@")[0], role=role, district=district,
+                language=language, username=email, email=email))
+    except Exception:
+        return None
+    return get_user_by_email(email)
+
+
 def authenticate(username, password):
     """Return the user dict (without the hash) if credentials match, else None."""
     _ensure()

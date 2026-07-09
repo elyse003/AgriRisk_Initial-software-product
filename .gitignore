@@ -5,8 +5,11 @@ venv/
 .venv/
 *.egg-info/
 
-# env / secrets
+# env / secrets  (never commit: Google OAuth client secret, cookie secret,
+# AGRIRISK_SECRET, API keys)
 .env
+.streamlit/secrets.toml
+!.streamlit/secrets.toml.example
 
 # The cleaned processed data (small, real) and trained models ARE committed so
 # the app clones-and-runs on real data with no rebuild step. Both are regenerable

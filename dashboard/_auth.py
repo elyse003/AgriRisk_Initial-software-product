@@ -15,7 +15,8 @@ import streamlit as st
 
 from _i18n import t
 from config.settings import DISTRICTS
-from src.db.connection import authenticate, add_user, get_user_by_username
+from src.db.connection import (authenticate, add_user, get_user_by_username,
+                               get_user_by_email, add_oauth_user)
 
 OFFICERS = ("officer", "super_admin")
 
@@ -60,6 +61,46 @@ def _user_from_token(token: str):
         return None
 
 
+# ---------------------------------------------------------------------------
+# Google sign-in (OpenID Connect), via Streamlit's built-in st.login().
+# Requires [auth] + [auth.google] in .streamlit/secrets.toml, and Authlib.
+# When it isn't configured the button is hidden and password login is unaffected,
+# so a fresh clone still runs with no OAuth setup.
+# ---------------------------------------------------------------------------
+GOOGLE_DEFAULT_ROLE = "farmer"     # least privilege; an admin promotes to officer
+
+
+def google_enabled() -> bool:
+    try:
+        auth = st.secrets.get("auth", {})
+        return bool(auth.get("google", {}).get("client_id"))
+    except Exception:
+        return False
+
+
+def _oidc_identity():
+    """(email, name) of the Google user, or (None, None) if not signed in."""
+    try:
+        u = st.user
+        if not getattr(u, "is_logged_in", False):
+            return None, None
+        return (u.get("email") or "").strip().lower(), (u.get("name") or "").strip()
+    except Exception:
+        return None, None
+
+
+def _user_from_google():
+    """Map a verified Google identity to an app account, creating one if new."""
+    email, name = _oidc_identity()
+    if not email:
+        return None
+    user = get_user_by_email(email)
+    if user:
+        return user
+    return add_oauth_user(name, email, role=GOOGLE_DEFAULT_ROLE,
+                          language=st.session_state.get("lang", "en"))
+
+
 def current_user():
     user = st.session_state.get("auth_user")
     if user:
@@ -74,6 +115,12 @@ def current_user():
         if user:
             st.session_state["auth_user"] = user
             st.session_state["auth_token"] = token
+            return user
+    # signed in with Google but no app session yet (e.g. straight after the redirect)
+    if google_enabled():
+        user = _user_from_google()
+        if user:
+            _start_session(user)
             return user
     return None
 
@@ -112,6 +159,12 @@ def logout():
             del st.query_params[_QP]
     except Exception:
         pass
+    # end the Google session too, else current_user() would silently sign back in
+    try:
+        if google_enabled() and getattr(st.user, "is_logged_in", False):
+            st.logout()
+    except Exception:
+        pass
 
 
 def _login_form():
@@ -126,8 +179,27 @@ def _login_form():
             st.rerun()
         else:
             st.error(t("Wrong username or password."))
-    st.caption("Demo: **admin / admin123** (admin), **musanze / officer123** "
-               "(officer), **jean / farmer123** (farmer)")
+    _google_button("signin")
+
+
+def _google_button(key):
+    """"Continue with Google", shown only when OIDC is configured.
+
+    `key` must differ per call site: the button renders on both the sign-in and
+    the sign-up tab, and Streamlit rejects two widgets sharing an id.
+    """
+    if not google_enabled():
+        return
+    st.markdown(
+        "<div style='display:flex;align-items:center;gap:12px;margin:14px 0 10px;"
+        "color:#5E7065;font-size:12px'>"
+        "<div style='flex:1;height:1px;background:#DED7C4'></div>"
+        f"{t('or')}"
+        "<div style='flex:1;height:1px;background:#DED7C4'></div></div>",
+        unsafe_allow_html=True)
+    if st.button(t("Continue with Google"), use_container_width=True,
+                 icon=":material/account_circle:", key=f"google_login_{key}"):
+        st.login("google")
 
 
 def _signup_form():
@@ -163,6 +235,7 @@ def _signup_form():
             return
         _start_session(authenticate(username, pw))
         st.rerun()
+    _google_button("signup")
 
 
 def require_login():

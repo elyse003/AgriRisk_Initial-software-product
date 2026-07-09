@@ -474,6 +474,10 @@ RW = {
     'Mixed signals. Monitor markets and weather; plan inputs carefully and keep a reserve.': "Ibimenyetso bivanze. Kurikirana isoko n'iteganyagihe; tegura ifumbire witonze kandi ubike ingoboka.",
     'Conditions look stable. Normal planting and input investment is reasonable.': "Imiterere isa n'ihagaze. Guhinga no gushora mu ifumbire bisanzwe birashoboka.",
 
+    # --- Google sign-in ---
+    "or": "cyangwa",
+    "Continue with Google": "Komeza ukoresheje Google",
+
     # --- Feedback page (RQ4) ---
     'FEEDBACK': 'IBITEKEREZO',
     'Your experience': 'Uburambe bwawe',
