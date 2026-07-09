@@ -24,32 +24,32 @@
 
   /* nav: fixed to the top so it stays put while scrolling */
   nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,242,232,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-  body{padding-top:66px}
-  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--brand);font-style:italic;font-weight:700;font-size:22px;color:var(--forest);letter-spacing:-.01em}
+  body{padding-top:67px}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:66px}
+  .brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;white-space:nowrap;font-family:var(--brand);font-style:italic;font-weight:700;font-size:22px;color:var(--forest);letter-spacing:-.01em}
   .brand .seed{width:22px;height:22px;border-radius:50% 50% 50% 0;background:var(--emerald);transform:rotate(-45deg);box-shadow:inset -3px -3px 0 rgba(0,0,0,.08)}
-  .nav-links{display:flex;gap:26px;font-size:14px;font-weight:500;color:var(--mut)}
+  .nav-links{display:flex;gap:26px;min-width:0;font-size:14px;font-weight:500;color:var(--mut)}
   .nav-links a:hover{color:var(--forest)}
-  .btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:9px;padding:11px 18px;border:none;cursor:pointer;display:inline-block;transition:transform .12s ease, box-shadow .12s ease}
+  .btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:9px;padding:11px 18px;border:none;cursor:pointer;display:inline-block;white-space:nowrap;transition:transform .12s ease, box-shadow .12s ease}
+  nav .btn{flex:0 0 auto}
   .btn-go{background:var(--forest);color:#fff}
   .btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(27,67,50,.25)}
   .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.55)}
   .btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.16)}
-  @media(max-width:740px){.nav-links{display:none}}
 
   /* hero, full-bleed farm photo with a green overlay, white text on top */
   .hero{position:relative;min-height:74vh;display:flex;align-items:center;overflow:hidden;
         background:url('../assets/background.jpg') center/cover no-repeat}
   .hero-overlay{position:absolute;inset:0;
         background:linear-gradient(180deg,rgba(14,30,22,.62),rgba(14,30,22,.50) 40%,rgba(14,30,22,.78))}
-  .hero-inner{position:relative;z-index:2;width:100%;padding:96px 0 92px;text-align:center}
+  .hero-inner{position:relative;z-index:2;width:100%;padding:96px 40px 92px;text-align:center}
   .eyebrow{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#A7DCBC;margin-bottom:20px}
   h1{font-family:var(--disp);font-size:clamp(44px,6vw,74px);line-height:1.04;letter-spacing:-.01em;color:#fff}
   .hero h1 .em{color:#9FE0BC}
   .lead{font-size:17.5px;color:rgba(255,255,255,.88);margin:22px auto 30px;max-width:36em}
   .cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   .hero-note{margin-top:22px;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.72)}
-  @media(max-width:860px){.hero{min-height:auto}.hero-inner{padding:58px 0 54px}}
+  @media(max-width:860px){.hero{min-height:auto}.hero-inner{padding:58px 24px 54px}}
 
   /* the season ring (signature) */
   .ring-wrap{display:flex;justify-content:center}
@@ -166,6 +166,62 @@
   .crop .cap .en{font-family:var(--disp);font-size:23px;color:var(--forest);line-height:1.1}
   .crop .cap .rw{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--harvest);margin-top:4px}
   .crop .cap p{font-size:13.5px;color:var(--mut);margin-top:8px}
+
+  /* ------------------------------------------------------------------- */
+  /* Responsive. Three things this fixes:                                  */
+  /*  a) the hero <h1> lost its white colour inside Streamlit (a bare      */
+  /*     h1 selector is outranked by Streamlit's own heading rule), so it  */
+  /*     rendered dark green on a dark photo. Scoping it to .hero wins.    */
+  /*  b) the nav links sat flush against the CTA from 741-1150px, and on   */
+  /*     a phone in "Desktop site" mode (~980px viewport) they overlapped. */
+  /*     Below 1000px they now get their own scrollable row.               */
+  /*  c) small screens had no side gutters in the hero.                    */
+  /* ------------------------------------------------------------------- */
+  img,svg{max-width:100%}
+  .hero h1{color:#fff;font-size:clamp(29px,7.4vw,66px);line-height:1.06}
+
+  @media(max-width:1000px){
+    .nav-in{flex-wrap:wrap;padding-top:9px;padding-bottom:9px;row-gap:4px}
+    .brand{order:1}
+    nav .btn{order:2;margin-left:auto}
+    .nav-links{order:3;flex:1 0 100%;justify-content:flex-start;gap:20px;
+               overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+    .nav-links::-webkit-scrollbar{display:none}
+    .nav-links a{white-space:nowrap}
+    body{padding-top:94px}
+  }
+  @media(max-width:640px){
+    .wrap{padding:0 20px}
+    .hero-inner{padding:58px 20px 54px}
+    section{padding:64px 0}
+    .eyebrow{font-size:10.5px;letter-spacing:.10em;margin-bottom:14px}
+    .lead{font-size:15.5px;margin:18px auto 24px}
+    .hero-note{font-size:11px}
+    .cta-row .btn{flex:1 1 auto;text-align:center}
+    .stats{padding:26px 22px}
+    .stat .v{font-size:28px}
+    .band{padding:34px 22px}
+    .crop img{height:190px}
+    summary{font-size:16px}
+    .sec-sub{font-size:15.5px}
+  }
+  .cta-short{display:none}
+  @media(max-width:520px){
+    .cta-full{display:none}
+    .cta-short{display:inline}
+    .brand{font-size:18px}
+    .brand .seed{width:18px;height:18px}
+    nav .btn{padding:9px 14px;font-size:13px}
+    body{padding-top:90px}
+    .cform{padding:18px}
+  }
+  @media(max-width:400px){
+    .brand{font-size:16.5px;gap:8px}
+    .brand .seed{width:16px;height:16px}
+    nav .btn{padding:8px 12px;font-size:12.5px}
+    .eyebrow{font-size:9.5px;letter-spacing:.08em}
+    body{padding-top:88px}
+  }
 </style>
 </head>
 <body>
@@ -182,7 +238,7 @@
       <a href="#contact">Contact</a>
     </div>
     <!-- Replace # with your deployed Streamlit URL (e.g. https://agririsk.streamlit.app) -->
-    <a class="btn btn-go" href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard">Open the dashboard</a>
+    <a class="btn btn-go" href="https://agririskinitial-software-appuct-nedmfzzrbgaz7jhb3c74jd.streamlit.app/Dashboard"><span class="cta-full">Open the dashboard</span><span class="cta-short">Dashboard</span></a>
   </div>
 </nav>
 

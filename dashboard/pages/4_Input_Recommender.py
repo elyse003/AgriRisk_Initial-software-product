@@ -74,7 +74,7 @@ if crop and district:
           </div></div>"""
     st.markdown(f"<div class='kicker ag-pagein' style='margin-bottom:10px'>{t('RECOMMENDED')} · {t('TOP')} {len(plan)}</div>",
                 unsafe_allow_html=True)
-    st.markdown(f"<div class='ag-pagein' style='display:grid;grid-template-columns:repeat({min(len(plan),3)},1fr);gap:14px;margin-bottom:22px'>{cards}</div>",
+    st.markdown(f"<div class='ag-pagein ag-grid' style='--cols:repeat({min(len(plan),3)},1fr);gap:14px;margin-bottom:22px'>{cards}</div>",
                 unsafe_allow_html=True)
 
     # ---- budget verdict ----

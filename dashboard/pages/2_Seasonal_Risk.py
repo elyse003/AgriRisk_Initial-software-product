@@ -138,9 +138,9 @@ if district and season_label:
         (t("Soil &amp; terrain"), ap["soil"], float(weights[3]), "var(--ag-soil)", soil_note),
     ]
     bars = "".join(driver_bar(*d) for d in drivers)
-    st.markdown(f"""<div class="ag-pagein" style="display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:22px">
+    st.markdown(f"""<div class="ag-pagein ag-grid" style="--cols:1.3fr 1fr;gap:18px;margin-bottom:22px">
       <div class="ag-card" style="background:{tbg};border-color:{tcol}">
-        <div style="padding:24px;display:flex;gap:26px;align-items:center">
+        <div class="ag-flexrow" style="padding:24px;gap:26px">
           <div style="flex-shrink:0">{gauge_svg(score, tcol)}</div>
           <div><div class="kicker" style="color:var(--ag-ink-soft)">{t('RISK LEVEL')}</div>
             <div style="font-family:var(--f-serif);font-size:52px;line-height:1;font-style:italic;color:{tcol};margin-bottom:4px">{level_txt}</div>
@@ -181,7 +181,7 @@ if district and season_label:
       <div class="ag-card-head"><div class="title">{t('SOIL &amp; TERRAIN')} · <strong>{district}</strong></div>
         <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{t('agro-ecological zone')}</div></div>
       <div class="ag-card-body">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">{cell_html}</div>
+        <div class="ag-grid" style="--cols:repeat(3,1fr);gap:12px">{cell_html}</div>
         <div style="font-size:11.5px;color:var(--ag-mute);margin-top:12px;line-height:1.5">
           {t("The model now factors in each district's soil and terrain (about {pct}% of its estimate here). "
              "Price-spike risk is still driven mostly by rainfall and market prices; soil and altitude "
@@ -199,7 +199,7 @@ if district and season_label:
                for i, lab in enumerate([f"t-{len(rseries)-1-i}" for i in range(len(rseries))])]
     rain_trend = trend_svg(rseries, "var(--ag-slate)", unit_pct=False, months=rmonths) if len(rseries) > 2 else ""
     cpi_trend = trend_svg(cseries, "var(--ag-terra)", unit_pct=True, months=rmonths[:len(cseries)]) if len(cseries) > 2 else ""
-    st.markdown(f"""<div class="ag-pagein" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px">
+    st.markdown(f"""<div class="ag-pagein ag-grid" style="--cols:1fr 1fr;gap:18px;margin-bottom:22px">
       <div class="ag-card"><div class="ag-card-head"><div class="title">{t('RAINFALL vs NORMAL')} · <strong>{t('RECENT')}</strong></div></div>
         <div class="ag-card-body" style="padding-top:8px">{rain_trend}
           <div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{t('Rainfall record')}</div></div></div>

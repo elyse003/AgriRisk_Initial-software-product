@@ -93,7 +93,7 @@ if district:
       <div class="ag-card-head"><div class="title">14-DAY <strong>{t('WEATHER CONTEXT')}</strong></div>
         <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">Open-Meteo · {district}</div></div>
       <div class="ag-card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:18px">{tiles}</div>
+        <div class="ag-grid" style="--cols:1fr 1fr 1fr;gap:24px;margin-bottom:18px">{tiles}</div>
         <div class="kicker">{t('DAILY DISEASE RISK INDEX')}</div>
         <div class="week-strip" style="margin-top:4px">{strip}<div class="axis">{axis}</div></div>
       </div></div>""", unsafe_allow_html=True)

@@ -239,7 +239,50 @@ table.ag-data td.muted{ color:var(--ag-mute); }
 .ag-hp .cross,.ag-hp .hdot,.ag-hp .htip{ opacity:0; transition:opacity .09s ease; pointer-events:none; }
 .ag-hp:hover .cross,.ag-hp:hover .hdot,.ag-hp:hover .htip{ opacity:1; }
 .ag-hp .hit{ cursor:crosshair; }
+/* ---- responsive ------------------------------------------------------
+   The console was laid out for a 1050px column. On a phone the header row,
+   the disease rows (220px/1fr/150px) and the wide tables all overflowed. */
+.ag-grid{ display:grid; grid-template-columns:var(--cols,1fr); }
+.ag-flexrow{ display:flex; align-items:center; }
 @media (max-width:820px){ .ag-two-col{ grid-template-columns:1fr; } }
+@media (max-width:760px){
+  /* every multi-column block collapses to a single column on a phone */
+  .ag-grid{ grid-template-columns:1fr !important; }
+  .tool-grid{ grid-template-columns:1fr !important; }
+  /* flex/grid children default to min-width:auto, so a wide child (the data
+     table below) would stretch its card past the viewport instead of scrolling */
+  .ag-card, .ag-grid > *, .ag-two-col > *{ min-width:0; }
+  /* the risk gauge + its readout stack instead of squeezing off-screen */
+  .ag-flexrow{ flex-wrap:wrap; justify-content:center; text-align:center; gap:14px !important; padding:18px !important; }
+  .ag-flexrow > *{ min-width:0; }
+  .ag-card-head{ flex-wrap:wrap; gap:6px; }
+  .ag-head{ flex-direction:column; align-items:flex-start; gap:10px; padding-bottom:14px; margin-bottom:18px; }
+  .ag-head h1{ font-size:30px; }
+  .ag-head .sub{ font-size:13px; max-width:none; }
+  .ag-head .meta{ text-align:left; white-space:normal; }
+  .ag-stat .value{ font-size:28px; }
+  .ag-card-body{ padding:14px; }
+  /* stack each disease row: name, then conditions + action, then the meter */
+  .ag-disease{ grid-template-columns:1fr; gap:10px; padding:14px 16px; }
+  /* the weather tile's right divider becomes a bottom divider when stacked */
+  .ag-wtile{ padding-right:0; border-right:none; padding-bottom:14px;
+             border-bottom:1px solid var(--ag-line-soft); }
+  .ag-advice{ flex-direction:column; gap:10px; }
+  .ag-foot{ gap:12px; }
+  /* wide tables scroll inside their own card instead of stretching the page */
+  .ag-card:has(table.ag-data){ overflow-x:auto; }
+  table.ag-data{ min-width:520px; }
+  table.ag-data th, table.ag-data td{ padding:9px 11px; }
+}
+@media (max-width:520px){
+  .ag-head h1{ font-size:25px; line-height:1.14; }
+  .ag-stat-grid{ grid-template-columns:1fr !important; }
+  .week-strip .day{ height:28px; }
+  .week-strip .axis{ font-size:8px; }
+  .ag-rank{ padding:22px 16px 16px; }
+  .ag-driver .pct{ width:34px; }
+  .block-container{ padding-top:1rem; }
+}
 </style>
 """
 
