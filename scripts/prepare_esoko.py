@@ -46,6 +46,8 @@ MARKET_TO_DISTRICT = {
     "kicukiro-center": ("Kicukiro", "Kigali City"),
     "gahanga": ("Kicukiro", "Kigali City"),
     "nyabugogo": ("Nyarugenge", "Kigali City"),
+    "kimisagara": ("Nyarugenge", "Kigali City"),
+    "ruhango": ("Ruhango", "Southern"),
     # --- best-effort: CONFIRM these (same sector name can exist in >1 district) ---
     "gahoromani": ("Kirehe", "Eastern"),     # confirm
     "karambi": ("Huye", "Southern"),         # confirm
@@ -54,6 +56,7 @@ MARKET_TO_DISTRICT = {
     "mulindi": ("Gicumbi", "Northern"),      # confirm
     "nyagahinga": ("Burera", "Northern"),    # confirm
     "mubyangabo": ("Musanze", "Northern"),   # confirm (uncertain)
+    "congonil": ("Rutsiro", "Western"),     # confirm (Congo-Nile crest market; verify district)
 }
 
 
@@ -106,7 +109,7 @@ def prepare(src):
         "market": df[c_mkt].astype(str).str.lower().str.strip(),
         # Esoko dates look like "Mon Jun 22 2026 13:28:47 GMT+0200 (...)" -> trim the tz text
         "date": pd.to_datetime(df[c_date].astype(str).str.replace(r"\s*GMT.*$", "", regex=True),
-                               errors="coerce"),
+                               errors="coerce", format="mixed"),
         "farmgate": pd.to_numeric(df[c_farm], errors="coerce"),
     })
     d["crop"] = d["product"].map(to_crop)
