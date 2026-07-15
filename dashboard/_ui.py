@@ -600,6 +600,7 @@ def render_sidebar_nav(user):
         sb.page_link(path, label=t(label), icon=icon)
     sb.markdown(f"<div class='nav-sec'>{t('Channels')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/5_USSD_Preview.py", label=t("USSD Preview"), icon=":material/dialpad:")
+    sb.page_link("pages/9_Farmer_Alerts.py", label=t("Farmer Alerts"), icon=":material/sms:")
     sb.markdown(f"<div class='nav-sec'>{t('Account')}</div>", unsafe_allow_html=True)
     sb.page_link("pages/6_Settings.py", label=t("Settings"), icon=":material/settings:")
     sb.page_link("pages/8_Feedback.py", label=t("Feedback"), icon=":material/rate_review:")
