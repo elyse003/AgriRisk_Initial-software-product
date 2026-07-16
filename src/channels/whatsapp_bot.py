@@ -170,6 +170,47 @@ def _detect_variety(text, crop):
     return None
 
 
+def _risk_explainer(lvl: str, ra: float, cc: float, ff: float, rw: bool):
+    """Turn the raw risk drivers into a plain-language reason + one action.
+
+    The seasonal-risk model scores PRICE-SPIKE risk from three real signals:
+    rainfall below normal (a dry spell / too much sun hurts the harvest and
+    pushes prices up), rising food prices, and rising fertilizer costs. We
+    surface the strongest driver so a farmer hears *why* and *what to do*,
+    not just 'Medium'. Returns (reason, action) already in the right language.
+    """
+    from config.settings import RISK_THRESHOLDS
+    med = RISK_THRESHOLDS["medium"]
+
+    def s(r, e):
+        return r if rw else e
+
+    if ra <= med["rain"]:                       # rainfall below normal -> dry spell
+        return (s("imvura iri munsi ya bisanzwe (izuba ryinshi), umusaruro ushobora kugabanuka",
+                  "rainfall is below normal (a dry spell), so harvests may drop and prices rise"),
+                s("twikira ubutaka kugira ngo bubike amazi, kandi utegure kubika umusaruro uwugurishe nyuma",
+                  "mulch to hold soil moisture, and store part of your harvest to sell later"))
+    if ra >= 0.8:                               # well above normal -> heavy rain / disease
+        return (s("imvura nyinshi cyane, hari ibyago by'indwara n'amazi menshi mu murima",
+                  "very heavy rain, raising the risk of disease and waterlogging"),
+                s("nyereza amazi mu murima kandi urebe indwara nka kirabiranya (blight)",
+                  "drain your field and watch for blight/fungal disease"))
+    if cc > med["cpi"]:                         # food prices climbing
+        return (s("ibiciro by'ibiribwa biriyongera ku isoko",
+                  "food prices are climbing on the market"),
+                s("tegura kugurisha neza kandi ubike niba bishoboka",
+                  "time your sales carefully and store if you can"))
+    if ff > med["fert"]:                        # fertilizer costs up
+        return (s("ibiciro by'ifumbire byazamutse",
+                  "fertilizer prices have risen"),
+                s("gura ifumbire hakiri kare, ukoreshe ingano isabwa gusa",
+                  "buy inputs early and use only the recommended amount"))
+    return (s("ibiciro bishobora guhinduka muri iki gihembwe",
+              "prices could swing this season"),
+            s("kurikirana isoko mbere yo kugurisha",
+              "check the market before you sell"))
+
+
 def answer(text: str, ctx: dict | None = None) -> str:
     """Return the bilingual reply for a farmer's message.
 
@@ -255,7 +296,17 @@ def answer(text: str, ctx: dict | None = None) -> str:
                 lvl = None
         if lvl is None:                                  # fall back to the rule-based label
             lvl = label_risk(ra, cc, ff)
-        return say(f"{district}: ibyago bingana {lvl}.", f"{district}: risk {lvl}.")
+        word_rw = {"High": "biri hejuru", "Medium": "biri hagati",
+                   "Low": "biri hasi"}.get(lvl, lvl)
+        # Low risk with no weather extreme -> reassure; otherwise name the driver + action
+        if lvl == "Low" and ra < 0.8:                    # calm season, nothing pressing
+            return say(f"{district}: ibyago {word_rw}. Ibihe bisa nk'ibisanzwe — komeza gahunda yawe.",
+                       f"{district}: risk is low. Conditions look normal — stick to your plan.")
+        reason, action = _risk_explainer(lvl, ra, cc, ff, rw)
+        cap = lambda s: s[:1].upper() + s[1:]            # sentence-case the phrases
+        reason, action = cap(reason), cap(action)
+        return say(f"{district}: ibyago {word_rw}. {reason}. {action}.",
+                   f"{district}: risk {lvl}. {reason}. {action}.")
 
     if intent == "disease":
         if not district:
