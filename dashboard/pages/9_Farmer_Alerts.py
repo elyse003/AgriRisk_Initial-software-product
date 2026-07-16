@@ -18,6 +18,17 @@ from src.channels.sms_alerts import build_alert, send_weekly_alerts
 from src.channels.sms_gateway import send_sms, is_live
 import os
 
+# Belt-and-suspenders: keys set in the Streamlit Cloud "Secrets" box populate
+# st.secrets but do not always reach os.getenv (which the SMS gateway reads).
+# Copy them across here, before is_live() is ever called, so a correctly-set
+# key flips the page to SANDBOX/LIVE even if the startup bridge did not run.
+for _k in ("AT_USERNAME", "AT_API_KEY", "AT_SENDER_ID", "SMS_PROVIDER", "SMS_DRY_RUN"):
+    try:
+        if _k in st.secrets and str(st.secrets[_k]).strip():
+            os.environ[_k] = str(st.secrets[_k]).strip()
+    except Exception:
+        pass
+
 user = setup("Farmer Alerts", "Enrol farmers and send SMS price & risk alerts",
              allowed_roles=("officer", "super_admin"))
 if user.get("role") not in ("officer", "super_admin"):
@@ -49,6 +60,36 @@ insight_panel([
     (colour, t("Send mode"), mode),
     ("var(--ag-sage)", t("Subscribers"), str(n)),
 ], lead=t("Farmer SMS channel"), strong=mode, meta=mode_help)
+
+# ---- diagnostics: why is it in this mode? --------------------------------
+# Shows exactly what the app detects, so a stuck DRY-RUN is easy to explain
+# (missing key, unparsed secrets, etc.). No secret values are ever printed.
+if mode == "dry-run":
+    with st.expander(t("Why is it in DRY-RUN? (diagnostics)")):
+        def _seen(k):
+            in_env = bool(os.getenv(k, "").strip())
+            try:
+                in_sec = k in st.secrets and bool(str(st.secrets[k]).strip())
+            except Exception:
+                in_sec = False
+            return in_env, in_sec
+        try:
+            n_secrets = len(list(st.secrets.keys()))
+            secrets_ok = True
+        except Exception as e:  # secrets file failed to parse
+            n_secrets, secrets_ok = 0, False
+            st.error(t("Streamlit could not read your Secrets — usually a TOML "
+                       "formatting error. Detail: {err}").format(err=str(e)))
+        st.write({
+            t("secrets loaded"): secrets_ok,
+            t("# of secret keys"): n_secrets,
+            "AT_USERNAME": {"env": _seen("AT_USERNAME")[0], "secret": _seen("AT_USERNAME")[1]},
+            "AT_API_KEY": {"env": _seen("AT_API_KEY")[0], "secret": _seen("AT_API_KEY")[1]},
+            "is_live()": is_live(),
+        })
+        st.caption(t("Both AT_USERNAME and AT_API_KEY must show True. If 'secrets "
+                     "loaded' is False, fix the TOML. If a key shows secret=True "
+                     "but env=False, reboot the app to pick up the latest code."))
 
 st.divider()
 
