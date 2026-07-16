@@ -13,6 +13,18 @@ if ROOT not in sys.path:
 import pandas as pd
 import streamlit as st
 
+# Bridge Streamlit secrets -> environment variables. On Streamlit Cloud, secrets
+# set in the Secrets box are exposed via st.secrets, NOT os.environ, but the SMS
+# gateway, DATABASE_URL and AGRIRISK_SECRET are read with os.getenv(). Copy any
+# string secrets across once at startup so those are picked up (e.g. AT_USERNAME,
+# AT_API_KEY -> the Farmer Alerts page can leave dry-run for sandbox/live).
+try:
+    for _k, _v in st.secrets.items():
+        if isinstance(_v, str):
+            os.environ.setdefault(_k, _v)
+except Exception:
+    pass
+
 from config.settings import CROPS, DISTRICTS, DISTRICT_COORDS, MODELS_STORE, data_path
 from _i18n import t, LANGUAGES
 
