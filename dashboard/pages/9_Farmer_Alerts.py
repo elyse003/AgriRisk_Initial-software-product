@@ -80,9 +80,14 @@ if mode == "dry-run":
             n_secrets, secrets_ok = 0, False
             st.error(t("Streamlit could not read your Secrets — usually a TOML "
                        "formatting error. Detail: {err}").format(err=str(e)))
+        try:
+            key_names = sorted(st.secrets.keys())  # names only, never values
+        except Exception:
+            key_names = []
         st.write({
             t("secrets loaded"): secrets_ok,
             t("# of secret keys"): n_secrets,
+            t("secret key names"): key_names,
             "AT_USERNAME": {"env": _seen("AT_USERNAME")[0], "secret": _seen("AT_USERNAME")[1]},
             "AT_API_KEY": {"env": _seen("AT_API_KEY")[0], "secret": _seen("AT_API_KEY")[1]},
             "is_live()": is_live(),
