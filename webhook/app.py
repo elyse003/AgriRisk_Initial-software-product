@@ -20,23 +20,14 @@ from fastapi.responses import JSONResponse, Response
 
 from src.channels.whatsapp_bot import converse
 from src.channels.sms_alerts import handle_keyword
+from src.db.connection import get_bot_session, set_bot_session
 
 app = FastAPI(title="AgriRisk farmer assistant webhook")
 
 # Per-sender conversation memory so SMS/WhatsApp match the in-app chat: a farmer can
-# text "price" then "beans" then "Musanze" across messages. Kept in memory with a
-# short TTL (a texting session is bursty). Note: this assumes a single worker; for
-# multiple workers/instances move this to the DB or a shared cache.
-_SESSIONS: dict[str, tuple] = {}
-_SESSION_TTL = 20 * 60   # seconds
-
-
-def _get_state(sender: str) -> dict:
-    ent = _SESSIONS.get(sender)
-    if ent and (time.time() - ent[1]) <= _SESSION_TTL:
-        return ent[0]
-    _SESSIONS.pop(sender, None)
-    return {}
+# text "price" then "beans" then "Musanze" across messages. Stored in the shared
+# DB (not an in-memory dict) so a multi-turn exchange survives across web-worker
+# processes and free-tier container restarts (e.g. on Render).
 
 
 def _reply(body: str, sender: str) -> str:
@@ -44,8 +35,8 @@ def _reply(body: str, sender: str) -> str:
     kw = handle_keyword(body, sender)
     if kw is not None:
         return kw
-    reply, state = converse(body, _get_state(sender))
-    _SESSIONS[sender] = (state, time.time())
+    reply, state = converse(body, get_bot_session(sender))
+    set_bot_session(sender, state)
     return reply
 
 

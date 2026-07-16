@@ -174,6 +174,17 @@ subscribers = Table(
     Column("language", String(5), default="rw"),
 )
 
+# Per-sender conversation state for the SMS/WhatsApp bot. Stored in the DB (not an
+# in-memory dict) so a multi-turn exchange (e.g. "potatoes in Musanze" -> pick a
+# variety) survives across web-worker processes and container restarts on hosts
+# like Render. `state` is a small JSON blob; `updated_at` drives the TTL.
+bot_sessions = Table(
+    "bot_sessions", metadata,
+    Column("sender", String(64), primary_key=True),
+    Column("state", Text),
+    Column("updated_at", Float),      # unix seconds (dialect-agnostic, easy TTL math)
+)
+
 SAMPLE_SUBSCRIBERS = [
     {"phone_number": "0788000101", "district": "Musanze", "crops": "potatoes,maize", "language": "rw"},
     {"phone_number": "0788000102", "district": "Bugesera", "crops": "beans,maize", "language": "rw"},
@@ -326,6 +337,44 @@ def add_subscriber(phone, district, crops, language="rw"):
         return False   # phone already subscribed
     except Exception:
         return False
+
+
+def get_bot_session(sender, ttl_seconds=1800):
+    """Return the saved conversation state for this sender, or {} if none/expired."""
+    _ensure()
+    import json, time
+    try:
+        with engine().connect() as conn:
+            row = conn.execute(select(bot_sessions.c.state, bot_sessions.c.updated_at)
+                               .where(bot_sessions.c.sender == sender)).first()
+        if not row or row[1] is None or (time.time() - float(row[1])) > ttl_seconds:
+            return {}
+        return json.loads(row[0] or "{}")
+    except Exception:
+        return {}
+
+
+def set_bot_session(sender, state):
+    """Upsert the conversation state for this sender."""
+    _ensure()
+    import json, time
+    try:
+        with engine().begin() as conn:
+            conn.execute(delete(bot_sessions).where(bot_sessions.c.sender == sender))
+            conn.execute(insert(bot_sessions).values(
+                sender=sender, state=json.dumps(state or {}), updated_at=time.time()))
+        return True
+    except Exception:
+        return False
+
+
+def clear_bot_session(sender):
+    _ensure()
+    try:
+        with engine().begin() as conn:
+            conn.execute(delete(bot_sessions).where(bot_sessions.c.sender == sender))
+    except Exception:
+        pass
 
 
 def remove_subscriber(phone):
