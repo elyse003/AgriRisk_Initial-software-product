@@ -30,11 +30,17 @@ crop_pick = c2.selectbox(t("Crop"), [_ALL] + list(CROPS),
 sel_crop = None if crop_pick == _ALL else crop_pick
 scope_label = _ALL if sel_crop is None else crop_label(sel_crop)
 
+# day/week window: the disease module is the one place with DAILY data, so a
+# 7-day (this week) vs 14-day view is meaningful here (unlike the monthly prices).
+horizon = st.radio(t("Forecast window"), [7, 14], index=1, horizontal=True,
+                   format_func=lambda d: t("This week (7 days)") if d == 7 else t("Two weeks (14 days)"))
+hlabel = t("{n}-day").format(n=horizon)
+
 page_header(
     t('Disease Alert').upper(),
     f"<em>{t('Climate-driven')}</em> {t('disease alerts')} · {district} · {scope_label}",
-    t("Crop disease warnings for the next 14 days, based on the local weather forecast."),
-    meta_strong=t("14-day horizon"), meta_sub=t("updated hourly"))
+    t("Crop disease warnings for the next {n} days, based on the local weather forecast.").format(n=horizon),
+    meta_strong=t("{n}-day horizon").format(n=horizon), meta_sub=t("updated hourly"))
 urban_notice(district)
 
 # live: recompute whenever the district or crop changes, no button
@@ -46,6 +52,9 @@ if district:
         daily = {"temperature_2m_min": [16] * 14, "temperature_2m_max": [22] * 14,
                  "relative_humidity_2m_mean": [90] * 14, "precipitation_sum": [6] * 14}
         live = False
+
+    # clip the daily forecast to the chosen window (7 or 14 days)
+    daily = {k: (v[:horizon] if isinstance(v, list) else v) for k, v in daily.items()}
 
     temps = [(lo + hi) / 2 for lo, hi in zip(daily["temperature_2m_min"], daily["temperature_2m_max"])]
     rh = daily["relative_humidity_2m_mean"]
@@ -70,7 +79,7 @@ if district:
     full.sort(key=lambda a: {"High": 0, "Medium": 1, "Low": 2}[a["risk"]])
     n_active = sum(1 for a in full if a["risk"] != "Low")
 
-    st.caption(t("Live 14-day weather forecast.") if live else t("Offline mode: showing a sample forecast."))
+    st.caption(t("Live {n}-day weather forecast.").format(n=horizon) if live else t("Offline mode: showing a sample forecast."))
 
     # ---- weather context strip ----
     def tile(label, value, note, color):
@@ -81,7 +90,7 @@ if district:
     rh_tone = "var(--ag-terra)" if rh_mean >= 85 else "var(--ag-sage)"
     temp_tone = "var(--ag-terra)" if 13 <= temp_mean <= 24 else "var(--ag-amber)"
     tiles = (
-        tile(t("14-day rainfall"), f"{rain_total:.0f}mm",
+        tile(t("{n}-day rainfall").format(n=horizon), f"{rain_total:.0f}mm",
              t("Wet, sustained leaf wetness") if rain_total >= 40 else t("Dry, lower fungal pressure"), rain_tone) +
         tile(t("Mean temperature"), f"{temp_mean:.1f}°C",
              t("Within blight-favourable window") if 13 <= temp_mean <= 24 else t("Outside main blight window"), temp_tone) +
@@ -90,7 +99,7 @@ if district:
     strip = "".join(f'<div class="day r{r}" title="Day +{i}: risk {r}/4"></div>' for i, r in enumerate(days))
     axis = "".join(f"<div>+{i}</div>" for i in range(n))
     st.markdown(f"""<div class="ag-card ag-pagein" style="margin-bottom:18px">
-      <div class="ag-card-head"><div class="title">14-DAY <strong>{t('WEATHER CONTEXT')}</strong></div>
+      <div class="ag-card-head"><div class="title">{hlabel.upper()} <strong>{t('WEATHER CONTEXT')}</strong></div>
         <div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district}</div></div>
       <div class="ag-card-body">
         <div class="ag-grid" style="--cols:1fr 1fr 1fr;gap:24px;margin-bottom:18px">{tiles}</div>
@@ -99,7 +108,7 @@ if district:
       </div></div>""", unsafe_allow_html=True)
 
     # ---- plain-language reading of the weather (what drives disease) ----
-    rain_i = (t("Wet 14 days ({mm}mm), leaves stay wet, which lets fungal spores spread.").format(mm=f"{rain_total:.0f}")
+    rain_i = (t("Wet {n} days ({mm}mm), leaves stay wet, which lets fungal spores spread.").format(n=horizon, mm=f"{rain_total:.0f}")
               if rain_total >= 40 else t("Fairly dry ({mm}mm), lower fungal pressure.").format(mm=f"{rain_total:.0f}"))
     temp_i = (t("{c}°C on average, inside the range blights favour.").format(c=f"{temp_mean:.1f}")
               if 13 <= temp_mean <= 24 else t("{c}°C on average, outside the main blight window.").format(c=f"{temp_mean:.1f}"))
@@ -109,13 +118,13 @@ if district:
         ("var(--ag-slate)", t("Rain & leaf wetness"), rain_i),
         ("var(--ag-amber)", t("Temperature"), temp_i),
         ("var(--ag-terra)", t("Humidity"), rh_i),
-    ], lead=t("What this means"), strong=t("Right now"), meta=f"{district} · {t('next 14 days')}")
+    ], lead=t("What this means"), strong=t("Right now"), meta=f"{district} · {t('next {n} days').format(n=horizon)}")
 
     # ---- recommendations: one clear "what to do" per disease (always shown) ----
     risk_col = {"High": "var(--ag-terra)", "Medium": "var(--ag-amber)", "Low": "var(--ag-sage)"}
     tick = lambda b: "✓" if b else "✗"
     if n_active == 0:
-        summary = t("No elevated disease risk in the next 14 days, the steps below are preventive.")
+        summary = t("No elevated disease risk in the next {n} days, the steps below are preventive.").format(n=horizon)
     else:
         summary = t("{n} disease(s) at elevated risk for {scope}. Act on the highlighted steps.").format(
             n=n_active, scope=scope_label)

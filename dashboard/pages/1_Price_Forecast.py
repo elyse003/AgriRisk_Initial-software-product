@@ -23,11 +23,19 @@ models = load_price_forecaster()
 esoko = load_esoko()
 ratios = load_farmgate_ratios()
 
+NATIONAL = t("National average")                       # aggregate across all districts
 c1, c2 = st.columns(2)
 crop = c1.selectbox(t("Crop"), CROPS, format_func=crop_label)
-district = c2.selectbox(t("District"), DISTRICTS)
+district = c2.selectbox(t("District"), [NATIONAL] + list(DISTRICTS))
+is_national = district == NATIONAL
 cl = crop_label(crop)
 tint = CROP_TINT.get(crop, "#6F5A34")
+
+# history window (the "date range" filter). WFP data is monthly, so we filter by
+# months of history shown, not day/week (which the monthly data can't support).
+_RANGES = {t("1 year"): 12, t("2 years"): 24, t("3 years"): 36, t("All"): None}
+rlabel = st.radio(t("History shown"), list(_RANGES), index=1, horizontal=True)
+months = _RANGES[rlabel]
 
 # beans & potatoes have varieties/grades in the Esoko data, let the user pick one
 variety = None
@@ -45,7 +53,8 @@ page_header(
     t("What a farmer is likely to be paid next month, the farmgate price, from "
       "recent market data."),
     meta_strong="RWF/kg", meta_sub=t("farmgate · monthly"))
-urban_notice(district)
+if not is_national:
+    urban_notice(district)
 
 # live: recompute + redraw whenever any filter (crop / district / type) changes, no button
 if crop and district:
@@ -65,7 +74,11 @@ if crop and district:
     real_fg = outlook["level"] == "farmgate"
     national = outlook["source"] == "national"     # no local history -> national average
     badge = "Esoko" if real_fg else (t("national avg") if national else t("estimated"))
-    if national and real_fg:
+    if is_national:                                 # user explicitly asked for the national rollup
+        badge = t("national avg")
+        src_note = t("Rwanda national average across all districts (median of market prices), "
+                     "expressed as a farmgate price; next-month trend from the model.")
+    elif national and real_fg:
         src_note = t("No local price history for {district}, so the trend uses Rwanda's national "
                      "average; the price level is a real Esoko farmgate figure.").format(district=district)
     elif national:
@@ -101,7 +114,7 @@ if crop and district:
         <div class="value">{fc:,.0f}<span class="unit">RWF/kg</span></div>
         <div class="delta {dcls}"><span>{arrow}</span>{pct:+.1f}% · {trend}</div></div>
     </div>""", unsafe_allow_html=True)
-    if national:
+    if national and not is_national:
         st.markdown(
             f'<div class="ag-pagein" style="font-family:var(--f-mono);font-size:11.5px;color:var(--ag-ink-soft);'
             f'margin:-8px 0 16px;padding:8px 14px;border-radius:8px;background:var(--ag-bg-deep)">'
@@ -110,7 +123,7 @@ if crop and district:
             f'</div>', unsafe_allow_html=True)
 
     # ---- chart card ----
-    hist = s.tail(24)
+    hist = s if months is None else s.tail(months)
     real_set = set(outlook.get("real_dates", []))
     real_flags = [d in real_set for d in hist.index]
     n_real = sum(real_flags)
@@ -128,7 +141,7 @@ if crop and district:
     note = t("Solid dots are real Esoko farmgate months; the rest of the line is estimated from market prices.")
     st.markdown(
         f'<div class="ag-card ag-pagein" style="margin-bottom:18px">'
-        f'<div class="ag-card-head"><div class="title">24 {t("MONTHS HISTORY")} · <strong>1 {t("MONTH FORECAST")}</strong></div>'
+        f'<div class="ag-card-head"><div class="title">{len(hist)} {t("MONTHS HISTORY")} · <strong>1 {t("MONTH FORECAST")}</strong></div>'
         f'<div style="font-family:var(--f-mono);font-size:10.5px;color:var(--ag-mute)">{district}</div></div>'
         f'<div class="ag-card-body"><div class="ag-legend">{legend}</div>{svg}'
         f'<div style="font-size:10.5px;font-family:var(--f-mono);color:var(--ag-mute);margin-top:6px">{note}</div>'
@@ -182,5 +195,27 @@ if crop and district:
     st.markdown(f"""<div class="ag-foot">
       <div><span class="label">{t('Note')}:</span> {t('Next-month estimate. Confirm with local market conditions.')}</div>
     </div>""", unsafe_allow_html=True)
+
+    # ---- multi-district aggregation: this crop across every district ----
+    with st.expander(t("Compare all districts (national view)")):
+        rows = []
+        for d in DISTRICTS:
+            o = price_outlook(prices, models, crop, d, esoko=esoko, ratios=ratios, variety=variety)
+            if o and o["forecast"] is not None:
+                rows.append({t("District"): d, t("Now (RWF/kg)"): round(o["current"]),
+                             t("Next month"): round(o["forecast"]),
+                             t("Change %"): round(o["pct"], 1) if o["pct"] is not None else None,
+                             "_local": o["source"] == "district"})
+        if rows:
+            comp = pd.DataFrame(rows)
+            nat_now = int(comp[t("Now (RWF/kg)")].mean())
+            local_n = int(comp["_local"].sum())
+            st.caption(t("National average now: ~{p} RWF/kg · {n}/{tot} districts have local market history "
+                         "(the rest use the national trend).").format(
+                         p=f"{nat_now:,}", n=local_n, tot=len(comp)))
+            st.dataframe(comp.drop(columns="_local").sort_values(t("Now (RWF/kg)"), ascending=False),
+                         use_container_width=True, hide_index=True)
+        else:
+            st.info(t("No comparable price data for this crop yet."))
 else:
-    st.info(t("Pick a crop and district, then click **Generate Forecast**."))
+    st.info(t("Pick a crop and district to see the forecast."))

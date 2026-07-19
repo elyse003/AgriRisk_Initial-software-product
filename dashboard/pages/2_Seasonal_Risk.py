@@ -213,5 +213,26 @@ if district and season_label:
       <div><span class="label">{t('Based on')}:</span> {t('Rainfall, food prices and fertilizer costs')}</div>
       <div><span class="label">{t('Note')}:</span> {t('Decision support only. Confirm with local extension advice.')}</div>
     </div>""", unsafe_allow_html=True)
+
+    # ---- national view: risk level across every district this season ----
+    with st.expander(t("Risk across all districts (national view)")):
+        latest = (rain[rain.season == scode].sort_values("date")
+                  .groupby("district").tail(1).set_index("district")["rainfall_anomaly"])
+        rows = []
+        for d in DISTRICTS:
+            ra = float(latest[d]) if d in latest.index else float(rain.rainfall_anomaly.mean())
+            if model is not None:
+                lvl = str(model.predict(rc.feature_row(ra, cpi_c, fert_c, d))[0])
+            else:
+                lvl = label_risk(ra, cpi_c, fert_c)
+            rows.append({t("District"): d, t("Risk"): t(lvl + " risk"),
+                         t("Rainfall vs normal"): round(ra, 2), "_o": {"High": 0, "Medium": 1, "Low": 2}[lvl]})
+        comp = pd.DataFrame(rows)
+        hi = int((comp["_o"] == 0).sum()); md = int((comp["_o"] == 1).sum()); lo = int((comp["_o"] == 2).sum())
+        st.caption(t("This season, nationally: {hi} High, {md} Medium, {lo} Low. "
+                     "Food prices and fertilizer costs are national; rainfall differs by district.").format(
+                     hi=hi, md=md, lo=lo))
+        st.dataframe(comp.sort_values("_o").drop(columns="_o"),
+                     use_container_width=True, hide_index=True)
 else:
     st.info(t("Pick a district and season, then click **Assess Risk**."))
