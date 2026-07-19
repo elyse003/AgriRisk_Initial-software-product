@@ -25,8 +25,13 @@ _OPT_OUT = {"stop", "hagarika", "end", "unsubscribe"}
 
 
 def build_alert(sub: dict) -> str:
-    """Compose one subscriber's weekly alert (kept short for SMS)."""
-    rw = (sub.get("language") or "rw") == "rw"
+    """Compose one subscriber's weekly alert (kept short for SMS).
+
+    English is the default; a subscriber only gets Kinyarwanda if their record
+    explicitly says language == 'rw' (set at enrolment). This standardises the
+    outbound channel on English while keeping Kinyarwanda available on request.
+    """
+    rw = (sub.get("language") or "en") == "rw"
     district = (sub.get("district") or "").strip()
     crops = [c.strip() for c in (sub.get("crops") or "").split(",") if c.strip()]
     lines = []
@@ -60,22 +65,29 @@ def send_weekly_alerts(dry_run: bool | None = None, limit: int | None = None) ->
     return results
 
 
+# the Kinyarwanda opt-in/out words; texting these is how a farmer chooses Kinyarwanda
+_RW_KEYWORDS = {"yego", "hagarika"}
+
+
 def handle_keyword(text: str, sender: str):
-    """Process a YEGO/STOP keyword from an inbound SMS. Returns the reply to send,
-    or None if `text` isn't an opt-in/out keyword (so the bot handles it normally)."""
+    """Process a START/STOP (or YEGO/HAGARIKA) keyword from an inbound SMS.
+
+    English is the default; a farmer who texts the Kinyarwanda keyword is opting
+    into Kinyarwanda, so we both reply and enrol them in that language. Returns
+    the reply to send, or None if `text` isn't a keyword (bot handles it normally).
+    """
     t = (text or "").strip().lower()
+    rw = t in _RW_KEYWORDS
     if t in _OPT_OUT:
         remove_subscriber(sender)
         return ("Wahagaritse imiburo ya AgriRisk. Andika YEGO kongera kwiyandikisha."
-                if _looks_rw(sender) else
-                "You've stopped AgriRisk alerts. Reply YEGO to rejoin.")
+                if rw else
+                "You've stopped AgriRisk alerts. Reply START to rejoin.")
     if t in _OPT_IN:
         district = user_district(sender)               # seed district from the user record if known
-        add_subscriber(sender, district, "maize,beans,potatoes", "rw")
+        add_subscriber(sender, district, "maize,beans,potatoes", "rw" if rw else "en")
         return ("Wiyandikishije! Uzajya wakira imiburo y'igiciro n'ibyago buri cyumweru. "
-                "Andika STOP guhagarika.")
+                "Andika STOP guhagarika."
+                if rw else
+                "You're subscribed! You'll get weekly price & risk alerts. Reply STOP to opt out.")
     return None
-
-
-def _looks_rw(_sender) -> bool:
-    return True   # default replies in Kinyarwanda; refine per-subscriber later

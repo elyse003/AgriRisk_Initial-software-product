@@ -106,7 +106,7 @@ with st.form("add_sub", border=False):
     district = c2.selectbox(t("District"), DISTRICTS)
     c3, c4 = st.columns(2)
     crops = c3.multiselect(t("Crops"), CROPS, default=["maize", "beans"])
-    lang = c4.selectbox(t("Language"), ["rw", "en"],
+    lang = c4.selectbox(t("Language"), ["en", "rw"],
                         format_func=lambda x: "Kinyarwanda" if x == "rw" else "English")
     if st.form_submit_button(t("Add subscriber"), type="primary"):
         p = (phone or "").strip()

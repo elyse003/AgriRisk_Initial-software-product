@@ -84,6 +84,22 @@ def _lime_rate_kg_ha(ph) -> int:
     return 0
 
 
+def _fertility_factor(fertility) -> float:
+    """Adjust the blanket N-P-K rate to the district's RAB soil-fertility class.
+
+    Rich volcanic andosols (fertility 5, e.g. Musanze/Burera) already supply
+    nutrients, so they need less external fertilizer; poor humic ferralsols
+    (fertility 2, e.g. Gicumbi/Nyaruguru) need more to hit the same target yield.
+    A fertility of 3 is the national baseline (factor 1.0), so a plan without a
+    district is unchanged. Bounded to ±20% so recommendations stay realistic.
+    """
+    table = {1: 1.20, 2: 1.15, 3: 1.00, 4: 0.90, 5: 0.80}
+    try:
+        return table.get(int(fertility), 1.0)
+    except (TypeError, ValueError):
+        return 1.0
+
+
 def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
                    budget_rwf: float, district: str | None = None):
     """Size a fertilizer plan to the farmer's land, and, when a district is given,
@@ -98,10 +114,14 @@ def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
     crop = crop.lower()
     rows = []
 
-    # district-specific soil correction: lime for acidic districts (before planting)
+    # district agro profile drives BOTH the soil correction (lime, by pH) and the
+    # N-P-K rate (by soil fertility) so the plan genuinely differs where soil differs.
+    ap = None
+    fert_factor = 1.0
     if district:
         from config.district_agro import agro_profile
         ap = agro_profile(district)
+        fert_factor = _fertility_factor(ap.get("fertility"))
         lime_rate = _lime_rate_kg_ha(ap.get("ph"))
         if lime_rate:
             need_kg = lime_rate * land_ha
@@ -116,17 +136,21 @@ def recommend_plan(catalogue: pd.DataFrame, crop: str, land_ha: float,
                 "line_cost": int(bags * LIME_PRICE_RWF),
             })
 
-    for name_key, rate, stage in CROP_PLAN.get(crop, []):
+    for name_key, base_rate, stage in CROP_PLAN.get(crop, []):
         match = catalogue[catalogue["input_name"].str.contains(name_key, case=False, na=False)]
         if match.empty:
             continue
         row = match.iloc[0]
         price = float(row["price_rwf"])
+        rate = round(base_rate * fert_factor)              # district soil-fertility adjustment
+        note = stage
+        if ap is not None and fert_factor != 1.0:
+            note = f"{stage} (soil fertility {ap.get('fertility')}/5: {fert_factor - 1:+.0%} rate)"
         required_kg = rate * land_ha
         bags = max(1, math.ceil(required_kg / BAG_KG))
         rows.append({
             "fertilizer": row["input_name"],
-            "when": stage,
+            "when": note,
             "rate_kg_ha": rate,
             "need_kg": round(required_kg),
             "bags_50kg": bags,
