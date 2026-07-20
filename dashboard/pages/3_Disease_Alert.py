@@ -7,7 +7,7 @@ forecast), disease rows with risk meters, and the FAO rule-base table.
 from _ui import setup, page_header, urban_notice, insight_panel, risk_meter
 from _i18n import t, crop_label
 import streamlit as st
-from config.settings import DISTRICT_COORDS, CROPS, DISEASE_RULES
+from config.settings import DISTRICT_COORDS, CROPS, DISEASE_RULES, DISTRICTS
 from src.models.disease_alert import fetch_forecast, assess_crop_full
 
 setup("Disease Alert", "Crop disease warnings from the local weather",
@@ -23,7 +23,7 @@ def _forecast(district):
 
 
 c1, c2 = st.columns(2)
-district = c1.selectbox(t("District"), list(DISTRICT_COORDS))
+district = c1.selectbox(t("District"), [d for d in DISTRICTS if d in DISTRICT_COORDS])
 _ALL = t("All crops")
 crop_pick = c2.selectbox(t("Crop"), [_ALL] + list(CROPS),
                          format_func=lambda c: c if c == _ALL else crop_label(c))

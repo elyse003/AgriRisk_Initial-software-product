@@ -29,18 +29,21 @@ CROPS = ["maize", "beans", "potatoes"]
 PILOT_DISTRICTS = ["Musanze", "Bugesera"]
 LANGUAGES = ["rw", "en"]  # Kinyarwanda, English
 
-# --- all 30 districts of Rwanda, grouped by province ---
+# --- all 30 districts of Rwanda ---
+# Ordered for the farmer audience: Musanze (a key farming district) leads and is
+# the sensible default; the three Kigali City districts are urban, so they sit
+# LAST. This order drives every district dropdown in the app.
 DISTRICTS = [
-    # Kigali City
-    "Nyarugenge", "Gasabo", "Kicukiro",
-    # Northern
-    "Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo",
+    # Northern (Musanze first — default)
+    "Musanze", "Burera", "Gakenke", "Gicumbi", "Rulindo",
     # Southern
     "Gisagara", "Huye", "Kamonyi", "Muhanga", "Nyamagabe", "Nyanza", "Nyaruguru", "Ruhango",
     # Eastern
     "Bugesera", "Gatsibo", "Kayonza", "Kirehe", "Ngoma", "Nyagatare", "Rwamagana",
     # Western
     "Karongi", "Ngororero", "Nyabihu", "Nyamasheke", "Rubavu", "Rusizi", "Rutsiro",
+    # Kigali City (urban — listed last)
+    "Nyarugenge", "Gasabo", "Kicukiro",
 ]
 
 # approximate district-centre coordinates (lat, lon) for the weather API
