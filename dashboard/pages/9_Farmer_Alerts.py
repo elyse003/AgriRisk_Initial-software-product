@@ -61,41 +61,6 @@ insight_panel([
     ("var(--ag-sage)", t("Subscribers"), str(n)),
 ], lead=t("Farmer SMS channel"), strong=mode, meta=mode_help)
 
-# ---- diagnostics: why is it in this mode? --------------------------------
-# Shows exactly what the app detects, so a stuck DRY-RUN is easy to explain
-# (missing key, unparsed secrets, etc.). No secret values are ever printed.
-if mode == "dry-run":
-    with st.expander(t("Why is it in DRY-RUN? (diagnostics)")):
-        def _seen(k):
-            in_env = bool(os.getenv(k, "").strip())
-            try:
-                in_sec = k in st.secrets and bool(str(st.secrets[k]).strip())
-            except Exception:
-                in_sec = False
-            return in_env, in_sec
-        try:
-            n_secrets = len(list(st.secrets.keys()))
-            secrets_ok = True
-        except Exception as e:  # secrets file failed to parse
-            n_secrets, secrets_ok = 0, False
-            st.error(t("Streamlit could not read your Secrets — usually a TOML "
-                       "formatting error. Detail: {err}").format(err=str(e)))
-        try:
-            key_names = sorted(st.secrets.keys())  # names only, never values
-        except Exception:
-            key_names = []
-        st.write({
-            t("secrets loaded"): secrets_ok,
-            t("# of secret keys"): n_secrets,
-            t("secret key names"): key_names,
-            "AT_USERNAME": {"env": _seen("AT_USERNAME")[0], "secret": _seen("AT_USERNAME")[1]},
-            "AT_API_KEY": {"env": _seen("AT_API_KEY")[0], "secret": _seen("AT_API_KEY")[1]},
-            "is_live()": is_live(),
-        })
-        st.caption(t("Both AT_USERNAME and AT_API_KEY must show True. If 'secrets "
-                     "loaded' is False, fix the TOML. If a key shows secret=True "
-                     "but env=False, reboot the app to pick up the latest code."))
-
 st.divider()
 
 # ---- enrol a farmer ------------------------------------------------------

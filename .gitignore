@@ -1,40 +1,42 @@
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
 venv/
 .venv/
 *.egg-info/
 
-# env / secrets  (never commit: Google OAuth client secret, cookie secret,
-# AGRIRISK_SECRET, API keys)
+# --- Secrets: never commit ---
+# Google OAuth client secret, cookie secret, AGRIRISK_SECRET, CPaaS API keys.
 .env
 .streamlit/secrets.toml
 !.streamlit/secrets.toml.example
 
-# The cleaned processed data (small, real) and trained models ARE committed so
-# the app clones-and-runs on real data with no rebuild step. Both are regenerable
+# --- Data ---
+# The cleaned processed data (small, real) and the trained models ARE committed,
+# so the app clones-and-runs on real data with no rebuild step. Both regenerate
 # via scripts/download_data.py -> prepare_data.py -> train_models.py.
-
-# Large raw source downloads are NOT committed (regenerate with download_data.py):
+# Large raw source downloads are NOT committed:
 data/raw/wfp_food_prices_rwa.csv
 data/raw/rwa-rainfall-subnat-full.csv
 data/raw/CMO-Historical-Data-Monthly.xlsx
 data/raw/worldbank_cpi_rwanda.csv
 
-# mlflow
-mlruns/
-
-# notebooks
-.ipynb_checkpoints/
-
-# OS
-.DS_Store
-
-# runtime database (auto-created)
+# runtime database (auto-created) and local exports
 data/agririsk.db
 *.db
-temp_auto_push.bat
-temp_interactive_push.bat
-.gitignore
-branch_structure.json
 data/feedback_export.csv
+
+# --- Documents ---
+# The dissertation, proposal and any exported write-ups stay OUT of the public
+# repo (submitted separately; avoids self-plagiarism flags on resubmission).
+*.docx
+*.pdf
+
+# --- Tooling ---
+mlruns/
+.ipynb_checkpoints/
+
+# --- OS ---
+.DS_Store
+desktop.ini
+Thumbs.db
