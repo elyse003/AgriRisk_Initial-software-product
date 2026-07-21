@@ -53,7 +53,7 @@ html, body, [class*="css"] { font-family:'Poppins',sans-serif; color:var(--ink);
 /* force Poppins across every Streamlit widget (beats the default Source Sans),
    but leave the Material icon font alone so icons still render */
 .stApp *:not([data-testid="stIconMaterial"]):not(.material-icons):not(.material-symbols-outlined){ font-family:'Poppins', sans-serif !important; }
-.block-container { padding-top: 0.75rem; max-width: 1050px; }
+.block-container { padding-top: 0.75rem; padding-left: 2.5rem; padding-right: 2.5rem; max-width: 1500px; }
 section[data-testid="stSidebar"] { background:#FFFFFF; }
 section[data-testid="stSidebar"] * { color:var(--ink); }
 section[data-testid="stSidebar"] a { border-radius:8px; }
