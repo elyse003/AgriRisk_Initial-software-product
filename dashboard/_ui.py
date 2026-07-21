@@ -44,12 +44,16 @@ CSS = """
    logs/settings; viewers never see it, so it doesn't affect the farmer/officer UI. */
 [data-testid="stAppDeployButton"],
 [data-testid="stAppViewBadge"], [class*="viewerBadge"] { display:none !important; }
+/* The top bar is empty now (menu/deploy hidden), so shrink it to reclaim the
+   dead space above each page's title; keep it transparent and non-zero so the
+   mobile sidebar reopen arrow still has somewhere to sit. */
+[data-testid="stHeader"] { height:2.25rem; background:transparent; }
 .stApp { background: var(--paper); }
 html, body, [class*="css"] { font-family:'Poppins',sans-serif; color:var(--ink); }
 /* force Poppins across every Streamlit widget (beats the default Source Sans),
    but leave the Material icon font alone so icons still render */
 .stApp *:not([data-testid="stIconMaterial"]):not(.material-icons):not(.material-symbols-outlined){ font-family:'Poppins', sans-serif !important; }
-.block-container { padding-top: 2rem; max-width: 1050px; }
+.block-container { padding-top: 0.75rem; max-width: 1050px; }
 section[data-testid="stSidebar"] { background:#FFFFFF; }
 section[data-testid="stSidebar"] * { color:var(--ink); }
 section[data-testid="stSidebar"] a { border-radius:8px; }

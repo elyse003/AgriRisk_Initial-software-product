@@ -1,4 +1,8 @@
 [theme]
+# base = "light" pins the theme so the loading skeleton between pages uses the
+# cream background too, instead of flashing Streamlit's dark default when the
+# viewer's OS is in dark mode.
+base = "light"
 primaryColor = "#2D6A4F"
 backgroundColor = "#F6F2E8"
 secondaryBackgroundColor = "#FFFFFF"
