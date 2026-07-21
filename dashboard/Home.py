@@ -86,12 +86,4 @@ def _landing_html():
 
 style, body = _landing_html()
 
-# if already signed in, carry the token so opening the dashboard keeps the session
-from _auth import auth_qs                                          # noqa: E402
-
-_qs = auth_qs()
-if _qs:
-    body = body.replace('href="/Dashboard" target="_self"',
-                        f'href="/Dashboard{_qs}" target="_self"')
-
 st.markdown(style + body, unsafe_allow_html=True)
