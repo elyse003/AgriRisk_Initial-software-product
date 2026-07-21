@@ -86,9 +86,16 @@ def _landing_html():
 
 style, body = _landing_html()
 
-# if already signed in, carry the token so opening the dashboard keeps the session
-from _auth import auth_qs                                          # noqa: E402
+from _auth import auth_qs, current_user                            # noqa: E402
 
+# A signed-in user should never be dumped on the marketing hero — e.g. when a
+# reload or a stray link lands them back on "/". Send them straight to the app
+# hub instead, so reloading always keeps them inside the dashboard.
+if current_user():
+    st.switch_page("pages/0_Dashboard.py")
+
+# not signed in: keep the landing, but carry the token on the CTA so opening the
+# dashboard keeps the session
 _qs = auth_qs()
 if _qs:
     body = body.replace('href="/Dashboard" target="_self"',
