@@ -104,17 +104,6 @@ def _user_from_google():
 def current_user():
     user = st.session_state.get("auth_user")
     if user:
-        # Keep the signed token in the URL on EVERY authenticated render. Sidebar
-        # page-links drop query params, so without this a full browser reload (F5)
-        # would find no token, lose the session, and bounce to the login screen.
-        # Re-asserting it here means a reload restores the session on the SAME page.
-        tok = st.session_state.get("auth_token") or _make_token(user)
-        st.session_state["auth_token"] = tok
-        try:
-            if st.query_params.get(_QP) != tok:
-                st.query_params[_QP] = tok
-        except Exception:
-            pass
         return user
     # restore from a token in the URL (survives the full reload some links cause)
     try:
