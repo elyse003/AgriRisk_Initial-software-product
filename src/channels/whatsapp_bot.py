@@ -416,11 +416,6 @@ def converse(text: str, state: dict | None = None):
     # gibberish/off-topic: give the domain decline and CLEAR the sticky state, so a
     # leftover "price" intent doesn't keep re-asking "Which crop?" for junk input.
     recognized = bool(p["intent"] or p["crop"] or p["district"] or p["land_ha"] or p["budget"])
-    if not recognized and state.get("variety_asked"):
-        tl = (text or "").strip().lower()
-        if (tl.isdigit() or tl in ("0", "all", "any", "all types", "byose", "zose", "bwose")
-                or _detect_variety(text, state.get("crop") or "")):
-            recognized = True
     if not recognized:
         return answer(text), {}
 
@@ -433,16 +428,9 @@ def converse(text: str, state: dict | None = None):
     if intent is None and crop and district:             # crop + district across turns -> price
         intent = "price"
 
-    # guided type step: beans & potatoes have varieties -> ask which one, once
-    if intent == "price" and district and variety is None and crop in ("beans", "potatoes"):
-        vs = crop_varieties(crop)
-        if vs and state.get("variety_asked"):
-            variety = _resolve_variety(text, vs, crop)   # this turn is the menu reply
-        elif vs:
-            return _variety_prompt(crop, vs, rw), {
-                "intent": intent, "crop": crop, "district": district,
-                "land_ha": land_ha, "budget": budget, "variety": None, "variety_asked": True}
-
+    # Direct answer (no USSD-style "which type?" menu): for beans & potatoes we
+    # answer with the all-types average unless the farmer named a variety in their
+    # message (_detect_variety above). Keeps WhatsApp/chat conversational, not menu-driven.
     merged = {"intent": intent, "crop": crop, "district": district,
               "land_ha": land_ha, "budget": budget, "variety": variety}
     reply = answer(text, ctx=merged)
