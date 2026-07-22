@@ -104,6 +104,19 @@ def _user_from_google():
 def current_user():
     user = st.session_state.get("auth_user")
     if user:
+        # Persist the signed token in the URL *query* so a full browser reload (F5)
+        # restores the session. Crucially the token is only ever a passenger in the
+        # address bar here — it is added AFTER navigation and is never put inside a
+        # nav link. (A link that carries ?t=... breaks Streamlit's page router, which
+        # is what made the dashboard cards get stuck.) Guarded so it writes once per
+        # page and doesn't loop.
+        tok = st.session_state.get("auth_token") or _make_token(user)
+        st.session_state["auth_token"] = tok
+        try:
+            if st.query_params.get(_QP) != tok:
+                st.query_params[_QP] = tok
+        except Exception:
+            pass
         return user
     # restore from a token in the URL (survives the full reload some links cause)
     try:
