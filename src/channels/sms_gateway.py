@@ -47,7 +47,7 @@ def _send_africastalking(to: str, message: str) -> dict:
     sender = os.getenv("AT_SENDER_ID")
     if sender:
         data["from"] = sender
-    r = requests.post(url, data=data, timeout=20, headers={
+    r = requests.post(url, data=data, timeout=12, headers={
         "apiKey": os.getenv("AT_API_KEY", ""),
         "Accept": "application/json",
         "Content-Type": "application/x-www-form-urlencoded",
@@ -59,13 +59,13 @@ def _send_africastalking(to: str, message: str) -> dict:
 def _send_twilio(to: str, message: str) -> dict:
     sid = os.getenv("TWILIO_SID", "")
     url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
-    r = requests.post(url, timeout=20, auth=(sid, os.getenv("TWILIO_TOKEN", "")),
+    r = requests.post(url, timeout=12, auth=(sid, os.getenv("TWILIO_TOKEN", "")),
                       data={"To": to, "From": os.getenv("TWILIO_FROM", ""), "Body": message})
     r.raise_for_status()
     return {"provider": "twilio", "status": "sent", "response": r.json()}
 
 
-def send_sms(to: str, message: str, dry_run: bool | None = None, retries: int = 3) -> dict:
+def send_sms(to: str, message: str, dry_run: bool | None = None, retries: int = 2) -> dict:
     """Send one SMS (or simulate it). Returns a small result dict; never raises
     on a provider error, it reports it, so a bad number can't stop a batch.
     Retries a few times so a transient network/TLS blip doesn't fail the send."""

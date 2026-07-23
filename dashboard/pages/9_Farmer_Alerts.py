@@ -111,7 +111,8 @@ st.caption(f"{len(preview)} {t('characters')}")
 if st.button(t("Send test to this number"), type="primary", disabled=not (tphone or "").strip()):
     msg = build_alert({"phone_number": tphone.strip(), "district": tdist,
                        "crops": tcrop, "language": "rw"})
-    res = send_sms(tphone.strip(), msg)
+    with st.spinner(t("Sending…")):
+        res = send_sms(tphone.strip(), msg, retries=1)   # single attempt so a blocked network fails fast
     if res["status"] in ("sent", "dry-run"):
         st.success(t("{mode}: message to {phone} — {status}.").format(
             mode=mode, phone=tphone.strip(), status=res["status"]))
