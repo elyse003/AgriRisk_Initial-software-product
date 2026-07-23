@@ -1,4 +1,4 @@
-"""Farmer SMS alerts (officer + admin): enrol subscribers and send the weekly
+"""Farmer SMS alerts (officer + admin): enroll subscribers and send the weekly
 price + seasonal-risk alert over the SMS gateway (Africa's Talking by default).
 
 This is the officer console for the low-bandwidth channels that reach farmers on
@@ -29,7 +29,7 @@ for _k in ("AT_USERNAME", "AT_API_KEY", "AT_SENDER_ID", "SMS_PROVIDER", "SMS_DRY
     except Exception:
         pass
 
-user = setup("Farmer Alerts", "Enrol farmers and send SMS price & risk alerts",
+user = setup("Farmer Alerts", "Enroll farmers and send SMS price & risk alerts",
              allowed_roles=("officer", "super_admin"))
 if user.get("role") not in ("officer", "super_admin"):
     st.error(t("This page is for extension officers and administrators."))
@@ -63,8 +63,8 @@ insight_panel([
 
 st.divider()
 
-# ---- enrol a farmer ------------------------------------------------------
-st.markdown(f"#### {t('Enrol a farmer')}")
+# ---- enroll a farmer ------------------------------------------------------
+st.markdown(f"#### {t('Enroll a farmer')}")
 with st.form("add_sub", border=False):
     c1, c2 = st.columns(2)
     phone = c1.text_input(t("Phone number"), placeholder="+2507...")
@@ -92,14 +92,14 @@ if n:
         remove_subscriber(rm)
         st.rerun()
 else:
-    st.info(t("No subscribers yet. Enrol a farmer above, or they can text YEGO to opt in."))
+    st.info(t("No subscribers yet. Enroll a farmer above, or they can text YEGO to opt in."))
 
 st.divider()
 
 # ---- preview + send one ---------------------------------------------------
-st.markdown(f"#### {t('Preview & send a test')}")
+st.markdown(f"#### {t('Preview & send a text')}")
 pc1, pc2, pc3 = st.columns(3)
-tphone = pc1.text_input(t("Test phone"), placeholder="+2507...")
+tphone = pc1.text_input(t("Phone number "), placeholder="+2507...")
 tdist = pc2.selectbox(t("District "), DISTRICTS, key="tdist")
 tcrop = pc3.selectbox(t("Crop"), CROPS, key="tcrop")
 preview = build_alert({"phone_number": tphone or "+250...", "district": tdist,
@@ -108,7 +108,7 @@ st.markdown(f"<div class='ag-note'><strong>{t('Message preview')}:</strong><br>{
             unsafe_allow_html=True)
 st.caption(f"{len(preview)} {t('characters')}")
 
-if st.button(t("Send test to this number"), type="primary", disabled=not (tphone or "").strip()):
+if st.button(t("Send text to this number"), type="primary", disabled=not (tphone or "").strip()):
     msg = build_alert({"phone_number": tphone.strip(), "district": tdist,
                        "crops": tcrop, "language": "rw"})
     with st.spinner(t("Sending…")):
