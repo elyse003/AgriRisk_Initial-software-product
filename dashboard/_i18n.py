@@ -635,3 +635,11 @@ RW.update({
     'National average now: ~{p} RWF/kg · {n}/{tot} districts have local market history (the rest use the national trend).': "Impuzandengo y'igihugu ubu: ~{p} RWF/kg · uturere {n}/{tot} tufite amateka y'isoko yaho (utundi dukoresha icyerekezo cy'igihugu).",
     '{mode}: message to {phone} — {status}.': '{mode}: ubutumwa kuri {phone} — {status}.',
 })
+
+# ---- sign-up privacy policy (draft) ----
+RW.update({
+    'Privacy Policy': "Politiki y'Ibanga",
+    'I have read and agree to the Privacy Policy.': "Nasomye kandi nemera Politiki y'Ibanga.",
+    'Please accept the Privacy Policy to create an account.': "Emera Politiki y'Ibanga kugira ngo ufungure konti.",
+    '**How AgriRisk uses your data**  \n- We store only your name, username, district and optional phone number, plus the questions you ask and the alerts you receive.  \n- We use it to give you price, seasonal-risk, disease and input advice, and to send the SMS alerts you subscribe to. Reply STOP to any SMS to stop them.  \n- We do not sell your data. Evaluation/research data is anonymised — a participant code only, never your name or phone.  \n- You may ask an administrator to delete your account and data at any time.': "**Uko AgriRisk ikoresha amakuru yawe**  \n- Tubika gusa izina ryawe, izina ukoresha, akarere, na nimero ya telefoni (ntibisabwa), hamwe n'ibibazo ubaza n'imiburo wakira.  \n- Tubikoresha kuguha inama ku giciro, ibyago by'igihembwe, indwara n'ifumbire, no kohereza imiburo ya SMS wiyandikishije. Andika STOP kuri SMS kugira ngo uhagarike.  \n- Ntitugurisha amakuru yawe. Amakuru y'ubushakashatsi ahishwa amazina — kode y'uwitabiriye gusa, atari izina cyangwa telefoni yawe.  \n- Ushobora gusaba umuyobozi gusiba konti yawe n'amakuru yawe igihe icyo ari cyo cyose.",
+})

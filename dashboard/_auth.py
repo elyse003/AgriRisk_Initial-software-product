@@ -294,6 +294,17 @@ def _signup_form():
         pw2 = c2.text_input(t("Confirm password"), type="password")
         district = st.selectbox(t("District"), ["Nationwide"] + DISTRICTS)
         phone = st.text_input(t("Phone (optional)"))
+        with st.expander(t("Privacy Policy")):
+            st.markdown(t(
+                "**How AgriRisk uses your data**  \n"
+                "- We store only your name, username, district and optional phone number, "
+                "plus the questions you ask and the alerts you receive.  \n"
+                "- We use it to give you price, seasonal-risk, disease and input advice, and to "
+                "send the SMS alerts you subscribe to. Reply STOP to any SMS to stop them.  \n"
+                "- We do not sell your data. Evaluation/research data is anonymised — a "
+                "participant code only, never your name or phone.  \n"
+                "- You may ask an administrator to delete your account and data at any time."))
+        agree = st.checkbox(t("I have read and agree to the Privacy Policy."))
         submitted = st.form_submit_button(t("Create account"), type="primary", use_container_width=True)
     # New accounts are farmers; an administrator promotes trusted users to officer.
     st.caption(t("New accounts are farmers. An administrator can upgrade you to "
@@ -306,6 +317,8 @@ def _signup_form():
             st.error(t("Passwords do not match."))
         elif len(pw) < 6:
             st.error(t("Password must be at least 6 characters."))
+        elif not agree:
+            st.error(t("Please accept the Privacy Policy to create an account."))
         else:
             ok = add_user(name, "farmer", district=district, phone=(phone.strip() or None),
                           language=st.session_state.get("lang", "en"),
