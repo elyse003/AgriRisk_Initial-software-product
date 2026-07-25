@@ -116,6 +116,15 @@ if st.button(t("Send text to this number"), type="primary", disabled=not (tphone
     if res["status"] in ("sent", "dry-run"):
         st.success(t("{mode}: message to {phone} — {status}.").format(
             mode=mode, phone=tphone.strip(), status=res["status"]))
+        # Surface Africa's Talking' actual per-recipient result: a 200 response can
+        # still say "Sent to 0/1" or a non-Success status, which is why nothing
+        # reaches the simulator. This shows exactly what the provider did.
+        smd = (res.get("response") or {}).get("SMSMessageData", {}) if isinstance(res.get("response"), dict) else {}
+        if smd.get("Message"):
+            st.caption(f"Africa's Talking: {smd['Message']}")
+        for rcp in smd.get("Recipients", []):
+            st.caption(f"→ {rcp.get('number')}: **{rcp.get('status')}** · "
+                       f"cost {rcp.get('cost')} · id {rcp.get('messageId', '—')}")
     else:
         st.error(t("Send failed: {err}").format(err=res.get("error", "unknown")))
 
