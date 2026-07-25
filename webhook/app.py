@@ -9,6 +9,7 @@ Deploy:      see render.yaml (free Render web service)
 """
 import sys
 import time
+import traceback
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -31,13 +32,31 @@ app = FastAPI(title="AgriRisk farmer assistant webhook")
 
 
 def _reply(body: str, sender: str) -> str:
-    """YEGO/STOP opt-in-out first, otherwise the stateful bot answer (same as chat)."""
-    kw = handle_keyword(body, sender)
-    if kw is not None:
-        return kw
-    reply, state = converse(body, get_bot_session(sender))
-    set_bot_session(sender, state)
-    return reply
+    """YEGO/STOP opt-in-out first, otherwise the stateful bot answer (same as chat).
+
+    Resilient by design: the conversation-memory store (DB) is a NICE-TO-HAVE, not
+    a dependency of answering. If reading/writing it fails (e.g. an ephemeral DB on
+    a free host), the bot still replies for this turn — it just loses multi-turn
+    memory. Any real error is logged to stdout (Render logs) instead of 500-ing,
+    so Twilio always gets a valid reply."""
+    try:
+        kw = handle_keyword(body, sender)
+        if kw is not None:
+            return kw
+        try:
+            state = get_bot_session(sender)
+        except Exception:
+            traceback.print_exc()
+            state = {}                                   # answer without memory this turn
+        reply, new_state = converse(body, state)
+        try:
+            set_bot_session(sender, new_state)
+        except Exception:
+            traceback.print_exc()
+        return reply
+    except Exception:
+        traceback.print_exc()                            # full trace -> Render logs
+        return "Sorry, I hit a problem answering that. Please try again in a moment."
 
 
 def _twiml(message: str) -> Response:
