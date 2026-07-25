@@ -71,11 +71,12 @@ GOOGLE_DEFAULT_ROLE = "farmer"     # least privilege; an admin promotes to offic
 
 
 def google_enabled() -> bool:
-    try:
-        auth = st.secrets.get("auth", {})
-        return bool(auth.get("google", {}).get("client_id"))
-    except Exception:
-        return False
+    # Google sign-in is disabled: the OIDC redirect flow was unreliable in this
+    # deployment, so we ship username/password only. This one switch hides the
+    # "Continue with Google" button on both the sign-in and sign-up screens and
+    # turns off the OAuth session paths. To re-enable later, restore the check:
+    #   return bool(st.secrets.get("auth", {}).get("google", {}).get("client_id"))
+    return False
 
 
 def _oidc_identity():
