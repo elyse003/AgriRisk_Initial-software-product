@@ -1,11 +1,13 @@
-# Webhook service (separate from the Streamlit app). The bot uses pandas (no ML
-# model loading); SMS opt-in/out (YEGO/STOP) reads/writes the shared subscribers
-# DB, and the CPaaS gateway uses plain HTTP.
+# Webhook service (separate from the Streamlit app). The bot answers price & risk
+# questions, so it imports the model modules and loads the trained scikit-learn
+# models; SMS opt-in/out (YEGO/STOP) reads/writes the shared subscribers DB, and
+# the CPaaS gateway uses plain HTTP.
 fastapi
 uvicorn[standard]
 python-multipart
 pandas
 numpy
+scikit-learn==1.9.0   # price_forecasting/risk_classifier import sklearn AND the .pkl models unpickle with it
 python-dotenv
 requests
 sqlalchemy>=2.0
