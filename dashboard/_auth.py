@@ -297,14 +297,20 @@ def _signup_form():
         phone = st.text_input(t("Phone (optional)"))
         with st.expander(t("Privacy Policy")):
             st.markdown(t(
-                "**How AgriRisk uses your data**  \n"
-                "- We store only your name, username, district and optional phone number, "
+                "**How AgriRisk uses your data — and your control over it**  \n\n"
+                "**Advice, not instruction.** Every figure we give — price, risk, disease or "
+                "input — is an estimate that carries a stated margin of error. It is decision "
+                "support: the decision always stays with you, the farmer. We never present an "
+                "estimate as a certainty you must act on.  \n"
+                "**What we store.** Only your name, username, district and optional phone number, "
                 "plus the questions you ask and the alerts you receive.  \n"
-                "- We use it to give you price, seasonal-risk, disease and input advice, and to "
-                "send the SMS alerts you subscribe to. Reply STOP to any SMS to stop them.  \n"
-                "- We do not sell your data. Evaluation/research data is anonymised — a "
-                "participant code only, never your name or phone.  \n"
-                "- You may ask an administrator to delete your account and data at any time."))
+                "**What we use it for.** To give you price, seasonal-risk, disease and input "
+                "advice, and to send the alerts you subscribe to. We do not sell your data. "
+                "Research data is anonymised — a participant code only, never your name or phone.  \n"
+                "**Consent you can withdraw.** You can leave at any time by texting **STOP** — one "
+                "keyword, on the cheapest channel, no web form. That ends all delivery and removes "
+                "your record. Consent you cannot withdraw is not consent, so the exit is always "
+                "one message away."))
         agree = st.checkbox(t("I have read and agree to the Privacy Policy."))
         submitted = st.form_submit_button(t("Create account"), type="primary", use_container_width=True)
     # New accounts are farmers; an administrator promotes trusted users to officer.
