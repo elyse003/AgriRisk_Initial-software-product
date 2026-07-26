@@ -684,3 +684,14 @@ RW.update({
     'Edit a price, add a row, or delete one — then Save. Changes apply immediately to the Input Recommender. Every row needs an input name and a price.': "Hindura igiciro, ongeraho umurongo, cyangwa usibe umwe — hanyuma ubike. Impinduka zikora ako kanya ku Input Recommender. Buri murongo ukeneye izina ry'ikoresho n'igiciro.",
     'Could not save — every row needs an input name and a numeric price.': "Ntibyashobotse kubika — buri murongo ukeneye izina ry'ikoresho n'igiciro cy'imibare.",
 })
+
+# ---- page titles/subtitles/nav (reached via t(variable)) ----
+RW.update({
+    'Advisory Summary': "Incamake y'Inama",
+    'Enroll farmers and send SMS price & risk alerts': "Andika abahinzi wohereze imiburo ya SMS y'ibiciro n'ibyago",
+    'Feature-phone menu demo': 'Igerageza rya menu ya telefoni isanzwe',
+    'Help us evaluate AgriRisk': 'Dufashe gusuzuma AgriRisk',
+    'Next-month farmgate price by crop and district': "Igiciro ku murima cy'ukwezi gutaha ku gihingwa n'akarere",
+    'One consolidated advisory to download and share': "Incamake imwe y'inama yo kuramo no gusangira",
+    'Update the input prices the recommender uses': "Vugurura ibiciro by'ibikoresho bikoreshwa",
+})
