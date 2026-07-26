@@ -648,3 +648,14 @@ RW.update({
 RW.update({
     '**How AgriRisk uses your data — and your control over it**  \n\n**Advice, not instruction.** Every figure we give — price, risk, disease or input — is an estimate that carries a stated margin of error. It is decision support: the decision always stays with you, the farmer. We never present an estimate as a certainty you must act on.  \n**What we store.** Only your name, username, district and optional phone number, plus the questions you ask and the alerts you receive.  \n**What we use it for.** To give you price, seasonal-risk, disease and input advice, and to send the alerts you subscribe to. We do not sell your data. Research data is anonymised — a participant code only, never your name or phone.  \n**Consent you can withdraw.** You can leave at any time by texting **STOP** — one keyword, on the cheapest channel, no web form. That ends all delivery and removes your record. Consent you cannot withdraw is not consent, so the exit is always one message away.': "**Uko AgriRisk ikoresha amakuru yawe — n'uburyo uyagenzura**  \n\n**Inama, atari itegeko.** Buri gaciro tuguha — igiciro, ibyago, indwara cyangwa ifumbire — ni igereranyo gifite urwego rw'amakosa ruvuzwe. Ni ubufasha mu gufata icyemezo: icyemezo gisigara ari icyawe, wowe muhinzi. Ntitwerekana igereranyo nk'ukuri ugomba gukurikiza.  \n**Icyo tubika.** Izina ryawe gusa, izina ukoresha, akarere na nimero ya telefoni (ntibisabwa), hamwe n'ibibazo ubaza n'imiburo wakira.  \n**Icyo tubikoresha.** Kuguha inama ku giciro, ibyago by'igihembwe, indwara n'ifumbire, no kohereza imiburo wiyandikishije. Ntitugurisha amakuru yawe. Amakuru y'ubushakashatsi ahishwa amazina — kode y'uwitabiriye gusa, atari izina cyangwa telefoni.  \n**Ubwumvikane ushobora kwikuramo.** Ushobora kuva igihe icyo ari cyo cyose wandika STOP — ijambo rimwe, ku muyoboro uhendutse, nta rupapuro rwo kuzuza. Ibyo bihagarika kohereza byose kandi bigasiba inyandiko yawe. Ubwumvikane udashobora kwikuramo si ubwumvikane, bityo inzira yo kuva iba ihari ubutumwa bumwe gusa.",
 })
+
+# ---- advisory summary download ----
+RW.update({
+    'Advisory summary': "Incamake y'inama",
+    'Generated': 'Byakozwe',
+    'PRICE OUTLOOK': "IGITEGEREZO CY'IGICIRO",
+    'Likely range': 'Urwego rushoboka',
+    'RECOMMENDATION': 'ICYIFUZO',
+    'Download advisory summary': "Kuramo incamake y'inama",
+    'This is an estimate with a stated margin of error. The decision stays with the farmer; confirm with local conditions.': "Iki ni igereranyo gifite urwego rw'amakosa ruvuzwe. Icyemezo gisigara ari icy'umuhinzi; genzura ku bihe byo aho.",
+})

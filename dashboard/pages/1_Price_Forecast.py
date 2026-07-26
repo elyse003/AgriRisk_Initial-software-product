@@ -196,6 +196,26 @@ if crop and district:
       <div><span class="label">{t('Note')}:</span> {t('Next-month estimate. Confirm with local market conditions.')}</div>
     </div>""", unsafe_allow_html=True)
 
+    # ---- downloadable advisory summary (officer saves / shares it) ----
+    stamp = pd.Timestamp.now().strftime("%Y-%m-%d")
+    name = f"{cl}{f' ({variety})' if variety else ''}"
+    summary = (
+        f"AgriRisk — {t('Advisory summary')}\n"
+        f"{t('Generated')}: {stamp}\n"
+        f"{t('Crop')}: {name}\n{t('District')}: {district}\n\n"
+        f"{t('PRICE OUTLOOK')} ({badge})\n"
+        f"  {t('Current price')}: {cur:,.0f} RWF/kg\n"
+        f"  {t('Next-month forecast')}: {fc:,.0f} RWF/kg ({pct:+.1f}%, {trend})\n"
+        f"  {t('Likely range')}: {lo:,.0f} - {hi:,.0f} RWF/kg\n"
+        f"  {src_note}\n\n"
+        f"{t('RECOMMENDATION')}: {badge_word}\n  {advice}\n\n"
+        f"{t('This is an estimate with a stated margin of error. The decision stays with '
+          'the farmer; confirm with local conditions.')}\n"
+    )
+    st.download_button(t("Download advisory summary"), data=summary.encode("utf-8"),
+                       file_name=f"agririsk_{crop}_{district}_{stamp}.txt",
+                       mime="text/plain", icon=":material/download:")
+
     # ---- multi-district aggregation: this crop across every district ----
     with st.expander(t("Compare all districts (national view)")):
         rows = []
