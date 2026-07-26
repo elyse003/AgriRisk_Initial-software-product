@@ -518,6 +518,7 @@ NAV_CONSOLE = [
     ("pages/2_Seasonal_Risk.py",     "Seasonal Risk",     ":material/thermostat:"),
     ("pages/3_Disease_Alert.py",     "Disease Alert",     ":material/coronavirus:"),
     ("pages/4_Input_Recommender.py", "Input Recommender", ":material/compost:"),
+    ("pages/10_Advisory_Summary.py", "Advisory Summary",  ":material/summarize:"),
 ]
 
 SIDEBAR_CSS = """
