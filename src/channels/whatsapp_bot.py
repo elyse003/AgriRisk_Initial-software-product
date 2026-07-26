@@ -264,18 +264,28 @@ def answer(text: str, ctx: dict | None = None) -> str:
             return say(f"Nta makuru y'igiciro cy'{crop} muri {district} ahari.",
                        f"No price data for {crop} in {district}.")
         cur, fc = o["current"], o["forecast"]
-        real = o["level"] == "farmgate"                  # real Esoko vs estimated farmgate
-        lvl_rw = "ku murima" if real else "ku murima (~)"
-        lvl_en = "farmgate" if real else "farmgate ~"
+        national = o["source"] == "national"             # trend built on the national series
+        real = o["level"] == "farmgate"                  # real Esoko level vs estimated farmgate
+        if national and not real:
+            # Genuinely no local figure to build on -> the whole number is the
+            # nationwide average. Say so plainly. (When `real`, the current price is
+            # a real local Esoko figure even if the trend borrows the national one.)
+            lbl_rw = lbl_en = ""
+            note_rw = f" Iyi ni impuzandengo y'igihugu kubera ko {district} idafite amakuru ahagije."
+            note_en = f" This is Rwanda's national average due to {district}'s thin data."
+        else:
+            lbl_rw = " (ku murima)" if real else " (ku murima (~))"
+            lbl_en = " (farmgate)" if real else " (farmgate ~)"
+            note_rw = note_en = ""
         name = f"{crop.title()} {variety}" if variety else crop.title()
         if fc is None:                                   # fall back to the latest price
-            return say(f"{name}, {district} ({lvl_rw}): hafi {cur:,.0f} RWF/kg ubu.",
-                       f"{name}, {district} ({lvl_en}): about {cur:,.0f} RWF/kg now.")
+            return say(f"{name}, {district}{lbl_rw}: hafi {cur:,.0f} RWF/kg ubu.{note_rw}",
+                       f"{name}, {district}{lbl_en}: about {cur:,.0f} RWF/kg now.{note_en}")
         pct = o["pct"] or 0.0
         tr_rw, tr_en = (("birazamuka", "rising") if pct > 1 else
                         ("biragabanuka", "falling") if pct < -1 else ("bihagaze", "stable"))
-        return say(f"{name}, {district} ({lvl_rw}): ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).",
-                   f"{name}, {district} ({lvl_en}): now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).")
+        return say(f"{name}, {district}{lbl_rw}: ubu {cur:,.0f}, ukwezi gutaha ~{fc:,.0f} RWF/kg ({tr_rw}).{note_rw}",
+                   f"{name}, {district}{lbl_en}: now {cur:,.0f}, next month ~{fc:,.0f} RWF/kg ({tr_en}).{note_en}")
 
     if intent == "risk":
         if not district:
