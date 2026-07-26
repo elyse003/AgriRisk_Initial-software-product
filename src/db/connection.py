@@ -305,6 +305,32 @@ def fetch_catalogue():
     return pd.DataFrame()
 
 
+def save_catalogue(df) -> bool:
+    """Replace the whole input catalogue with `df` (admin edit). Every row needs
+    an input_name and a numeric price_rwf; input_id is reassigned on write. The
+    catalogue is small, so a full replace cleanly handles adds/edits/removals.
+    Returns True on success, False if the data is invalid or the write fails."""
+    _ensure()
+    cols = ["input_name", "input_type", "crop_suitability", "supplier", "district", "price_rwf"]
+    try:
+        d = df.copy()
+        d["input_name"] = d["input_name"].astype(str).str.strip()
+        d["price_rwf"] = pd.to_numeric(d["price_rwf"], errors="coerce")
+        d = d[(d["input_name"] != "") & d["input_name"].notna() & d["price_rwf"].notna()]
+        for c in cols:
+            if c not in d.columns:
+                d[c] = ""
+        rows = d[cols].where(pd.notna(d[cols]), None).to_dict("records")
+        if not rows:
+            return False
+        with engine().begin() as conn:
+            conn.execute(delete(input_catalogue))
+            conn.execute(insert(input_catalogue), rows)
+        return True
+    except Exception:
+        return False
+
+
 def subscriber_count():
     _ensure()
     try:

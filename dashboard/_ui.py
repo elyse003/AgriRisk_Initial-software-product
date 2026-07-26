@@ -623,6 +623,7 @@ def render_sidebar_nav(user):
     sb.page_link("pages/8_Feedback.py", label=t("Feedback"), icon=":material/rate_review:")
     if role == "super_admin":
         sb.page_link("pages/7_User_Management.py", label=t("User Management"), icon=":material/group:")
+        sb.page_link("pages/11_Input_Catalogue.py", label=t("Input Catalogue"), icon=":material/inventory_2:")
 
 
 @st.fragment
