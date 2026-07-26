@@ -176,7 +176,8 @@ Interface screenshots are in `docs/screenshots/`:
 ![Seasonal Risk](docs/screenshots/seasonal_risk.png)
 ![Disease Alert](docs/screenshots/disease_alert.png)
 ![Input Recommender](docs/screenshots/input_recommender.png)
-![WhatsApp chat](docs/screenshots/whatsapp_preview.png)
+![Advisory Summary](docs/screenshots/advisory_summary.png)
+![Farmer chat](docs/screenshots/whatsapp_preview.png)
 
 Figma mockup: [AgriRisk on Figma](https://www.figma.com/design/xojszh9Hb3OfHGNwGK8eNG/AgriRisk?node-id=3-2&t=hLKZUy3iGXhZkMXo-0)
 
