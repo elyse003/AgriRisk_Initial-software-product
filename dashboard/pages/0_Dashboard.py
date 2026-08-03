@@ -2,32 +2,30 @@
 
 Reached from the landing page's "Open the dashboard" button.
 """
-from _ui import setup
+from _ui import setup, open_chat
 from _i18n import t
 import streamlit as st
 
-user = setup("Dashboard", "Choose a tool to get started")
+user = setup("Dashboard", "Choose a tool to get started", header=False)
+
+# Farmers don't use the analytical tools — open the assistant as their home, filling
+# the page (no empty tool grid). setup() suppresses the floating chat for farmers.
+if user["role"] == "farmer":
+    open_chat(user.get("name", ""))
+    st.stop()
+
+# --- Officers / admin: the tool hub ---
+st.markdown(f"<div class='ar-head'>{t('Dashboard')}</div>"
+            f"<div class='ar-sub'>{t('Choose a tool to get started')}</div>", unsafe_allow_html=True)
 
 # (title, page file, description, accent colour, season stage). The page file is
-# used with st.page_link so a card click navigates client-side (like the sidebar),
-# which keeps the session — a raw <a href> did a full reload and logged the user out.
-ALL_TOOLS = [
+# used with st.page_link so a card click navigates client-side (like the sidebar).
+TOOLS = [
     ("Price Forecast", "pages/1_Price_Forecast.py", "Next-month price outlook by crop and district.", "#2D6A4F", "At selling"),
     ("Seasonal Risk", "pages/2_Seasonal_Risk.py", "Planting risk from rainfall, food inflation and fertilizer cost.", "#C76E1B", "Before planting"),
     ("Disease Alert", "pages/3_Disease_Alert.py", "Crop disease warnings from the live weather forecast.", "#DC2626", "While growing"),
     ("Input Recommender", "pages/4_Input_Recommender.py", "A fertilizer plan sized to your land and budget.", "#7C3AED", "At planting"),
 ]
-
-# Farmers get a limited view: a welcome note pointing them to the chat assistant
-# (the analytical tools are for extension officers).
-if user["role"] == "farmer":
-    st.info(f"{t('Welcome')}, {user['name']}. " + t(
-        "The full dashboard is for extension officers. Tap the chat button (bottom-right), "
-        "or open USSD Preview to try the *384# menu, both answer price, risk, disease and "
-        "input questions."))
-    TOOLS = []
-else:
-    TOOLS = ALL_TOOLS
 
 st.markdown("""<style>
 /* each card is a keyed st.container; style it to match the old tool-card look */

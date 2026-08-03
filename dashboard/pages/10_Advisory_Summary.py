@@ -50,7 +50,22 @@ if st.button(t("Generate advisory"), type="primary"):
 
 if st.session_state.get("_advisory"):
     summary = st.session_state["_advisory"]
-    st.text_area(t("Advisory preview"), summary, height=380)
+    st.markdown(f"#### {t('Advisory preview')}")
+    # Render as a clean, printable document card (bold green section headers)
+    import html as _html, re as _re
+    doc = _html.escape(summary)
+    doc = _re.sub(r"AgriRisk — (.+)", r"<div class='ad-title'>AgriRisk — \1</div>", doc, count=1)
+    doc = _re.sub(r"=== (.+?) ===", r"<div class='ad-sec'>\1</div>", doc)
+    st.markdown(
+        "<style>"
+        ".advisory-doc{background:#fff;border:1px solid #DED7C4;border-radius:16px;"
+        "padding:24px 28px;max-height:480px;overflow:auto;white-space:pre-wrap;"
+        "font-family:'Poppins',sans-serif;font-size:13.5px;line-height:1.7;color:#1C2A22;"
+        "box-shadow:0 10px 30px rgba(27,67,50,.07);}"
+        ".advisory-doc .ad-title{font-weight:700;font-size:16px;color:#1B4332;margin-bottom:4px;}"
+        ".advisory-doc .ad-sec{font-weight:700;color:#2D6A4F;letter-spacing:.04em;"
+        "margin:14px 0 2px;padding-top:10px;border-top:1px solid #EDE7D8;}</style>"
+        f"<div class='advisory-doc'>{doc}</div>", unsafe_allow_html=True)
     st.download_button(
         t("Download advisory summary"), data=summary.encode("utf-8"),
         file_name=f"agririsk_advisory_{district}_{pd.Timestamp.now().strftime('%Y-%m-%d')}.txt",

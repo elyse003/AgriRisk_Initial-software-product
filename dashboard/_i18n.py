@@ -695,3 +695,8 @@ RW.update({
     'One consolidated advisory to download and share': "Incamake imwe y'inama yo kuramo no gusangira",
     'Update the input prices the recommender uses': "Vugurura ibiciro by'ibikoresho bikoreshwa",
 })
+
+# ---- farmer open chat ----
+RW.update({
+    'Ask me about price, seasonal risk, disease or inputs — in Kinyarwanda or English.': "Mbaza ku giciro, ibyago by'igihembwe, indwara cyangwa ifumbire — mu Kinyarwanda cyangwa Icyongereza.",
+})

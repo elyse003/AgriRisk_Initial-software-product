@@ -627,9 +627,10 @@ def render_sidebar_nav(user):
 
 
 @st.fragment
-def _chat_body():
-    """Chat UI inside the popover. A fragment, so sending a message reruns only
-    this widget and the popover stays open. Reuses the WhatsApp bot's answer()."""
+def _chat_body(height=460):
+    """Chat UI (used in the floating popover for officers, and inline/open on the
+    farmer home). A fragment, so sending a message reruns only this widget. Reuses
+    the WhatsApp bot's answer()."""
     from src.channels.whatsapp_bot import converse
     st.markdown(f"<div class='ag-chat-head'><span class='dot'></span>{t('AgriRisk Assistant')}</div>",
                 unsafe_allow_html=True)
@@ -637,7 +638,7 @@ def _chat_body():
         st.session_state.chat = [("assistant", t("Hello! Ask me about price, risk, disease or inputs, "
                                                  "for example: 'maize price Musanze'."))]
     st.session_state.setdefault("chat_ctx", {})
-    box = st.container(height=460)   # taller so the panel opens higher (Eza-style)
+    box = st.container(height=height)
     for role, txt in st.session_state.chat:
         with box.chat_message("user" if role == "user" else "assistant"):
             st.write(txt)
@@ -664,6 +665,23 @@ def floating_chat():
                 _chat_body()
     except Exception:
         pass
+
+
+def open_chat(name=""):
+    """The farmer's home: an OPEN assistant that fills the page (no analytical
+    tools, no empty grid). setup() skips the floating button for farmers, so this
+    is the single chat instance."""
+    greeting = f"{t('Welcome')}, {name}" if name else t("Welcome")
+    st.markdown(
+        f"<div style='text-align:center;margin:2px auto 16px;max-width:760px'>"
+        f"<div style='font-family:Poppins,sans-serif;font-weight:600;font-size:23px;color:#1B4332'>{greeting}</div>"
+        f"<div style='color:#5E7065;font-size:14px;margin-top:4px'>"
+        f"{t('Ask me about price, seasonal risk, disease or inputs — in Kinyarwanda or English.')}</div></div>"
+        # centre the chat at a comfortable reading width (the container gets a st-key-* class)
+        "<style>div[class*='st-key-ag_farmerchat']{max-width:840px;margin:0 auto;}</style>",
+        unsafe_allow_html=True)
+    with st.container(key="ag_farmerchat"):
+        _chat_body(height=520)
 
 
 def _language_selector(dg=None):
@@ -729,7 +747,10 @@ def setup(title, subtitle, allowed_roles=None, header=True):
     if header:
         st.markdown(f"<div class='ar-head'>{t(title)}</div><div class='ar-sub'>{t(subtitle)}</div>",
                     unsafe_allow_html=True)
-    floating_chat()
+    # Officers/admin get the floating chat button; farmers get an OPEN inline chat
+    # as their home (rendered by the Dashboard page), so no duplicate chat widgets.
+    if user.get("role") != "farmer":
+        floating_chat()
     return user
 
 
