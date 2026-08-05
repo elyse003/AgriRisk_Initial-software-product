@@ -1,6 +1,6 @@
 {
   "wfp_prices": {
-    "data_through": "2026-05"
+    "data_through": "2026-06"
   },
   "cpi": {
     "data_through": "2025-07"
@@ -9,6 +9,6 @@
     "data_through": "2024-12"
   },
   "rainfall": {
-    "data_through": "2026-06"
+    "data_through": "2026-07"
   }
 }
