@@ -54,8 +54,10 @@ if st.session_state.get("_advisory"):
     # Render as a clean, printable document card (bold green section headers)
     import html as _html, re as _re
     doc = _html.escape(summary)
+    doc = doc.replace("\n\n=== ", "\n=== ")          # each section header carries its own spacing
     doc = _re.sub(r"AgriRisk — (.+)", r"<div class='ad-title'>AgriRisk — \1</div>", doc, count=1)
     doc = _re.sub(r"=== (.+?) ===", r"<div class='ad-sec'>\1</div>", doc)
+    doc = doc.rstrip("\n")
     st.markdown(
         "<style>"
         ".advisory-doc{background:#fff;border:1px solid #DED7C4;border-radius:16px;"
