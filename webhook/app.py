@@ -7,6 +7,8 @@ separate web service because Streamlit cannot receive webhooks.
 Local run:   uvicorn webhook.app:app --reload
 Deploy:      see render.yaml (free Render web service)
 """
+import utils.transport
+import utils.session
 import sys
 import time
 import traceback
